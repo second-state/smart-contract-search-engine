@@ -1,8 +1,9 @@
 # Please provide:
-# The RPC URL for the blockchain on line 5 and 
-# The raw GitHub URL to the contract's ABI on line 8 
-# This program will go ahead and find all instances of your contract and index them 
+# The RPC URL for the blockchain on line 10 and 
+# The raw GitHub URL to the contract's ABI on line 14
+# This program will go ahead and find your contract and index it 
 
+from elasticsearch import Elasticsearch # pip3 install elasticsearch 
 import requests
 import json
 from web3 import Web3, HTTPProvider
