@@ -1,4 +1,4 @@
-# Please fill in the config on lines 13 and 28 (blockchain RPC and SmartContract's raw ABI)
+# Please fill in the config betweeen lines 15 and 25 
 # Also, use a ~/.aws/config file for private config such as aws_access_key_id, aws_secret_access_key, region and output (BotoAWSRequestAuth will read these automatically if the file is present)
 
 #IMPORTS
@@ -23,6 +23,7 @@ es = Elasticsearch(
 )
 
 # FUNCTIONS
+
 def fetchAbi():
     contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/dapp/FairPlay.abi"
     contractAbiFileData = requests.get(contractAbiFileLocation)
@@ -67,7 +68,8 @@ def loadDataIntoElastic(theContractName, thePayLoad):
 # MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
 print("Latest block is %s" % latestBlockNumber)
-for blockNumber in reversed(range(latestBlockNumber)):
+#for blockNumber in reversed(range(latestBlockNumber)):
+for blockNumber in range(1562732, 1562747):
     print("\nProcessing block number %s" % blockNumber)
     # Check to see if this block has any transactions in it
     blockTransactionCount = web3.eth.getBlockTransactionCount(blockNumber)
@@ -96,27 +98,30 @@ for blockNumber in reversed(range(latestBlockNumber)):
                 if count == len(listOfKeccakHashes):
                     print("All hashes match!")
                     print("Contract address: %s " % transactionContractAddress)
-                    Abi = fetchAbi()
-                    outerData = {}
-                    contractInstance = web3.eth.contract(abi=Abi, address=transactionContractAddress)
-                    outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
-                    outerData['blockNumber'] = transactionReceipt.blockNumber 
-                    outerData['contractAddress'] = transactionReceipt.contractAddress
-                    #print(contractInstance.all_functions())
-                    callableFunctions = getPureOrViewFunctions()
-                    for callableFunction in callableFunctions:
-                        contract_func = contractInstance.functions[str(callableFunction)]
-                        result = contract_func().call()
-                        if type(result) is list:
-                            if len(result) > 0:
-                                innerData = {}
-                                for i in range(len(result)):
-                                    innerData[i] = result[i]
-                                outerData[str(callableFunction)] = innerData
-                        else:
-                            outerData[str(callableFunction)] = result
-                    print(json.dumps(outerData))
-                    loadDataIntoElastic("fairplay", json.dumps(outerData))
+                    try:
+                        Abi = fetchAbi()
+                        outerData = {}
+                        contractInstance = web3.eth.contract(abi=Abi, address=transactionContractAddress)
+                        outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
+                        outerData['blockNumber'] = transactionReceipt.blockNumber 
+                        outerData['contractAddress'] = transactionReceipt.contractAddress
+                        #print(contractInstance.all_functions())
+                        callableFunctions = getPureOrViewFunctions()
+                        for callableFunction in callableFunctions:
+                            contract_func = contractInstance.functions[str(callableFunction)]
+                            result = contract_func().call()
+                            if type(result) is list:
+                                if len(result) > 0:
+                                    innerData = {}
+                                    for i in range(len(result)):
+                                        innerData[i] = result[i]
+                                    outerData[str(callableFunction)] = innerData
+                            else:
+                                outerData[str(callableFunction)] = result
+                        print(json.dumps(outerData))
+                        loadDataIntoElastic("fairplay", json.dumps(outerData))
+                    except:
+                        print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
             else:
                 print("This transaction does not involve a contract, so we will ignore it")
                 continue
