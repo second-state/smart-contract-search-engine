@@ -23,7 +23,6 @@ es = Elasticsearch(
 )
 
 # FUNCTIONS
-
 def fetchAbi():
     contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/dapp/FairPlay.abi"
     contractAbiFileData = requests.get(contractAbiFileLocation)
