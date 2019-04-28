@@ -1,4 +1,4 @@
-# Please fill in the config betweeen lines 15 and 25 
+# Please fill in the config on lines 13 and 28 (blockchain RPC and SmartContract's raw ABI)
 # Also, use a ~/.aws/config file for private config such as aws_access_key_id, aws_secret_access_key, region and output (BotoAWSRequestAuth will read these automatically if the file is present)
 
 #IMPORTS
