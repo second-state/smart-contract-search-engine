@@ -1,14 +1,28 @@
-# Please provide:
-# The RPC URL for the blockchain on line 10 and 
-# The raw GitHub URL to the contract's ABI on line 14
-# This program will go ahead and find your contract and index it 
-from elasticsearch import Elasticsearch # pip3 install elasticsearch 
-es=Elasticsearch([{'host':'https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/','port':9200}])
-import requests
-import json
-from web3 import Web3, HTTPProvider
-web3 = Web3(HTTPProvider('https://testnet-rpc.cybermiles.io:8545'))
+# Please fill in the config betweeen lines 15 and 25 
+# Also, use a ~/.aws/config file for private config such as aws_access_key_id, aws_secret_access_key, region and output (BotoAWSRequestAuth will read these automatically if the file is present)
 
+#IMPORTS
+import json
+import boto3 # pip3 install boto3
+import requests
+from web3 import Web3, HTTPProvider
+from aws_requests_auth.boto_utils import BotoAWSRequestsAuth # pip3 install aws_requests_auth
+from elasticsearch import Elasticsearch, RequestsHttpConnection # pip3 install elasticsearch 
+
+# CONFIG
+web3 = Web3(HTTPProvider('https://testnet-rpc.cybermiles.io:8545'))
+host = 'search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com'
+auth = BotoAWSRequestsAuth(aws_host='search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com', aws_region='ap-southeast-2', aws_service='es')
+es = Elasticsearch(
+    hosts=[{'host': host, 'port': 443}],
+    region='ap-southeast-2',
+    use_ssl=True,
+    verify_certs=True,
+    http_auth=auth,
+    connection_class=RequestsHttpConnection
+)
+
+# FUNCTIONS
 
 def fetchAbi():
     contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/dapp/FairPlay.abi"
@@ -48,9 +62,12 @@ def getPureOrViewFunctions():
                     pureOrViewFunctions.append(str(item['name']))
     return pureOrViewFunctions
 
+def loadDataIntoElastic(theContractName, thePayLoad):
+    es.index(index=theContractName, body=thePayLoad)
+
+# MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
 print("Latest block is %s" % latestBlockNumber)
-
 for blockNumber in reversed(range(1563539)):
     print("\nProcessing block number %s" % blockNumber)
     # Check to see if this block has any transactions in it
@@ -80,21 +97,27 @@ for blockNumber in reversed(range(1563539)):
                 if count == len(listOfKeccakHashes):
                     print("All hashes match!")
                     print("Contract address: %s " % transactionContractAddress)
-                    # We can now call the contract functions at this address and store all of this data in the search engine
+                    Abi = fetchAbi()
                     outerData = {}
+                    contractInstance = web3.eth.contract(abi=Abi, address=transactionContractAddress)
+                    outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
                     outerData['blockNumber'] = transactionReceipt.blockNumber 
                     outerData['contractAddress'] = transactionReceipt.contractAddress
-                    
-                    Abi = fetchAbi()
-                    contractInstance = web3.eth.contract(abi=Abi, address=transactionContractAddress)
                     #print(contractInstance.all_functions())
                     callableFunctions = getPureOrViewFunctions()
                     for callableFunction in callableFunctions:
                         contract_func = contractInstance.functions[str(callableFunction)]
                         result = contract_func().call()
-                        outerData[str(callableFunction)] = result
+                        if type(result) is list:
+                            if len(result) > 0:
+                                innerData = {}
+                                for i in range(len(result)):
+                                    innerData[i] = result[i]
+                                outerData[str(callableFunction)] = innerData
+                        else:
+                            outerData[str(callableFunction)] = result
                     print(json.dumps(outerData))
-                    res = es.index(index='FairPlay', body=outerData)
+                    loadDataIntoElastic("fairplay", json.dumps(outerData))
             else:
                 print("This transaction does not involve a contract, so we will ignore it")
                 continue
