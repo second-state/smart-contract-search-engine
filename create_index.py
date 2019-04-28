@@ -68,7 +68,7 @@ def loadDataIntoElastic(theContractName, thePayLoad):
 # MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
 print("Latest block is %s" % latestBlockNumber)
-for blockNumber in reversed(range(1563539)):
+for blockNumber in reversed(range(latestBlockNumber)):
     print("\nProcessing block number %s" % blockNumber)
     # Check to see if this block has any transactions in it
     blockTransactionCount = web3.eth.getBlockTransactionCount(blockNumber)
