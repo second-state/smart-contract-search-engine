@@ -63,7 +63,7 @@ def getPureOrViewFunctions():
 
 def loadDataIntoElastic(theContractName, theId, thePayLoad):
     esReponse = es.index(index=theContractName, id=theId, body=thePayLoad)
-    #print(thePayLoad)
+    print("\n %s \n" % thePayLoad)
     return esReponse
 
 def hasDataBeenIndexed(esIndexName, esId):
@@ -117,8 +117,9 @@ for blockNumber in reversed(range(latestBlockNumber)):
                         outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
                         outerData['blockNumber'] = transactionReceipt.blockNumber 
                         outerData['contractAddress'] = transactionReceipt.contractAddress
-                        #print(contractInstance.all_functions())
+                        # Contract pure and view functions
                         callableFunctions = getPureOrViewFunctions()
+                        functionData = {}
                         for callableFunction in callableFunctions:
                             contract_func = contractInstance.functions[str(callableFunction)]
                             result = contract_func().call()
@@ -127,13 +128,13 @@ for blockNumber in reversed(range(latestBlockNumber)):
                                     innerData = {}
                                     for i in range(len(result)):
                                         innerData[i] = result[i]
-                                    outerData[str(callableFunction)] = innerData
+                                    functionData[str(callableFunction)] = innerData
                             else:
-                                outerData[str(callableFunction)] = result
+                                functionData[str(callableFunction)] = result
+                        functionDataId = str(web3.toHex(web3.sha3(text=json.dumps(functionData))))
+                        outerData['functionDataId'] = functionDataId
+                        outerData['functionData'] = functionData
                         itemId = str(web3.toHex(web3.sha3(text=json.dumps(outerData))))
-                        #print(itemId)
-                        #print(json.dumps(outerData))
-
                         dataStatus = hasDataBeenIndexed("fairplay", itemId)
                         if dataStatus == False:
                             indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
