@@ -23,7 +23,6 @@ es = Elasticsearch(
 )
 
 # FUNCTIONS
-
 def fetchAbi():
     contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/dapp/FairPlay.abi"
     contractAbiFileData = requests.get(contractAbiFileLocation)
@@ -62,14 +61,27 @@ def getPureOrViewFunctions():
                     pureOrViewFunctions.append(str(item['name']))
     return pureOrViewFunctions
 
-def loadDataIntoElastic(theContractName, thePayLoad):
-    es.index(index=theContractName, body=thePayLoad)
+def loadDataIntoElastic(theContractName, theId, thePayLoad):
+    esReponse = es.index(index=theContractName, id=theId, body=thePayLoad)
+    #print(thePayLoad)
+    return esReponse
+
+def hasDataBeenIndexed(esIndexName, esId):
+    print("Checking for %s " % esId)
+    returnVal = False
+    try:
+        esReponse2 = es.get(index=esIndexName, id=esId, _source="false")
+        if esReponse2['found'] == True:
+            returnVal = True
+            print("Item is already indexed.")
+    except:
+        print("Item does not exist yet.")
+    return returnVal
 
 # MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
 print("Latest block is %s" % latestBlockNumber)
-#for blockNumber in reversed(range(latestBlockNumber)):
-for blockNumber in range(1562732, 1562747):
+for blockNumber in reversed(range(latestBlockNumber)):
     print("\nProcessing block number %s" % blockNumber)
     # Check to see if this block has any transactions in it
     blockTransactionCount = web3.eth.getBlockTransactionCount(blockNumber)
@@ -118,8 +130,13 @@ for blockNumber in range(1562732, 1562747):
                                     outerData[str(callableFunction)] = innerData
                             else:
                                 outerData[str(callableFunction)] = result
-                        print(json.dumps(outerData))
-                        loadDataIntoElastic("fairplay", json.dumps(outerData))
+                        itemId = str(web3.toHex(web3.sha3(text=json.dumps(outerData))))
+                        #print(itemId)
+                        #print(json.dumps(outerData))
+
+                        dataStatus = hasDataBeenIndexed("fairplay", itemId)
+                        if dataStatus == False:
+                            indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
                     except:
                         print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
             else:
