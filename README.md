@@ -10,7 +10,7 @@ The harvesting scripts are written in Python; they require a particular smart co
 
 ### Full - smart contract harvest
 
-The Python file, at python/SmartContractHarvesterFull.py harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
+The Python file, at `python/SmartContractHarvesterFull.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
 
 ```python3
 for blockNumber in reversed(range(latestBlockNumber)):
@@ -35,6 +35,20 @@ ps ax | grep SmartContractHarvesterFull.py
 ```
 
 ### Topup - smart contract harvest
+
+The Python file, at `python/SmartContractHarvesterTopup.py` must be run regularly. This script, when run regularly, will index brand new smart contracts by scanning the most recent 350 blocks. 
+
+```python3
+stop = latestBlockNumber - 350
+for blockNumber in reversed(range(stop, latestBlockNumber)):
+```
+
+The topup - smart contract harvest, can be run once per minute using the following cron job.
+
+```bash
+* * * * * cd ~/htdocs/python && /usr/bin/python3 SmartContractHarvesterTopup.py
+# The above cron job will trigger at every minute of every hour of every day
+```
 
 ### 
 
