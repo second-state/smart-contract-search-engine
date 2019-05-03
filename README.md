@@ -2,15 +2,45 @@
 
 This search engine is designed to run locally (from your file system without the need for a server).
 
-This search engine can also be hosted publicly by simply copying this entire project into the htdocs folder of a LAMP server.
+This search engine can also be hosted publicly by simply copying this entire project into the htdocs folder of a LAMP server, as seen here < http://54.66.215.89/index.html >.
 
-The harvester is written in Python; it requires a smart contract's ABI file and a link to the blockchain's RPC endpoint.
+## Harvesting - Backend
 
-At present (in its MVP form) this system uses an Elasticsearch instance which is restricted to a few IP addresses. If you would like to use this system, please raise an issue and we can organize to have your IP address listed. You could also spin up your own Elasticsearch instance locally and run the Python file.
+The harvesting scripts are written in Python; they require a particular smart contract's ABI file and a link to the blockchain's RPC endpoint.
 
-## Public Access
+### Full - smart contract harvest
 
-This system is also running live at the following endpoint < http://54.66.215.89/index.html >. At this stage you will be able to access the Product Giveaway DApp information on the CyberMiles Testnet.
+The Python file, at python/SmartContractHarvesterFull.py harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
+
+```python3
+for blockNumber in reversed(range(latestBlockNumber)):
+```
+
+The full - smart contract harvest, technically, only needs to be run once. However, if you like you can set it to run once per day using a cron job such as the following. 
+
+```bash
+# m h  dom mon dow   command
+45 22 * * * cd ~/htdocs/python && /usr/bin/python3 SmartContractHarvesterFull.py
+# The above cron job will trigger at 10:45pm every day
+# Please note that you can obtain your system's time using the "date" command
+# Please note that the python path, for your unique system, can be obtained via the "which python3" command
+```
+
+Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside to running it daily or weekly). Think of this harvest as a full sweep of the entire blockchain.
+
+You can check to see if the `SmartContractHarvesterFull.py` script is running via the following command.
+
+```bash
+ps ax | grep SmartContractHarvesterFull.py
+```
+
+### Topup - smart contract harvest
+
+### 
+
+## Searching - Frontend
+
+This system is running live at the following endpoint < http://54.66.215.89/index.html >. Please feel free to try it out, using the following examples of usage.
 
 ### Example usage
 
