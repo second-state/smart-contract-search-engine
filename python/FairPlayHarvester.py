@@ -51,20 +51,15 @@ def createUniqueAbiComparisons():
                 keccakHashes.append(str(web3.toHex(web3.sha3(text=stringToHash)))[2:10])
     return keccakHashes
 
-def getPureOrViewFunctions():
-    pureOrViewFunctions = []
-    Abi = fetchAbi()
-    for item in Abi:
-        if item['type'] == 'function':
-            if len(item['inputs']) == 0:
-                if len(item['outputs']) > 0:
-                    pureOrViewFunctions.append(str(item['name']))
-    return pureOrViewFunctions
-
 def loadDataIntoElastic(theContractName, theId, thePayLoad):
-    esReponse = es.index(index=theContractName, id=theId, body=thePayLoad)
+    esReponseD = es.index(index=theContractName, id=theId, body=thePayLoad)
     print("\n %s \n" % thePayLoad)
-    return esReponse
+    return esReponseD
+
+def loadIncrementalHashIntoElastic(theIndexName, theHash, thePayload):
+    esReponseH = es.index(index=theIndexName, id=theHash, body=thePayload)
+    print("\n %s \n" % thePayload)
+    return esReponseH
 
 def hasDataBeenIndexed(esIndexName, esId):
     print("Checking for %s " % esId)
@@ -77,6 +72,37 @@ def hasDataBeenIndexed(esIndexName, esId):
     except:
         print("Item does not exist yet.")
     return returnVal
+
+def getPureOrViewFunctionNames():
+    pureOrViewFunctions = []
+    Abi = fetchAbi()
+    for item in Abi:
+        if item['type'] == 'function':
+            if len(item['inputs']) == 0:
+                if len(item['outputs']) > 0:
+                    pureOrViewFunctions.append(str(item['name']))
+    return pureOrViewFunctions
+
+def fetchPureViewFunctionData(theContractInstance):
+# Contract pure and view functions
+    callableFunctions = getPureOrViewFunctionNames()
+    theFunctionData = {}
+    for callableFunction in callableFunctions:
+        contract_func = theContractInstance.functions[str(callableFunction)]
+        result = contract_func().call()
+        if type(result) is list:
+            if len(result) > 0:
+                innerData = {}
+                for i in range(len(result)):
+                    innerData[i] = result[i]
+                theFunctionData[str(callableFunction)] = innerData
+        else:
+            theFunctionData[str(callableFunction)] = result
+    return theFunctionData
+
+def getFunctionDataId(theFunctionData):
+    theId = str(web3.toHex(web3.sha3(text=json.dumps(theFunctionData))))
+    return theId
 
 # MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
@@ -117,27 +143,22 @@ for blockNumber in reversed(range(latestBlockNumber)):
                         outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
                         outerData['blockNumber'] = transactionReceipt.blockNumber 
                         outerData['contractAddress'] = transactionReceipt.contractAddress
-                        # Contract pure and view functions
-                        callableFunctions = getPureOrViewFunctions()
-                        functionData = {}
-                        for callableFunction in callableFunctions:
-                            contract_func = contractInstance.functions[str(callableFunction)]
-                            result = contract_func().call()
-                            if type(result) is list:
-                                if len(result) > 0:
-                                    innerData = {}
-                                    for i in range(len(result)):
-                                        innerData[i] = result[i]
-                                    functionData[str(callableFunction)] = innerData
-                            else:
-                                functionData[str(callableFunction)] = result
-                        functionDataId = str(web3.toHex(web3.sha3(text=json.dumps(functionData))))
+                        functionData = fetchPureViewFunctionData(contractInstance)
+                        functionDataId = getFunctionDataId(functionData)
                         outerData['functionDataId'] = functionDataId
                         outerData['functionData'] = functionData
                         itemId = str(web3.toHex(web3.sha3(text=json.dumps(outerData))))
+                        print("Combining %s " % transactionReceipt.contractAddress)
+                        print("and %s " % functionDataId)
+                        incrementalHashPre = transactionReceipt.contractAddress + functionDataId
+                        incrementalHash = str(web3.toHex(web3.sha3(text=incrementalHashPre)))
+                        incrementalHashBody = {}
+                        incrementalHashBody['address'] = transactionReceipt.contractAddress
+                        incrementalHashBody['dataid'] = functionDataId
                         dataStatus = hasDataBeenIndexed("fairplay", itemId)
                         if dataStatus == False:
                             indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
+                            indexResultH = loadIncrementalHashIntoElastic("incrementalindex", incrementalHash, json.dumps(incrementalHashBody))
                     except:
                         print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
             else:

@@ -1,0 +1,55 @@
+body {
+	font-family: 'Spectral', serif;
+}
+
+#searchAddressInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
+#searchTextInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
+#searchAddressButton {
+	width: 30%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 8px;
+}
+
+#pageResetText {
+	font.size: 3px;
+}
+
+.shaded {
+	padding: 1%;
+	background-color: #f9f9f9;
+}
+
+.centralHeading {
+	text-align: center;
+	padding: 1%;
+	text-shadow: 2px 1px #f9f9f9;
+}
+
+.light {
+	text-align: center;
+	color: white;
+}
+
+.hr {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border-style: inset;
+	border-width: 1px;
+}
