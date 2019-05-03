@@ -20,9 +20,20 @@ You can search the system using the address of product-giveaway contract owners,
 
 ![Demonstration address](images/demonstration_address.png)
 
+#### Search using plain text 
+
 You can also search the system using plain text; for example try typing the word "demonstration" into the search box as shown below.
 
 ![Demonstration image](images/demonstration_text.png)
 
+#### Search using both address and plain text
+
+You can also search the system using plain text, with the addition of an address. The following example shows how the "demonstration" text (which produced 3 results above) is now filtered to a single contract address of `0x7e38f41F7562720D1F219D474C78d98152382BFe`. You can try this out for yourself, just paste in the address and text.
+
+#### Show/Hide Details
+
+To make the results cleaner, we have provided the clickable "Show / Hide Details" text. This will reveal or hide additional information such as the list of winners, block number of when the contract was last interacted with and so forth.
+
+![Demonstration image](images/demonstration_show.png)
 
 
