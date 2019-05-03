@@ -18,11 +18,11 @@ This system is also running live at the following endpoint < http://54.66.215.89
 
 You can search the system using the address of product-giveaway contract owners, product-giveaway players, product-giveaway winners and even product-giveaway smart contract addresses.
 
-![Demonstration image](images/demonstration_text.png)
+![Demonstration address](images/demonstration_address.png)
 
 You can also search the system using plain text; for example try typing the word "demonstration" into the search box as shown below.
 
-![]()
+![Demonstration image](images/demonstration_text.png)
 
 
 
