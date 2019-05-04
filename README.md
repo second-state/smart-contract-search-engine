@@ -79,7 +79,36 @@ The topup - smart contract harvest, can be run once per minute using the followi
 # The above cron job will trigger at every minute of every hour of every day
 ```
 
-### 
+### Configuring your own search engine system
 
+Using the publicly available frontend is easy and free. However, if you would like to run your own infrastructure, please following the instructions below. These examples are all for the latest Ubuntu LTS.
+
+#### Operating system libraries
+
+Python3
+
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install python3
+```
+Pip3
+
+```bash
+sudo apt-get install python3-pip
+pip3 install --upgrade pip
+```
+
+Boto3
+```bash
+pip3 install boto3
+```
+#### Elasticsearch
+
+
+
+#### Amazon Web Services (AWS)
+
+Authentication
 
 
