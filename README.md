@@ -62,6 +62,10 @@ You can check to see if the `SmartContractHarvesterFull.py` script is running vi
 ```bash
 ps ax | grep SmartContractHarvesterFull.py
 ```
+**Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
+```
+>/dev/null 2>&1
+```
 
 ### Topup - smart contract harvest
 
@@ -72,12 +76,18 @@ stop = latestBlockNumber - 350
 for blockNumber in reversed(range(stop, latestBlockNumber)):
 ```
 
-The topup - smart contract harvest, can be run once per minute using the following cron job.
+The topup - smart contract harvest, can be run once per minute using the following cron job. Again, remember that this script will only index contract instances which do not already exist in the index. If a contract instance already exists this script will just skip over it and continue looking for new unindexed contract instances. This is a very cheap and efficient script; essentially just sweeps a finite amount of upper blocks in the chain over and over as time goes on.
 
 ```bash
 * * * * * cd ~/htdocs/python && /usr/bin/python3 SmartContractHarvesterTopup.py
 # The above cron job will trigger at every minute of every hour of every day
 ```
+
+### Incremental  - smart contract **STATE** update
+
+The above scripts primarily store the contract infrastructure (contract address, owner address etc.). Having the ABI and contract address means that we can create web3 instances of each contract instance; and then go ahead and read all of the contract's public variables. The above harvesting scripts do this **only once**.
+
+The Python file, at `python/FairPlayStateUpdate.py` checks for changes in each contract's state in real-time. As soon as any change is detected, the main index is updated. The Python script does not repeatedly query the main index. Instead it locally compares hashes (hash(smart contract address + smart contract state)). This is very efficient and fast.
 
 ### Configuring your own search engine system
 
