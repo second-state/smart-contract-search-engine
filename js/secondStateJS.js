@@ -232,28 +232,49 @@ function renderItems(_hits) {
 
         var textStatus = "";
         if (value._source.functionData.status == 0){
-            textStatus = "Running: No winners yet ...";
+            textStatus = "Winners have not been declared as yet";
             var status = jQuery('<dd/>', {
             text: textStatus,
-            class: 'current'
+            // Optional color change?
+            // class: 'current'
             });
             status.appendTo(dl);
 
         } else if (value._source.functionData.status == 1){
-            textStatus = "Finished: Winners have been declared";
+            textStatus = "Winners have been declared";
             var status = jQuery('<dd/>', {
             text: textStatus,
-            class: 'expired'
+            // Optional color change?
+            // class: 'expired'
             });
             status.appendTo(dl);
         }
 
-        var endDate = new Date(value._source.functionData.info[5]);
-        var time = jQuery('<dd/>', {
-            text: "End date: " + endDate
+        // Expiry time
+        var epochRepresentation = value._source.functionData.info[5];
+        if (epochRepresentation.toString().length == 10){
+            var endDate = new Date(epochRepresentation*1000);
+        } else if (epochRepresentation.toString().length == 13){
+            var endDate = new Date(epochRepresentation);
+        }
+        
+        // Current time
+        var currentDate = new Date();
+        
+        if (currentDate > endDate){
+            var time = jQuery('<dd/>', {
+            text: "End date: " + endDate,
+            class: "expired"
         });
         time.appendTo(dl);
-
+        } else if (currentDate < endDate){
+            var time = jQuery('<dd/>', {
+            text: "End date: " + endDate,
+            class: "current"
+        });
+        time.appendTo(dl);
+        }
+        
         /* More details */
         var pGroup = jQuery('<div/>', {
             class: 'panel-group'
@@ -312,6 +333,8 @@ function renderItems(_hits) {
         cAddress.appendTo(dl2);
 
         if (value._source.functionData.player_addrs == undefined) {
+            var lineBreak = jQuery('<hr/>', {});
+            lineBreak.appendTo(dl2);
             var pAddress = jQuery('<dd/>', {
                 text: "Players: There are no players yet!"
             });
@@ -328,6 +351,8 @@ function renderItems(_hits) {
         }
 
         if (value._source.functionData.winner_addrs == undefined) {
+            var lineBreak = jQuery('<hr/>', {});
+            lineBreak.appendTo(dl2);
             var wAddress = jQuery('<dd/>', {
                 text: "Winners: There are no winners yet!"
             });
