@@ -230,13 +230,20 @@ function renderItems(_hits) {
         });
         winners.appendTo(dl);
 
+        var textStatus = "";
+        if (value._source.functionData.status == 0){
+            textStatus = "Running";
+        } else if (value._source.functionData.status == 1){
+            textStatus = "Finished: Winners have been declared";
+        }
         var status = jQuery('<dd/>', {
-            text: "Status: " + value._source.functionData.status
+                text: textStatus
         });
-        status.appendTo(dl);
+        status.appendTo(dl);        
 
+        var endDate = new Date(value._source.functionData.info[5]);
         var time = jQuery('<dd/>', {
-            text: "Ends: " + value._source.functionData.info[5]
+            text: "End date: " + endDate
         });
         time.appendTo(dl);
 
