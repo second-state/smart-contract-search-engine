@@ -232,14 +232,21 @@ function renderItems(_hits) {
 
         var textStatus = "";
         if (value._source.functionData.status == 0){
-            textStatus = "Running";
+            textStatus = "Running: No winners yet ...";
+            var status = jQuery('<dd/>', {
+            text: textStatus,
+            class: 'current'
+            });
+            status.appendTo(dl);
+
         } else if (value._source.functionData.status == 1){
             textStatus = "Finished: Winners have been declared";
+            var status = jQuery('<dd/>', {
+            text: textStatus,
+            class: 'expired'
+            });
+            status.appendTo(dl);
         }
-        var status = jQuery('<dd/>', {
-                text: textStatus
-        });
-        status.appendTo(dl);        
 
         var endDate = new Date(value._source.functionData.info[5]);
         var time = jQuery('<dd/>', {
