@@ -104,19 +104,21 @@ for ifi in uniqueFunctionIds:
     print(ifi)
 
 contractInstanceList = []
-
+updateRequired = False
 for uniqueContracAddress in uniqueContractList:
     #print("Processing: %s " % uniqueContracAddress)
     contractInstance = web3.eth.contract(abi=Abi, address=uniqueContracAddress)
     contractInstanceList.append(contractInstance)
     #print("Added contract to list")
 
-for uniqueContractInstance in contractInstanceList:
-    freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
-    #print(freshFunctionData)
-    functionDataId = getFunctionDataId(freshFunctionData)
-    #print(functionDataId)
-    if functionDataId in uniqueFunctionIds:
-        print("No change to %s " % functionDataId)
-    else:
-        print("Hash not found, we must now update this contract instance state")
+# These happen about once every second, we can make this faster by spawning a check per contract #TODO
+while updateRequired == False:
+    for uniqueContractInstance in contractInstanceList:
+        freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
+        functionDataId = getFunctionDataId(freshFunctionData)
+        if functionDataId in uniqueFunctionIds:
+            print("No change to %s " % functionDataId)
+        else:
+            print("Hash not found, we must now update this contract instance state")
+            updateRequired == True
+print("Script has halted! The updated needs to be written and refined next")
