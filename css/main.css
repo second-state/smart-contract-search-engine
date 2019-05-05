@@ -41,6 +41,14 @@ body {
 	text-shadow: 2px 1px #f9f9f9;
 }
 
+.expired {
+	color: red;
+}
+
+.current {
+	color: green;
+}
+
 .light {
 	text-align: center;
 	color: white;
