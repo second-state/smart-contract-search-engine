@@ -18,15 +18,13 @@ $(document).ready(function() {
         });
     });
 
-
-
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
-        console.log($.trim(theAddress.length));
+        //console.log($.trim(theAddress.length));
         if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
-            console.log("Address and text are both blank, fetching all results without a filter");
+            //console.log("Address and text are both blank, fetching all results without a filter");
             getItems(elasticSearchUrl);
 
         } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
@@ -43,34 +41,34 @@ $(document).ready(function() {
             dQueryOuter["query"] = dMultiMatch;
             var jsonString = JSON.stringify(dQueryOuter);
             var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            console.log(itemArray);
+            //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
 
             var dDesc = {};
             dDesc['desc'] = theText;
-            console.log(dDesc);
+            //console.log(dDesc);
             var dTitle = {};
             dTitle['title'] = theText;
-            console.log(dTitle);
+            //console.log(dTitle);
             var dFunctionDataOwner = {};
             dFunctionDataOwner['functionData.owner'] = theAddress;
-            console.log(dFunctionDataOwner);
+            //console.log(dFunctionDataOwner);
             var dContractAddress = {};
             dContractAddress['contractAddress'] = theAddress;
-            console.log(dContractAddress);
+            //console.log(dContractAddress);
             var dMatchContractAddress = {};
             dMatchContractAddress['match'] = dContractAddress;
-            console.log(dMatchContractAddress);
+            //console.log(dMatchContractAddress);
 
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
-            console.log(dMatchFunctionDataOwner);
+            //console.log(dMatchFunctionDataOwner);
             var dMatchTitle = {};
             dMatchTitle['match'] = dTitle;
-            console.log(dMatchTitle);
+            //console.log(dMatchTitle);
             var dMatchDesc = {};
             dMatchDesc['match'] = dDesc;
-            console.log(dMatchDesc);
+            //console.log(dMatchDesc);
             var lShould = [];
             lShould.push(dMatchContractAddress);
             lShould.push(dMatchFunctionDataOwner);
@@ -99,36 +97,36 @@ $(document).ready(function() {
             }
             // End - Players and Winners
 
-            console.log(lShould);
+            //console.log(lShould);
             var dShould = {};
             dShould['should'] = lShould;
-            console.log(dShould);
+            //console.log(dShould);
             var dBool = {};
             dBool['bool'] = dShould;
-            console.log(dBool);
+            //console.log(dBool);
             var dQuery = {};
             dQuery['query'] = dBool;
-            console.log(dQuery);
-            console.log(JSON.stringify(dQuery));
+            //console.log(dQuery);
+            //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
             var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            console.log(itemArray);
+            //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
 
 
             var dFunctionDataOwner = {};
             dFunctionDataOwner['functionData.owner'] = theAddress;
-            console.log(dFunctionDataOwner);
+            //console.log(dFunctionDataOwner);
             var dContractAddress = {};
             dContractAddress['contractAddress'] = theAddress;
-            console.log(dContractAddress);
+            //console.log(dContractAddress);
             var dMatchContractAddress = {};
             dMatchContractAddress['match'] = dContractAddress;
-            console.log(dMatchContractAddress);
+            //console.log(dMatchContractAddress);
 
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
-            console.log(dMatchFunctionDataOwner);
+            //console.log(dMatchFunctionDataOwner);
 
             var lShould = [];
             lShould.push(dMatchContractAddress);
@@ -156,20 +154,20 @@ $(document).ready(function() {
             }
             // End - Players and Winners
 
-            console.log(lShould);
+            //console.log(lShould);
             var dShould = {};
             dShould['should'] = lShould;
-            console.log(dShould);
+            //console.log(dShould);
             var dBool = {};
             dBool['bool'] = dShould;
-            console.log(dBool);
+            //console.log(dBool);
             var dQuery = {};
             dQuery['query'] = dBool;
-            console.log(dQuery);
-            console.log(JSON.stringify(dQuery));
+            //console.log(dQuery);
+            //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
             var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            console.log(itemArray);
+            //console.log(itemArray);
         }
 
     });
@@ -193,8 +191,7 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
 
 function getItems(_url) {
     $.get(_url, function(data, status) {
-        console.log("here");
-        console.log(data.hits.hits);
+        //console.log(data.hits.hits);
         renderItems(data.hits.hits);
     });
 }
@@ -383,6 +380,4 @@ function renderItems(_hits) {
         var lineBreak = jQuery('<hr/>', {});
         lineBreak.appendTo('.results');
     });
-
-
 }
