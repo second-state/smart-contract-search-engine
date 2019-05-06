@@ -3,18 +3,21 @@ var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop3
 $(document).ready(function() {
     $("#ICreated").click(function() {
         console.log("Showing contracts which I created");
+        $('#collapseAdvancedSearch').removeClass('show');
         });
     });
 
 $(document).ready(function() {
     $("#IParticipated").click(function() {
         console.log("Showing contracts which I participated in");
+        $('#collapseAdvancedSearch').removeClass('show');
         });
     });
 
 $(document).ready(function() {
     $("#IWon").click(function() {
         console.log("Showing contracts which I won");
+        $('#collapseAdvancedSearch').removeClass('show');
         });
     });
 
@@ -380,4 +383,6 @@ function renderItems(_hits) {
         var lineBreak = jQuery('<hr/>', {});
         lineBreak.appendTo('.results');
     });
+
+
 }
