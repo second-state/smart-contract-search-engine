@@ -364,7 +364,24 @@ function renderItems(_hits) {
             class: "current"
         });
         time.appendTo(dl);
+        // Allow user to play this giveaway
+        var play = jQuery('<dd/>', {
+
+        });
+        var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?" + value._source.contractAddress;
+        var playButton = jQuery('<a/>', {
+            href: playUrl,
+            class: "btn btn-success",
+            role: "button",
+            target: "_blank",
+            text: "Play"
+        });
+        playButton.appendTo(play);
+        play.appendTo(dl);
+        
         }
+
+        //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
         
         /* More details */
         var pGroup = jQuery('<div/>', {
