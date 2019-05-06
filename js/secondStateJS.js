@@ -1,6 +1,26 @@
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 
 $(document).ready(function() {
+    $("#ICreated").click(function() {
+        console.log("Showing contracts which I created");
+        });
+    });
+
+$(document).ready(function() {
+    $("#IParticipated").click(function() {
+        console.log("Showing contracts which I participated in");
+        });
+    });
+
+$(document).ready(function() {
+    $("#IWon").click(function() {
+        console.log("Showing contracts which I won");
+        });
+    });
+
+
+
+$(document).ready(function() {
     $("#searchAddressButton").click(function() {
         var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
@@ -152,13 +172,6 @@ $(document).ready(function() {
             console.log(itemArray);
         }
 
-    });
-});
-
-
-$(document).ready(function() {
-    $("#pageResetText").click(function() {
-        window.location.reload();
     });
 });
 
