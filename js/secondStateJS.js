@@ -1,26 +1,77 @@
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
+var currentAccount;
+
+$(document).ready(function() {
+    window.addEventListener('load', function() {
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider);
+        console.log("Connected to web3 - Success!")
+        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
+    } else {
+        // set the provider you want from Web3.providers
+        console.log("Was unable to connect to web3. Trying localhost ...")
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    }
+
+    })
+});
 
 $(document).ready(function() {
     $("#ICreated").click(function() {
-        console.log("Showing contracts which I created");
+        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
+        console.log("Showing contracts which " + currentAccount + " created");
         $('#collapseAdvancedSearch').removeClass('show');
         $('.results').empty()
+
+        var dFunctionDataOwner = {};
+        dFunctionDataOwner['functionData.owner'] = currentAccount;
+        var dMatchFunctionDataOwner = {};
+        dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+        var dMust = {};
+        dMust['must'] = dMatchFunctionDataOwner;
+        var dBool = {};
+        dBool['bool'] = dMust;
+        var dQuery = {};
+        dQuery['query'] = dBool;
+        var jsonString = JSON.stringify(dQuery);
+        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+
         });
     });
 
 $(document).ready(function() {
     $("#IParticipated").click(function() {
-        console.log("Showing contracts which I participated in");
+        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
+        console.log("Showing contracts which " + currentAccount + " participated in");
         $('#collapseAdvancedSearch').removeClass('show');
         $('.results').empty()
+        
+        var dFunctionDataOwner = {};
+        dFunctionDataOwner['functionData.owner'] = currentAccount;
+        var dMatchFunctionDataOwner = {};
+        dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+        var dMust = {};
+        dMust['must'] = dMatchFunctionDataOwner;
+        var dBool = {};
+        dBool['bool'] = dMust;
+        var dQuery = {};
+        dQuery['query'] = dBool;
+        var jsonString = JSON.stringify(dQuery);
+        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+
+
         });
     });
 
 $(document).ready(function() {
     $("#IWon").click(function() {
-        console.log("Showing contracts which I won");
+        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
+        console.log("Showing contracts which " + currentAccount + " won");
         $('#collapseAdvancedSearch').removeClass('show');
         $('.results').empty()
+
+
+
         });
     });
 
