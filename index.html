@@ -1,4 +1,12 @@
 <!doctype html><html lang="en"><head>
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120065893-13"></script>
+   <script>
+     window.dataLayer = window.dataLayer || [];
+     function gtag(){dataLayer.push(arguments);}
+     gtag('js', new Date());
+     gtag('config', 'UA-120065893-13');
+   </script>
 <!-- Never cache -->
 <meta charset="utf-8">
 	<meta http-equiv='cache-control' content='no-cache'>
@@ -25,19 +33,34 @@
 						</div>
 						<div class="container rounded bg-dark" id="centralHeader">
 							<div class="row">
+								<div class="col-sm-4"><br /><button id="ICreated" class="searchAddressButtons">Giveaways, I created</button><br /></div><div class="col-sm-4"><br /><button id="IParticipated" class="searchAddressButtons">Giveaways, I won</button><br /></div><div class="col-sm-4"><br /><button id="IWon" class="searchAddressButtons">Giveaways, I participated in</button><br /></div>
+							</div>
+						</div>
+						<br />
+						<div class="container rounded bg-dark" id="centralHeader">
+							<!-- Start collapsable advanced search section -->
+							<br />
+							<p>
+							  <a class="btn btn-secondary light btn-block" data-toggle="collapse" href="#collapseAdvancedSearch" role="button" aria-expanded="false" aria-controls="collapseAdvancedSearch">Advanced Search</a>
+							</p>
+							<br />
+							<div class="collapse" id="collapseAdvancedSearch">
+							<div class="row">
 								<div class="col-sm-2"></div>
 								<div class="col-sm-8">
-									<br />
+									
 									<input type="text" id="searchAddressInput" placeholder="Search using an address: 0x1234...">
 										<br />
 										<input type="text" id="searchTextInput" placeholder="Search using text: i.e. demonstration...">
 											<br />
 											<button id="searchAddressButton">Search</button>
 											<br />
-											<p class="light" id="pageResetText">Reset Page</p>
 										</div>
 										<div class="col-sm-2"></div>
 									</div>
+								</div>
+
+								<!-- End collapsable advances search section -->
 								</div>
 								<hr class="hr"></hr>
 								<div class="container rounded shaded">
