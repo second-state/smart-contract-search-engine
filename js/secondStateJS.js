@@ -46,19 +46,24 @@ $(document).ready(function() {
         $('#collapseAdvancedSearch').removeClass('show');
         $('.results').empty()
         
-        var dFunctionDataOwner = {};
-        dFunctionDataOwner['functionData.owner'] = currentAccount;
-        var dMatchFunctionDataOwner = {};
-        dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+        lShould = [];
+        for (i = 0; i < 20; i++) {
+                var dPTemp = {};
+                var dPTemp2 = {};
+                var fString = 'functionData.player_addrs.' + i;
+                dPTemp[fString] = currentAccount;
+                dPTemp2['match'] = dPTemp;
+                lShould.push(dPTemp2);
+        }
         var dMust = {};
-        dMust['must'] = dMatchFunctionDataOwner;
+        dMust['should'] = lShould;
         var dBool = {};
         dBool['bool'] = dMust;
         var dQuery = {};
         dQuery['query'] = dBool;
         var jsonString = JSON.stringify(dQuery);
+        console.log(jsonString);
         var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-
 
         });
     });
@@ -70,6 +75,24 @@ $(document).ready(function() {
         $('#collapseAdvancedSearch').removeClass('show');
         $('.results').empty()
 
+        lShould = [];
+        for (i = 0; i < 20; i++) {
+                var dPTemp = {};
+                var dPTemp2 = {};
+                var fString = 'functionData.winner_addrs.' + i;
+                dPTemp[fString] = currentAccount;
+                dPTemp2['match'] = dPTemp;
+                lShould.push(dPTemp2);
+        }
+        var dMust = {};
+        dMust['should'] = lShould;
+        var dBool = {};
+        dBool['bool'] = dMust;
+        var dQuery = {};
+        dQuery['query'] = dBool;
+        var jsonString = JSON.stringify(dQuery);
+        console.log(jsonString);
+        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
 
 
         });
