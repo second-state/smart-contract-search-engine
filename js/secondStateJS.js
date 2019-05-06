@@ -4,6 +4,7 @@ $(document).ready(function() {
     $("#ICreated").click(function() {
         console.log("Showing contracts which I created");
         $('#collapseAdvancedSearch').removeClass('show');
+        $('.results').empty()
         });
     });
 
@@ -11,6 +12,7 @@ $(document).ready(function() {
     $("#IParticipated").click(function() {
         console.log("Showing contracts which I participated in");
         $('#collapseAdvancedSearch').removeClass('show');
+        $('.results').empty()
         });
     });
 
@@ -18,11 +20,13 @@ $(document).ready(function() {
     $("#IWon").click(function() {
         console.log("Showing contracts which I won");
         $('#collapseAdvancedSearch').removeClass('show');
+        $('.results').empty()
         });
     });
 
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
+        $('.results').empty()
         var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
         //console.log($.trim(theAddress.length));
