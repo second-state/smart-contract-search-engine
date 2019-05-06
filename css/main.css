@@ -23,11 +23,19 @@ body {
 	padding: 1%;
 	margin: auto;
 	display: block;
-	border-radius: 8px;
+	border-radius: 4px;
 }
 
 #pageResetText {
 	font.size: 3px;
+}
+
+.searchAddressButtons {
+	width: 70%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 8px;
 }
 
 .shaded {
