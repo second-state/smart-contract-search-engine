@@ -382,7 +382,7 @@ function renderItems(_hits) {
             var play = jQuery('<dd/>', {
 
             });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?" + value._source.contractAddress;
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=" + value._source.contractAddress;
             var playButton = jQuery('<a/>', {
                 href: playUrl,
                 class: "btn btn-success",
