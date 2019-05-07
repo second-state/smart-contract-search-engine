@@ -1,7 +1,7 @@
 <!doctype html><html lang="en"><head>
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-120065893-13"></script>
-   <script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-120065893-13"></script>
+<script>
      window.dataLayer = window.dataLayer || [];
      function gtag(){dataLayer.push(arguments);}
      gtag('js', new Date());
@@ -27,7 +27,6 @@
 						<script src="js/secondStateJS.js"></script>
 						<!-- Web3 CMT -->
 						<script src="js/web3-cmt.js"></script>
-
 						<title>Product Giveaway</title>
 					</head>
 					<body>
@@ -36,7 +35,21 @@
 						</div>
 						<div class="container rounded bg-dark" id="centralHeader1">
 							<div class="row">
-								<div class="col-sm-4"><br /><button id="ICreated" class="searchAddressButtons">Giveaways, I created</button><br /></div><div class="col-sm-4"><br /><button id="IParticipated" class="searchAddressButtons">Giveaways, I participated in</button><br /></div><div class="col-sm-4"><br /><button id="IWon" class="searchAddressButtons">Giveaways, I won</button><br /></div>
+								<div class="col-sm-4">
+									<br />
+									<button id="ICreated" class="searchAddressButtons">Giveaways, I created</button>
+									<br />
+								</div>
+								<div class="col-sm-4">
+									<br />
+									<button id="IParticipated" class="searchAddressButtons">Giveaways, I participated in</button>
+									<br />
+								</div>
+								<div class="col-sm-4">
+									<br />
+									<button id="IWon" class="searchAddressButtons">Giveaways, I won</button>
+									<br />
+								</div>
 							</div>
 						</div>
 						<br />
@@ -44,29 +57,33 @@
 							<!-- Start collapsable advanced search section -->
 							<br />
 							<p>
-							  <a class="btn btn-secondary light btn-block" data-toggle="collapse" href="#collapseAdvancedSearch" role="button" aria-expanded="false" aria-controls="collapseAdvancedSearch">Advanced Search</a>
+								<a class="btn btn-secondary light btn-block" data-toggle="collapse" href="#collapseAdvancedSearch" role="button" aria-expanded="false" aria-controls="collapseAdvancedSearch">Advanced Search</a>
 							</p>
 							<br />
 							<div class="collapse" data-target="cdt" id="collapseAdvancedSearch">
-							<div class="row">
-								<div class="col-sm-2"></div>
-								<div class="col-sm-8">
-									
-									<input type="text" id="searchAddressInput" placeholder="Search using an address: 0x1234...">
-										<br />
-										<input type="text" id="searchTextInput" placeholder="Search using text: i.e. demonstration...">
+								<div class="row">
+									<div class="col-sm-2"></div>
+									<div class="col-sm-8">
+										<input type="text" id="searchAddressInput" placeholder="Search using an address: 0x1234...">
 											<br />
-											<button id="searchAddressButton">Search</button>
-											<br />
+											<input type="text" id="searchTextInput" placeholder="Search using text: i.e. demonstration...">
+												<br />
+												<button id="searchAddressButton">Search</button>
+												<br />
+											</div>
+											<div class="col-sm-2"></div>
 										</div>
-										<div class="col-sm-2"></div>
 									</div>
-								</div>
-
-								<!-- End collapsable advances search section -->
+									<!-- End collapsable advances search section -->
 								</div>
 								<hr class="hr"></hr>
 								<div class="container rounded shaded">
+									<div class="progress" id="pbc">
+										<div class="progress-bar" id="pb" role="progressbar" aria-valuenow="0"
+									  aria-valuemin="0" aria-valuemax="100" style="width:0%">
+											<span class="sr-only"></span>
+										</div>
+									</div>
 									<div class="results"></div>
 									<!-- Closing DIV of the page -->
 								</div>
