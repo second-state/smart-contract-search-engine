@@ -163,25 +163,24 @@ pip3 install boto3
 ```
 #### Elasticsearch
 
-AWS provides Elasticsearch as a service. To set up an AWS Elasticsearch instance visit your AWS console using the following URL.
+**AWS provides Elasticsearch as a service. To set up an AWS Elasticsearch instance visit your AWS console using the following URL.**
 ```
 https://console.aws.amazon.com/console/home
 ```
-Type "Elasticsearch" into the Find Services section of the AWS console.
+**Type "Elasticsearch" into the Find Services section of the AWS console.**
 
 ![Demonstration image](images/find_services.png)
 
-Click the "Create a new domain" button.
+**Click the "Create a new domain" button.**
 
 ![Demonstration image](images/create_new_es_domain.png)
 
-Choose the appropriate machine[s] for your cluster, keeping in mind [the pricing of each machine](https://aws.amazon.com/ec2/pricing/on-demand/). Remember that you can also set up [cost, usage and reservation budgets](https://console.aws.amazon.com/billing/home?region=us-east-1#/budgets/create?type=COST) as well as [cost alerts and cost forecasts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html) to avoid surprises.
-
-
-
+Choose the appropriate machine[s] for your cluster, keeping in mind [the pricing of each machine](https://aws.amazon.com/ec2/pricing/on-demand/). Remember that you can also set up [cost, usage and reservation budgets](https://console.aws.amazon.com/billing/home?region=us-east-1#/budgets/create?type=COST) as well as [cost alerts and cost forecasts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html) to avoid surprises. Please also remember that Elasticsearch instances (domains and indexes) are region specific. Make sure that you remember which region you used to initialize the instance (you will also need this region information later for authentication and access control).
 
 #### Amazon Web Services (AWS)
 
-Authentication
+**Authentication and access control**
+
+All of the blockchain data is public so there is no real need to restric access. However, we want to ensure that this global access is **Read-Only** and that write access is restricted to the appropriate IP/Domain/User etc.
 
 
