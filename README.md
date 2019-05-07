@@ -183,4 +183,8 @@ Choose the appropriate machine[s] for your cluster, keeping in mind [the pricing
 
 All of the blockchain data is public so there is no real need to restric access. However, we want to ensure that this global access is **Read-Only** and that write access is restricted to the appropriate IP/Domain/User etc.
 
+Please read the [Amazon Elasticsearch Service Access Control](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html) documentation.
+
+
+
 
