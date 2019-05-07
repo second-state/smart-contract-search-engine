@@ -163,7 +163,13 @@ pip3 install boto3
 ```
 #### Elasticsearch
 
+AWS provides Elasticsearch as a service. To set up an AWS Elasticsearch instance visit your AWS console using the following URL.
+```
+https://console.aws.amazon.com/console/home
+```
+Type "Elasticsearch" into the Find Services section of the AWS console.
 
+![Demonstration image](images/find_services.png)
 
 #### Amazon Web Services (AWS)
 
