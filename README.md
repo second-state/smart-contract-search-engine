@@ -171,6 +171,15 @@ Type "Elasticsearch" into the Find Services section of the AWS console.
 
 ![Demonstration image](images/find_services.png)
 
+Click the "Create a new domain" button.
+
+![Demonstration image](images/create_new_es_domain.png)
+
+Choose the appropriate machine[s] for your cluster, keeping in mind [the pricing of each machine](https://aws.amazon.com/ec2/pricing/on-demand/). Remember that you can also set up [cost, usage and reservation budgets](https://console.aws.amazon.com/billing/home?region=us-east-1#/budgets/create?type=COST) as well as [cost alerts and cost forecasts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html) to avoid surprises.
+
+
+
+
 #### Amazon Web Services (AWS)
 
 Authentication
