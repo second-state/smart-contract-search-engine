@@ -1,102 +1,130 @@
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
-var currentAccount;
+var currentAccount = "";
 
 $(document).ready(function() {
     window.addEventListener('load', function() {
-    if (typeof web3 !== 'undefined') {
-        web3 = new Web3(web3.currentProvider);
-        console.log("Connected to web3 - Success!")
-        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
-    } else {
-        // set the provider you want from Web3.providers
-        console.log("Was unable to connect to web3. Trying localhost ...")
-        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-    }
-
+        if (typeof web3 !== 'undefined') {
+            web3 = new Web3(web3.currentProvider);
+            console.log("Connected to web3 - Success!")
+            web3.eth.getAccounts((err, accounts) => {
+                this.currentAccount = accounts[0]
+            });
+        } else {
+            // set the provider you want from Web3.providers
+            console.log("Was unable to connect to web3. Trying localhost ...")
+            web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+        }
     })
 });
 
 $(document).ready(function() {
     $("#ICreated").click(function() {
-        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
-        console.log("Showing contracts which " + currentAccount + " created");
-        $('#collapseAdvancedSearch').removeClass('show');
-        $('.results').empty()
-
-        var dFunctionDataOwner = {};
-        dFunctionDataOwner['functionData.owner'] = currentAccount;
-        var dMatchFunctionDataOwner = {};
-        dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
-        var dMust = {};
-        dMust['must'] = dMatchFunctionDataOwner;
-        var dBool = {};
-        dBool['bool'] = dMust;
-        var dQuery = {};
-        dQuery['query'] = dBool;
-        var jsonString = JSON.stringify(dQuery);
-        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-
-        });
+        async function setUpAndProgress() {
+            var originalState = $("#pb.progress-bar").clone();
+            $("#pbc").show()
+            $('#collapseAdvancedSearch').removeClass('show');
+            this.currentAccount = "";
+            $('.results').empty();
+            $("#pb.progress-bar").attr('style', 'width:25%');
+            await web3.eth.getAccounts((err, accounts) => {
+                this.currentAccount = accounts[0]
+            });
+            $("#pb.progress-bar").attr('style', 'width:100%');
+            await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            var dFunctionDataOwner = {};
+            dFunctionDataOwner['functionData.owner'] = this.currentAccount;
+            var dMatchFunctionDataOwner = {};
+            dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+            var dMust = {};
+            dMust['must'] = dMatchFunctionDataOwner;
+            var dBool = {};
+            dBool['bool'] = dMust;
+            var dQuery = {};
+            dQuery['query'] = dBool;
+            $("#pbc").hide('slow');
+            var jsonString = JSON.stringify(dQuery);
+            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            $("#pb.progress-bar").replaceWith(originalState.clone());
+        }
+        setUpAndProgress();
     });
+});
 
 $(document).ready(function() {
     $("#IParticipated").click(function() {
-        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
-        console.log("Showing contracts which " + currentAccount + " participated in");
-        $('#collapseAdvancedSearch').removeClass('show');
-        $('.results').empty()
-        
-        lShould = [];
-        for (i = 0; i < 20; i++) {
+        async function setUpAndProgress() {
+            var originalState = $("#pb.progress-bar").clone();
+            $("#pbc").show()
+            $('#collapseAdvancedSearch').removeClass('show');
+            this.currentAccount = "";
+            $('.results').empty();
+            $("#pb.progress-bar").attr('style', 'width:25%');
+            await web3.eth.getAccounts((err, accounts) => {
+                this.currentAccount = accounts[0]
+            });
+            $("#pb.progress-bar").attr('style', 'width:100%');
+            await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            lShould = [];
+            for (i = 0; i < 20; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.player_addrs.' + i;
-                dPTemp[fString] = currentAccount;
+                dPTemp[fString] = this.currentAccount;
                 dPTemp2['match'] = dPTemp;
                 lShould.push(dPTemp2);
+            }
+            var dMust = {};
+            dMust['should'] = lShould;
+            var dBool = {};
+            dBool['bool'] = dMust;
+            var dQuery = {};
+            dQuery['query'] = dBool;
+            $("#pbc").hide('slow');
+            var jsonString = JSON.stringify(dQuery);
+            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            $("#pb.progress-bar").replaceWith(originalState.clone());
         }
-        var dMust = {};
-        dMust['should'] = lShould;
-        var dBool = {};
-        dBool['bool'] = dMust;
-        var dQuery = {};
-        dQuery['query'] = dBool;
-        var jsonString = JSON.stringify(dQuery);
-        console.log(jsonString);
-        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-
-        });
+        setUpAndProgress();
     });
+});
 
 $(document).ready(function() {
     $("#IWon").click(function() {
-        web3.eth.getAccounts((err, accounts) => { this.currentAccount = accounts[0] });
-        console.log("Showing contracts which " + currentAccount + " won");
-        $('#collapseAdvancedSearch').removeClass('show');
-        $('.results').empty()
-
-        lShould = [];
-        for (i = 0; i < 20; i++) {
+        async function setUpAndProgress() {
+            var originalState = $("#pb.progress-bar").clone();
+            $("#pbc").show()
+            $('#collapseAdvancedSearch').removeClass('show');
+            this.currentAccount = "";
+            $('.results').empty();
+            $("#pb.progress-bar").attr('style', 'width:25%');
+            await web3.eth.getAccounts((err, accounts) => {
+                this.currentAccount = accounts[0]
+            });
+            $("#pb.progress-bar").attr('style', 'width:100%');
+            await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            lShould = [];
+            for (i = 0; i < 20; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.winner_addrs.' + i;
-                dPTemp[fString] = currentAccount;
+                dPTemp[fString] = this.currentAccount;
                 dPTemp2['match'] = dPTemp;
                 lShould.push(dPTemp2);
+            }
+            var dMust = {};
+            dMust['should'] = lShould;
+            var dBool = {};
+            dBool['bool'] = dMust;
+            var dQuery = {};
+            dQuery['query'] = dBool;
+            $("#pbc").hide('slow');
+            var jsonString = JSON.stringify(dQuery);
+            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            $("#pb.progress-bar").replaceWith(originalState.clone());
         }
-        var dMust = {};
-        dMust['should'] = lShould;
-        var dBool = {};
-        dBool['bool'] = dMust;
-        var dQuery = {};
-        dQuery['query'] = dBool;
-        var jsonString = JSON.stringify(dQuery);
-        console.log(jsonString);
-        var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-
-
-        });
+        setUpAndProgress();
     });
+});
 
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
@@ -107,9 +135,7 @@ $(document).ready(function() {
         if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
             //console.log("Address and text are both blank, fetching all results without a filter");
             getItems(elasticSearchUrl);
-
         } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
-
             var dFields = {};
             var dQueryInner = {};
             var dMultiMatch = {};
@@ -124,7 +150,6 @@ $(document).ready(function() {
             var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
-
             var dDesc = {};
             dDesc['desc'] = theText;
             //console.log(dDesc);
@@ -140,7 +165,6 @@ $(document).ready(function() {
             var dMatchContractAddress = {};
             dMatchContractAddress['match'] = dContractAddress;
             //console.log(dMatchContractAddress);
-
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
             //console.log(dMatchFunctionDataOwner);
@@ -155,7 +179,6 @@ $(document).ready(function() {
             lShould.push(dMatchFunctionDataOwner);
             lShould.push(dMatchTitle);
             lShould.push(dMatchDesc);
-
             // Start - Players and Winners
             // Players
             for (i = 0; i < 20; i++) {
@@ -166,7 +189,6 @@ $(document).ready(function() {
                 dPTemp2['match'] = dPTemp;
                 lShould.push(dPTemp2);
             }
-
             // Winners
             for (i = 0; i < 20; i++) {
                 var dWTemp = {};
@@ -177,7 +199,6 @@ $(document).ready(function() {
                 lShould.push(dWTemp2);
             }
             // End - Players and Winners
-
             //console.log(lShould);
             var dShould = {};
             dShould['should'] = lShould;
@@ -193,8 +214,6 @@ $(document).ready(function() {
             var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
-
-
             var dFunctionDataOwner = {};
             dFunctionDataOwner['functionData.owner'] = theAddress;
             //console.log(dFunctionDataOwner);
@@ -204,15 +223,12 @@ $(document).ready(function() {
             var dMatchContractAddress = {};
             dMatchContractAddress['match'] = dContractAddress;
             //console.log(dMatchContractAddress);
-
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
             //console.log(dMatchFunctionDataOwner);
-
             var lShould = [];
             lShould.push(dMatchContractAddress);
             lShould.push(dMatchFunctionDataOwner);
-
             // Start - Players and Winners
             // Players
             for (i = 0; i < 20; i++) {
@@ -223,7 +239,6 @@ $(document).ready(function() {
                 dPTemp2['match'] = dPTemp;
                 lShould.push(dPTemp2);
             }
-
             // Winners
             for (i = 0; i < 20; i++) {
                 var dWTemp = {};
@@ -234,7 +249,6 @@ $(document).ready(function() {
                 lShould.push(dWTemp2);
             }
             // End - Players and Winners
-
             //console.log(lShould);
             var dShould = {};
             dShould['should'] = lShould;
@@ -322,67 +336,67 @@ function renderItems(_hits) {
         winners.appendTo(dl);
 
         var textStatus = "";
-        if (value._source.functionData.status == 0){
+        if (value._source.functionData.status == 0) {
             textStatus = "Winners have not been declared as yet";
             var status = jQuery('<dd/>', {
-            text: textStatus,
-            // Optional color change?
-            // class: 'current'
+                text: textStatus,
+                // Optional color change?
+                // class: 'current'
             });
             status.appendTo(dl);
 
-        } else if (value._source.functionData.status == 1){
+        } else if (value._source.functionData.status == 1) {
             textStatus = "Winners have been declared";
             var status = jQuery('<dd/>', {
-            text: textStatus,
-            // Optional color change?
-            // class: 'expired'
+                text: textStatus,
+                // Optional color change?
+                // class: 'expired'
             });
             status.appendTo(dl);
         }
 
         // Expiry time
         var epochRepresentation = value._source.functionData.info[5];
-        if (epochRepresentation.toString().length == 10){
-            var endDate = new Date(epochRepresentation*1000);
-        } else if (epochRepresentation.toString().length == 13){
+        if (epochRepresentation.toString().length == 10) {
+            var endDate = new Date(epochRepresentation * 1000);
+        } else if (epochRepresentation.toString().length == 13) {
             var endDate = new Date(epochRepresentation);
         }
-        
+
         // Current time
         var currentDate = new Date();
-        
-        if (currentDate > endDate){
-            var time = jQuery('<dd/>', {
-            text: "End date: " + endDate,
-            class: "expired"
-        });
-        time.appendTo(dl);
-        } else if (currentDate < endDate){
-            var time = jQuery('<dd/>', {
-            text: "End date: " + endDate,
-            class: "current"
-        });
-        time.appendTo(dl);
-        // Allow user to play this giveaway
-        var play = jQuery('<dd/>', {
 
-        });
-        var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?" + value._source.contractAddress;
-        var playButton = jQuery('<a/>', {
-            href: playUrl,
-            class: "btn btn-success",
-            role: "button",
-            target: "_blank",
-            text: "Play"
-        });
-        playButton.appendTo(play);
-        play.appendTo(dl);
-        
+        if (currentDate > endDate) {
+            var time = jQuery('<dd/>', {
+                text: "End date: " + endDate,
+                class: "expired"
+            });
+            time.appendTo(dl);
+        } else if (currentDate < endDate) {
+            var time = jQuery('<dd/>', {
+                text: "End date: " + endDate,
+                class: "current"
+            });
+            time.appendTo(dl);
+            // Allow user to play this giveaway
+            var play = jQuery('<dd/>', {
+
+            });
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?" + value._source.contractAddress;
+            var playButton = jQuery('<a/>', {
+                href: playUrl,
+                class: "btn btn-success",
+                role: "button",
+                target: "_blank",
+                text: "Play"
+            });
+            playButton.appendTo(play);
+            play.appendTo(dl);
+
         }
 
         //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
-        
+
         /* More details */
         var pGroup = jQuery('<div/>', {
             class: 'panel-group'
