@@ -28,10 +28,11 @@ def fetchAbi():
     contractAbiFileData = requests.get(contractAbiFileLocation)
     contractAbiJSONData = json.loads(contractAbiFileData.content)
     return contractAbiJSONData
+Abi = fetchAbi()
 
 def createUniqueAbiComparisons():
     keccakHashes = []
-    Abi = fetchAbi()
+    # Abi = fetchAbi() This is now global
     for item in Abi:
         if item['type'] == 'function':
             if len(item['inputs']) == 0:
@@ -70,7 +71,7 @@ def hasDataBeenIndexed(esIndexName, esId):
 
 def getPureOrViewFunctionNames():
     pureOrViewFunctions = []
-    Abi = fetchAbi()
+    #Abi = fetchAbi()
     for item in Abi:
         if item['type'] == 'function':
             if len(item['inputs']) == 0:
@@ -133,7 +134,7 @@ for blockNumber in reversed(range(latestBlockNumber)):
                     print("All hashes match!")
                     print("Contract address: %s " % transactionContractAddress)
                     try:
-                        Abi = fetchAbi()
+                        #Abi = fetchAbi()
                         outerData = {}
                         contractInstance = web3.eth.contract(abi=Abi, address=transactionContractAddress)
                         outerData['abiSha3'] = str(web3.toHex(web3.sha3(text=json.dumps(contractInstance.abi))))
@@ -143,7 +144,7 @@ for blockNumber in reversed(range(latestBlockNumber)):
                         functionDataId = getFunctionDataId(functionData)
                         outerData['functionDataId'] = functionDataId
                         outerData['functionData'] = functionData
-                        itemId = str(web3.toHex(web3.sha3(text=json.dumps(transactionReceipt.contractAddress))))
+                        itemId = str(web3.toHex(web3.sha3(text=transactionReceipt.contractAddress)))
                         dataStatus = hasDataBeenIndexed("fairplay", itemId)
                         if dataStatus == False:
                             indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
