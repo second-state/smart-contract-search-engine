@@ -95,6 +95,11 @@ def getFunctionDataId(theFunctionData):
     theId = str(web3.toHex(web3.sha3(text=json.dumps(theFunctionData))))
     return theId
 
+def updateDataInElastic(theContractName, theId, thePayLoad):
+    esReponseD = es.update(index=theContractName, id=theId, body=thePayLoad)
+    print("\n %s \n" % thePayLoad)
+    return esReponseD
+
 Abi = fetchAbi()
 
 uniqueContractList = fetchContractAddresses()
@@ -104,7 +109,6 @@ for ifi in uniqueFunctionIds:
     print(ifi)
 
 contractInstanceList = []
-updateRequired = False
 for uniqueContracAddress in uniqueContractList:
     #print("Processing: %s " % uniqueContracAddress)
     contractInstance = web3.eth.contract(abi=Abi, address=uniqueContracAddress)
@@ -112,13 +116,22 @@ for uniqueContracAddress in uniqueContractList:
     #print("Added contract to list")
 
 # These happen about once every second, we can make this faster by spawning a check per contract #TODO
-while updateRequired == False:
-    for uniqueContractInstance in contractInstanceList:
-        freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
-        functionDataId = getFunctionDataId(freshFunctionData)
-        if functionDataId in uniqueFunctionIds:
-            print("No change to %s " % functionDataId)
-        else:
-            print("Hash not found, we must now update this contract instance state")
-            updateRequired == True
-print("Script has halted! The updated needs to be written and refined next")
+
+for uniqueContractInstance in contractInstanceList:
+    freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
+    functionDataId = getFunctionDataId(freshFunctionData)
+    if functionDataId in uniqueFunctionIds:
+        print("No change to %s " % functionDataId)
+    else:
+        print("Hash not found, we must now update this contract instance state")
+        itemId = str(web3.toHex(web3.sha3(text=json.dumps(uniqueContractInstance.address))))
+        doc = {}
+        outerData = {}
+        outerData["functionData"] = freshFunctionData
+        outerData["functionDataId"] = functionDataId
+        doc["doc"] = outerData
+        #print(json.dumps(doc))
+        indexResult = updateDataInElastic("fairplay", itemId, json.dumps(doc))
+        
+
+
