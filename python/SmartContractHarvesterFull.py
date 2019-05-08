@@ -103,7 +103,6 @@ def getFunctionDataId(theFunctionData):
 # MAIN
 latestBlockNumber = web3.eth.getBlock('latest').number
 print("Latest block is %s" % latestBlockNumber)
-stop = latestBlockNumber - 300
 for blockNumber in reversed(range(latestBlockNumber)):
     print("\nProcessing block number %s" % blockNumber)
     # Check to see if this block has any transactions in it
