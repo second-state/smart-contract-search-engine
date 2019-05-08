@@ -92,40 +92,6 @@ The Python file, at `python/FairPlayStateUpdate.py` checks for changes in each c
 The output from the incremental smart contract state update looks like this (when contract state is unchanged)
 
 ```bash
-No change to 0x681e5af3f8dd7d1955d97c7aa9d8d68d9a1417058a31a7210a4a7114e101b540 
-No change to 0xac08f0dd1227ef9431aba9ebf8c6272a0cb892b1c76b86db96cf459961a55576 
-No change to 0x3210380897fec52068ef12022ebb93f9628f7f0ca7f9c7b0c045ce9d45a4661f 
-No change to 0xa6d92e264b53de0b994bc14b339f1bb7c32f8a9486f88dc40604a314b18627f0 
-No change to 0xc587f558efa5f82fe1d3e433d73613f59758136ebe7f298fe10bc8af891952ba 
-No change to 0x45259eb068e8137e75bcba0209ac6b9cefb07e127f3460af7ada2b14380e7d06 
-No change to 0x7b539f070d764711cc190a7b08a9a86e0814079f948f0ec5bfc50275059a53ce 
-No change to 0x2186fad80585434759fa81c6a6f04534c9048b6a01f6e374414fdccb9e8a36c7 
-No change to 0xe44d14f137d76faca652cc274d9e49907805569823a1847faea5712afcc77808 
-No change to 0xe4ae455e2a449bb3f1812ac87e3c7eddc3eae81aa4dc522ed41e083f69605975 
-No change to 0x9e834391d8833f6111d419e527112639bbfdc2b17b64d8668b1e8be2731068ae 
-No change to 0xf6d156c759fe4cbc0cf5f06e4928d5a65094718265f2c8fc19b3b8720ae22eb4 
-No change to 0xc9699912089a75f22089dd781df3bfb8771ce80343ae8677ef26ffd8067c8759 
-No change to 0x3b7eaa7f9e570361f78adcd65b001ed73e8fc76faac6e18bed593d8fac9a3e67 
-No change to 0x31c6616092ee84469bf5758ada8b6c3830fe499a506ad68f4ea16e74c5e7acea 
-No change to 0x99eac22abb8a5d04b1a2fec42ffa2251cd0e1748d5bd759e62460998d63fbc7f 
-No change to 0x148b5436da9944c11dd844b96631baf1de6470b77619339cfd563283e3d0b5c2 
-No change to 0xe7e0d864d2d6e4cd0c5a96d4a2a5bc750e83416529634b7b914b58ddd90cca8d 
-No change to 0xa11f6303dd4ddd783367f872d81ba90ebb8e8aaa6fe2b35acb92e6eec8bc7d81 
-No change to 0x972aab8455e88f656c8be37155f8736cef29b61ad0417a9047f0ed4cd59cb8be 
-No change to 0xdb0475edc0059ba0bb293014144843b376ca5c310000a4e9758455727763fd84 
-No change to 0x450656a37afb1f22875a9d75efd8d77c6920c22fd0bebc6ece3478d9c33b46fb 
-No change to 0xc0e47a5fb58070143a2bb3366fa1a5fa3571052831b77e65e460adc289b7bad2 
-No change to 0x9b378652f4ceb518e630d73199b37bb904c4f0b22c77eaba036dba371c90042c 
-No change to 0x75fb09b59b6894debe38023b0e62e580ff9f35fbbef457b1f3eb5a2ad286f835 
-No change to 0x34d411c1ea78da8bae18c91315be0c58b464a1f7f76b7dcdb47889d106af62c8 
-No change to 0x6106974b10068baae40b614e35136530be1501bb2609b56410bf893003e21196 
-No change to 0xa518a11b5f6306e23651bcc162851049a86b0a713ee2250d59929e07956b53d6 
-No change to 0x4ad1062c8b5b3183c048545b85f4ed6c9d081d3eab0aabfee639922e9311e8a0 
-No change to 0x3bd4317349248f20a7d2440db3658dcfed2049ce84a60ce11ba075d4fe4664a7 
-No change to 0xcc85afbff710f4f620fa1dafc557625e7c0f6a95c1257ff89e805d10f2fb41c3 
-No change to 0x8f6a869e1221751921cb83b0b99863a2242f466f2b5c64d4a3f4fc0bc8cd87ff 
-No change to 0xf35457fb89459ff0f19961a4a23cbcbd6ea6b5fbd4bcae7db9d9a4e54fb46a60 
-No change to 0x6e9e9b5f3c468c0d4f2b912226053f034f06fd9781546b86384c5849bfb26241 
 No change to 0x06bf38c9b46227cc551dab2a54bd8c21027d1f3ce4e6310c2db2be98bbba44d8 
 No change to 0xa899b93e1f99ade55665b79f4fdb879ecbb1598fa72dd433a6927861170d4d52 
 No change to 0x0386dabea26abe1d76b80ed41da1fbb610f6f69b01d1da1766748e776f7b9da6 
@@ -185,9 +151,35 @@ All of the blockchain data is public so there is no real need to restric access.
 
 Please read the [Amazon Elasticsearch Service Access Control](https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html) documentation. This very flexible authentication and access control can be set up after the fact by writing a policy.
 
-To modify the policy, for a specific index, click on the "Modift access policy" button.
+To modify the policy, for a specific index, click on the "Modify access policy" button.
 
 ![Demonstration image](images/modify_access.png)
+
+**Restrict public to view only (HTTP GET only) while allowing your AWS user to perform any task**
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::007383469891:user/tpmccallum"
+      },
+      "Action": "es:*",
+      "Resource": "arn:aws:es:ap-southeast-2:007383469891:domain/smart-contract-search-engine/*"
+    },
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "es:ESHttpGet",
+      "Resource": "arn:aws:es:ap-southeast-2:007383469891:domain/smart-contract-search-engine/*"
+    }
+  ]
+}
+```
+The arn:aws:iam above can be found in [your AWS IAM console](https://console.aws.amazon.com/iam/home#/home)
 
 
 
