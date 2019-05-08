@@ -187,3 +187,14 @@ The arn:aws:iam above can be found in [your AWS IAM console](https://console.aws
 
 ![Demonstration image](images/iam.png)
 
+#### AWS CLI
+Install the cli
+https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html
+
+Configure the cli using aws configure
+https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+https://docs.aws.amazon.com/cli/latest/reference/configure/
+
+More documentation coming soon ...
+
+
