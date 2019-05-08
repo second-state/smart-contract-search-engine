@@ -52,6 +52,11 @@ def createUniqueAbiComparisons():
                 keccakHashes.append(str(web3.toHex(web3.sha3(text=stringToHash)))[2:10])
     return keccakHashes
 
+def loadDataIntoElastic(theContractName, theId, thePayLoad):
+    esReponseD = es.index(index=theContractName, id=theId, body=thePayLoad)
+    print("\n %s \n" % thePayLoad)
+    return esReponseD
+
 def hasDataBeenIndexed(esIndexName, esId):
     print("Checking for %s " % esId)
     returnVal = False
@@ -139,9 +144,13 @@ for blockNumber in reversed(range(stop, latestBlockNumber)):
                         functionDataId = getFunctionDataId(functionData)
                         outerData['functionDataId'] = functionDataId
                         outerData['functionData'] = functionData
-                        itemId = str(web3.toHex(web3.sha3(text=transactionReceipt.contractAddress)))
+                        itemId = str(web3.toHex(web3.sha3(text=str(transactionReceipt.contractAddress))))
                         dataStatus = hasDataBeenIndexed("fairplay", itemId)
                         if dataStatus == False:
+                            print("Indexing ...")
+                            print(json.dumps(outerData))
+                            print("as ...")
+                            print(itemId);
                             indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
                     except:
                         print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
