@@ -27,6 +27,9 @@ def fetchAbi():
     contractAbiJSONData = json.loads(contractAbiFileData.content)
     return contractAbiJSONData
 
+Abi = fetchAbi()
+
+
 def fetchContractAddresses():
     dQuery = {}
     dWildCard = {}
@@ -66,7 +69,7 @@ def fetchFunctionDataIds():
 
 def getPureOrViewFunctionNames():
     pureOrViewFunctions = []
-    Abi = fetchAbi()
+    
     for item in Abi:
         if item['type'] == 'function':
             if len(item['inputs']) == 0:
@@ -124,7 +127,7 @@ for uniqueContractInstance in contractInstanceList:
         print("No change to %s " % functionDataId)
     else:
         print("Hash not found, we must now update this contract instance state")
-        itemId = str(web3.toHex(web3.sha3(text=json.dumps(uniqueContractInstance.address))))
+        itemId = str(web3.toHex(web3.sha3(text=uniqueContractInstance.address)))
         doc = {}
         outerData = {}
         outerData["functionData"] = freshFunctionData
