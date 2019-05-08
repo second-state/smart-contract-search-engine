@@ -51,16 +51,6 @@ def createUniqueAbiComparisons():
                 keccakHashes.append(str(web3.toHex(web3.sha3(text=stringToHash)))[2:10])
     return keccakHashes
 
-def loadDataIntoElastic(theContractName, theId, thePayLoad):
-    esReponseD = es.index(index=theContractName, id=theId, body=thePayLoad)
-    print("\n %s \n" % thePayLoad)
-    return esReponseD
-
-def loadIncrementalHashIntoElastic(theIndexName, theHash, thePayload):
-    esReponseH = es.index(index=theIndexName, id=theHash, body=thePayload)
-    print("\n %s \n" % thePayload)
-    return esReponseH
-
 def hasDataBeenIndexed(esIndexName, esId):
     print("Checking for %s " % esId)
     returnVal = False
@@ -148,18 +138,10 @@ for blockNumber in reversed(range(stop, latestBlockNumber)):
                         functionDataId = getFunctionDataId(functionData)
                         outerData['functionDataId'] = functionDataId
                         outerData['functionData'] = functionData
-                        itemId = str(web3.toHex(web3.sha3(text=json.dumps(outerData))))
-                        print("Combining %s " % transactionReceipt.contractAddress)
-                        print("and %s " % functionDataId)
-                        incrementalHashPre = transactionReceipt.contractAddress + functionDataId
-                        incrementalHash = str(web3.toHex(web3.sha3(text=incrementalHashPre)))
-                        incrementalHashBody = {}
-                        incrementalHashBody['address'] = transactionReceipt.contractAddress
-                        incrementalHashBody['dataid'] = functionDataId
+                        itemId = str(web3.toHex(web3.sha3(text=json.dumps(transactionReceipt.contractAddress))))
                         dataStatus = hasDataBeenIndexed("fairplay", itemId)
                         if dataStatus == False:
                             indexResult = loadDataIntoElastic("fairplay", itemId, json.dumps(outerData))
-                            indexResultH = loadIncrementalHashIntoElastic("incrementalindex", incrementalHash, json.dumps(incrementalHashBody))
                     except:
                         print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
             else:
