@@ -120,13 +120,25 @@ Pip3
 
 ```bash
 sudo apt-get install python3-pip
-pip3 install --upgrade pip
+pip3 install --upgrade pip --user
 ```
 
 Boto3
+
 ```bash
 pip3 install boto3
 ```
+AWS Requests Auth
+```
+pip3 install aws_requests_auth --user
+```
+
+Elasticsearch
+
+```
+pip3 install elasticsearch --user
+```
+
 #### Elasticsearch
 
 **AWS provides Elasticsearch as a service. To set up an AWS Elasticsearch instance visit your AWS console using the following URL.**
