@@ -144,9 +144,15 @@ Configuring AWS CLI
 ```
 aws configure
 ```
-**AWS Access Key ID:** The aws configure script will request that you add your "AWS Access Key ID". Your AWS Access Key ID can be found by clicking on "users" and then the "security credentials" tab at your [console home](https://console.aws.amazon.com/iam/home); as shown below.
+**AWS Access Key ID:** The aws configure script will request that you add your "AWS Access Key ID". Your AWS Access Key ID can be found by clicking on "users" and then the "security credentials" tab at your [console home](https://console.aws.amazon.com/iam/home); as shown below. If you are creating a new AWS Access Key ID, remember to store the Secret Access Key (as it is only ever displayed here this once) ... you will need the Secret Access Key in the next step.
 
 ![Demonstration image](images/access_key_id.png)
+
+**AWS Secret Access Key:** This is obtained when you create the AWS Access Key ID (as per the previous step).
+
+**Default region name:** There is a table of regions, you can see the region in the top right corner of your EC2 console. Use the following table to convert this to the appropriate name i.e. Sydney = "ap-southeast-2".
+
+![Demonstration image](images/region_table.png)
 
 Elasticsearch
 
