@@ -116,8 +116,8 @@ sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install python3
 
-# Or if using older Ubuntu, stipulate dev if/as required
-sudo apt-get install python3.6-dev 
+# If cytoolz error, or if using older Ubuntu, stipulate 3.6-dev if/as required
+#sudo apt-get install python3.6-dev 
 ```
 Pip3
 
@@ -126,17 +126,23 @@ sudo apt-get install python3-pip
 pip3 install --upgrade pip --user
 
 # Or if using older Ubuntu, stipulate 3.6 if/as required
-python3.6 -m pip install web3 --user
+#python3.6 -m pip install web3 --user
 ```
 
 Boto3
 
 ```bash
 pip3 install boto3
+#Or if using older Ubuntu, stipulate 3.6 if/as required
+#python3.6 -m pip install boto3 --user
 ```
 AWS Requests Auth
 ```
 pip3 install aws_requests_auth --user
+
+#Or if using older Ubuntu, stipulate 3.6 if/as required
+#python3.6 -m pip install aws_requests_auth --user
+
 ```
 
 AWS Command Line Interface (CLI)
@@ -166,6 +172,9 @@ Elasticsearch
 
 ```
 pip3 install elasticsearch --user
+
+#Or if using older Ubuntu, stipulate 3.6 if/as required
+#python3.6 -m pip install elasticsearch --user
 ```
 
 #### Elasticsearch
