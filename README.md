@@ -154,6 +154,8 @@ aws configure
 
 ![Demonstration image](images/region_table.png)
 
+**Default output format:** The default output format can stay as None; just hit enter.
+
 Elasticsearch
 
 ```
