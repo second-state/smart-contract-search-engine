@@ -139,6 +139,15 @@ AWS Command Line Interface (CLI)
 pip3 install awscli --user
 ```
 
+Configuring AWS CLI
+
+```
+aws configure
+```
+**AWS Access Key ID:** The aws configure script will request that you add your "AWS Access Key ID". Your AWS Access Key ID can be found by clicking on "users" and then the "security credentials" tab at your [console home](https://console.aws.amazon.com/iam/home); as shown below.
+
+![Demonstration image](images/access_key_id.png)
+
 Elasticsearch
 
 ```
