@@ -10,6 +10,10 @@ This system is running live at the following endpoint < http://54.66.215.89/inde
 
 ### Example usage
 
+#### Pre defined queries
+
+![Demonstration address](images/predefined_queries.gif)
+
 #### Search using address
 
 You can search the system using the address of product-giveaway contract owners, product-giveaway players, product-giveaway winners and even product-giveaway smart contract addresses.
