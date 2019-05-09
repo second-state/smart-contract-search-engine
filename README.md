@@ -133,6 +133,12 @@ AWS Requests Auth
 pip3 install aws_requests_auth --user
 ```
 
+AWS Command Line Interface (CLI)
+
+```
+pip3 install awscli --user
+```
+
 Elasticsearch
 
 ```
