@@ -105,7 +105,7 @@ No change to 0xb6023d7796882028d3f54c4dbc756ee6ace811484a99ab6d693058d65af62ccd
 
 ### Configuring your own search engine system
 
-Using the publicly available frontend is easy and free. However, if you would like to run your own infrastructure, please following the instructions below. These examples are all for the latest Ubuntu LTS.
+Using the publicly available frontend is easy and free. However, if you would like to run your own infrastructure, please following the instructions below. These examples are all for the latest Ubuntu LTS. More specifically, you must use 18.04 because it comes with Python 3.6 (which Py Web3 requires).
 
 #### Operating system libraries
 
