@@ -22,11 +22,13 @@ You can also search the system using plain text; for example try typing the word
 
 #### Search using address
 
-You can search the system using the address of product-giveaway contract owners, product-giveaway players, product-giveaway winners and even product-giveaway smart contract addresses.
+You can search the system using the **address** of:
+- a contract
+- an owner 
+- a player
+- a winner 
 
-![Demonstration address](images/demonstration_address.png)
-
-![Demonstration image](images/demonstration_text.png)
+![Demonstration address](images/advanced_search2.gif)
 
 #### Search using both address and plain text
 
