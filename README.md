@@ -14,11 +14,15 @@ This system is running live at the following endpoint < http://54.66.215.89/inde
 
 ![Demonstration address](images/predefined_queries.gif)
 
+---
+
 #### Search using plain text 
 
 You can also search the system using plain text; for example try typing the words "Cup Cake" into the search box as shown below.
 
 ![Demonstration address](images/advanced_search.gif)
+
+---
 
 #### Search using address
 
@@ -29,6 +33,8 @@ You can search the system using the **address** of:
 - a winner 
 
 ![Demonstration address](images/advanced_search2.gif)
+
+---
 
 ## Harvesting - Backend
 
