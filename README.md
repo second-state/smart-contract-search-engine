@@ -115,12 +115,18 @@ Python3
 sudo apt-get update
 sudo apt-get upgrade
 sudo apt-get install python3
+
+# Or if using older Ubuntu, stipulate dev if/as required
+sudo apt-get install python3.6-dev 
 ```
 Pip3
 
 ```bash
 sudo apt-get install python3-pip
 pip3 install --upgrade pip --user
+
+# Or if using older Ubuntu, stipulate 3.6 if/as required
+python3.6 -m pip install web3 --user
 ```
 
 Boto3
