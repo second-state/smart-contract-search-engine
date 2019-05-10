@@ -22,7 +22,7 @@ es = Elasticsearch(
 )
 
 def fetchAbi():
-    contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/dapp/FairPlay.abi"
+    contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
     contractAbiFileData = requests.get(contractAbiFileLocation)
     contractAbiJSONData = json.loads(contractAbiFileData.content)
     return contractAbiJSONData
