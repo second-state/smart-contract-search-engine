@@ -14,7 +14,7 @@ Below are some basic usage examples. Please see the [documentation](./documentat
 
 ### Pre defined queries
 
-![Demonstration address](images/predefined_queries.gif)
+![Demonstration address](documentation/images/predefined_queries.gif)
 
 ---
 
@@ -22,7 +22,7 @@ Below are some basic usage examples. Please see the [documentation](./documentat
 
 You can also search the system using plain text; for example try typing the words "Cup Cake" into the search box as shown below.
 
-![Demonstration address](images/advanced_search.gif)
+![Demonstration address](documentation/images/advanced_search.gif)
 
 ---
 
@@ -34,7 +34,7 @@ You can search the system using the **address** of:
 - a player
 - a winner 
 
-![Demonstration address](images/advanced_search2.gif)
+![Demonstration address](documentation/images/advanced_search2.gif)
 
 ---
 
