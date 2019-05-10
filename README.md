@@ -1,26 +1,24 @@
 # Smart Contract Search Engine
 
+## Local vs Global
+
 This search engine is designed to run in two modalities:
 - local, single end-user mode (without the need for a server). See [local-mode documentation](./documentation/local_mode.md)
-- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation]()
+- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation](documentation/global_mode.md)
+
+## Frontend Demonstration
 
 We have put together a [demonstration of the search engine running in global mode](http://54.66.215.89/index.html). At this early stage, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity). 
 
-Below are some basic usage examples. Please see the [documentation]() for details on how to deploy your own Smart Contract Search Engine.
+Below are some basic usage examples. Please see the [documentation](./documentation) section for details on how to deploy your own Smart Contract Search Engine.
 
-## Searching - Frontend
-
-This system is running live at the following endpoint < http://54.66.215.89/index.html >. Please feel free to try it out, using the following examples of usage.
-
-### Example usage
-
-#### Pre defined queries
+### Pre defined queries
 
 ![Demonstration address](images/predefined_queries.gif)
 
 ---
 
-#### Search using plain text 
+### Search using plain text 
 
 You can also search the system using plain text; for example try typing the words "Cup Cake" into the search box as shown below.
 
@@ -28,7 +26,7 @@ You can also search the system using plain text; for example try typing the word
 
 ---
 
-#### Search using address
+### Search using address
 
 You can search the system using the **address** of:
 - a contract
