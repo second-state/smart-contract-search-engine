@@ -1,8 +1,12 @@
 # Smart Contract Search Engine
 
-This search engine is designed to run locally (from your file system without the need for a server).
+This search engine is designed to run in two modalities:
+- local, single end-user mode (without the need for a server). See [local-mode documentation]()
+- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation]()
 
-This search engine can also be hosted publicly by simply copying this entire project into the htdocs folder of a LAMP server, as seen here < http://54.66.215.89/index.html >.
+We have put together a [demonstration of the search engine running in global mode](http://54.66.215.89/index.html). At this early stage, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity). 
+
+Below are some basic usage examples. Please see the [documentation]() for details on how to deploy your own Smart Contract Search Engine.
 
 ## Searching - Frontend
 
