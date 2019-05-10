@@ -12,10 +12,6 @@ Once you are ready to invite the world to use your search engine please switch t
 
 ## Local Mode - Configuration
 
-### Elasticsearch endpoint
-
-As mentioned above, you will need to enter your Elasticsearch endpoint URL in the `var elasticSearchUrl` variable which is located in the [secondStateJS.js file](../js/secondStateJS.js).
-
 ### DApp endpoint
 
 You will notice that this search engine is currently configured to demonstrate the Product Giveaway DApp (which is running on the CyberMiles TestNet and MainNet). You will notice that the results page is customized for this particular DApp. Mpore specifically there is a link in the search engine results which allows an end-user to participate in the DApp. The endpoint is located in the `var playUrl` variable, which is in the [secondStateJS.js file](../js/secondStateJS.js).
@@ -40,6 +36,39 @@ This search engine requires a link to the blockchain RPC endpoint. This can be a
 [blockchain]
 rpc="https://testnet-rpc.cybermiles.io:8545"
 ```
+
+### Elasticsearch endpoint
+
+At present this endpoint is required in two places (Javascript and Python files).
+
+#### Elasticsearch endpoint - Python
+
+Please go ahead and paste your Elasticsearch endpoint URL into the elasticSearch, endpoint section of the [config.ini file](../python/config.ini). 
+
+**Notice** that this is just the base domain URL (no protocol and no path or query string etc.)
+
+```
+[elasticSearch]
+index=fairplay
+endpoint="search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com"
+```
+#### Elasticsearch index name - Python
+
+Please go ahead and type the name of your Elasticsearch index into the elasticSearch, index section of the [config.ini file](../python/config.ini). **Please note** that the index name must be lowercase (Elasticsearch requirement)
+
+#### Elasticsearch endpoint - Javascript
+
+Please go ahead and enter your Elasticsearch endpoint URL in the `var elasticSearchUrl` variable which is located in the [secondStateJS.js file](../js/secondStateJS.js).
+
+**Notice** that this URL contains the protocol, base domain URL, index name and a query string.
+
+```
+var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
+```
+
+#### Elasticsearch index name - Javascript
+
+**Notice** As mentioned directly above, the index name is entered as part of the elasticSearchUrl string.
 
 # Harvesting / Indexing
 
