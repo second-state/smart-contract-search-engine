@@ -41,3 +41,7 @@ This search engine requires a link to the blockchain RPC endpoint. This can be a
 rpc="https://testnet-rpc.cybermiles.io:8545"
 ```
 
+# Harvesting / Indexing
+
+Once you have downloaded this project and configured the above URLs it will be time to harvest the blockchain (populate the search engine). The harvesting process is automated using Cron (in combination with Python 3.6 scripts). Please see the [harvesting documentation](./harvesting.md) section for more assistance.
+
