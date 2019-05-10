@@ -1,7 +1,7 @@
 # Smart Contract Search Engine
 
 This search engine is designed to run in two modalities:
-- local, single end-user mode (without the need for a server). See [local-mode documentation]()
+- local, single end-user mode (without the need for a server). See [local-mode documentation](./documentation/local_mode.md)
 - global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation]()
 
 We have put together a [demonstration of the search engine running in global mode](http://54.66.215.89/index.html). At this early stage, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity). 
