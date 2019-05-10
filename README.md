@@ -8,9 +8,7 @@ This search engine is designed to run in two modalities:
 
 ## Frontend Demonstration
 
-We have put together a "live" [demonstration of the search engine running in global mode](http://54.66.215.89/index.html). At this early stage, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity). 
-
-Below are some basic usage examples. Please see the [documentation](./documentation) section for details on how to deploy your own Smart Contract Search Engine.
+We have put together a "live" [demonstration of the search engine running in global mode](http://54.66.215.89/index.html). At this early stage, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity) for you to play with.
 
 ---
 
