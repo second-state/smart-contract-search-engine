@@ -202,4 +202,16 @@ The arn:aws:iam above can be found in [your AWS IAM console](https://console.aws
 
 ![Demonstration image](images/iam.png)
 
+# Known system errors
+
+## Error 1
+ModuleNotFoundError: No module named 'apt_pkg'
+
+## Fix 1
+```
+sudo apt-get remove python3-apt
+sudo apt-get install python3-apt
+```
+
+
 
