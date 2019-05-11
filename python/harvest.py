@@ -3,6 +3,7 @@ import json
 import boto3 
 import requests
 import configparser
+import elasticsearch.helpers
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
@@ -101,6 +102,11 @@ class Harvest:
         print("\n %s \n" % thePayLoad)
         return esReponseD
 
+    def updateDataInElastic(_theId, _thePayLoad):
+        esReponseD = es.update(index=self.elasticSearchIndex, id=_theId, body=_thePayLoad)
+        print("\n %s \n" % thePayLoad)
+        return esReponseD
+
     def hasDataBeenIndexed(self, _esId):
         print("Checking for %s " % _esId)
         returnVal = False
@@ -141,6 +147,42 @@ class Harvest:
     def getFunctionDataId(self, _theFunctionData):
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
+
+    def fetchContractAddresses():
+        dQuery = {}
+        dWildCard = {}
+        dContractAddress = {}
+        lContractAddress = []
+        dContractAddress["contractAddress"] = "0x*"
+        dWildCard["wildcard"] = dContractAddress
+        lContractAddress.append("contractAddress")
+        dQuery["query"] = dWildCard
+        dQuery["_source"] = lContractAddress
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.elasticSearchIndex, query=json.dumps(dQuery), preserve_order=True)
+        uniqueList = []
+        for i, doc in enumerate(esReponseAddresses):
+            source = doc.get('_source')
+            if source['contractAddress'] not in uniqueList:
+                uniqueList.append(source['contractAddress'])
+        return uniqueList
+
+    def fetchFunctionDataIds():
+        dQuery = {}
+        dWildCard = {}
+        dFunctionDataId = {}
+        lFunctionId = []
+        dFunctionDataId["functionDataId"] = "0x*"
+        dWildCard["wildcard"] = dFunctionDataId
+        lFunctionId.append("functionDataId")
+        dQuery["query"] = dWildCard
+        dQuery["_source"] = lFunctionId
+        esReponseIds = elasticsearch.helpers.scan(client=self.es, index=self.elasticSearchIndex, query=json.dumps(dQuery), preserve_order=True)
+        uniqueList = []
+        for i, doc in enumerate(esReponseIds):
+            source = doc.get('_source')
+            if source['functionDataId'] not in uniqueList:
+                uniqueList.append(source['functionDataId'])
+        return uniqueList
 
     def harvest(self, _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
@@ -201,21 +243,43 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
+    def updateState(self):
+        uniqueContractList = fetchContractAddresses()
+        uniqueFunctionIds = fetchFunctionDataIds()
+        for ifi in uniqueFunctionIds:
+            print(ifi)
+        contractInstanceList = []
+        for uniqueContracAddress in uniqueContractList:
+            contractInstance = self.web3.eth.contract(abi=self.contractAbiJSONData, address=uniqueContracAddress)
+            contractInstanceList.append(contractInstance)
+        for uniqueContractInstance in contractInstanceList:
+            freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
+            functionDataId = getFunctionDataId(freshFunctionData)
+            if functionDataId in uniqueFunctionIds:
+                print("No change to %s " % functionDataId)
+            else:
+                print("Hash not found, we must now update this contract instance state")
+                itemId = str(self.web3.toHex(self.web3.sha3(text=uniqueContractInstance.address)))
+                doc = {}
+                outerData = {}
+                outerData["functionData"] = freshFunctionData
+                outerData["functionDataId"] = functionDataId
+                doc["doc"] = outerData
+                indexResult = updateDataInElastic(itemId, json.dumps(doc))
+
+
 
 
 # Driver - Start
 harvester = Harvest()
+
 # Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
-harvester.harvest()
+#harvester.harvest()
+
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
-harvester.harvest(True)
-<<<<<<< HEAD
+#harvester.harvest(True)
+
+# Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
+harvester.updateState()
 
 
-
-
-# notes
-# loadDataIntoElastic now only has 2 arguments because we get the index globally
-# hasDataBeenIndexed also has no index arg anymore
-=======
->>>>>>> d6a06078064f5a2f6658dd4d199b236ac7c2d07a
