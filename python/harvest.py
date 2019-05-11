@@ -77,7 +77,7 @@ class Harvest:
                     stringToHash = str(item['name'] + '()')
                     print("String to be hashed: %s" % stringToHash)
                     hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
-                    print("Hash: %s" + hashCreated)
+                    print("Hash: %s" % hashCreated)
                     keccakHashes.append(hashCreated)
                 else:
                     tempString = ""
@@ -92,7 +92,7 @@ class Harvest:
                     stringToHash = tempString
                     print("String to be hashed: %s" % stringToHash)
                     hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
-                    print("Hash: %s" + hashCreated)
+                    print("Hash: %s" % hashCreated)
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
