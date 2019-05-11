@@ -209,6 +209,7 @@ harvester = Harvest()
 harvester.harvest()
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 harvester.harvest(True)
+<<<<<<< HEAD
 
 
 
@@ -216,3 +217,5 @@ harvester.harvest(True)
 # notes
 # loadDataIntoElastic now only has 2 arguments because we get the index globally
 # hasDataBeenIndexed also has no index arg anymore
+=======
+>>>>>>> d6a06078064f5a2f6658dd4d199b236ac7c2d07a
