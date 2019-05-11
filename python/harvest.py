@@ -18,7 +18,11 @@ class Harvest:
         config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
 
-        # ABI[s]
+        # ABI (single abi)
+        self.fairPlayAbi = config['abis']['fair_play_v_one']
+        print("FairPlay ABI: %s" % self.fairPlayAbi)
+
+        # ABI[s] possible future use, if storing abis in the configuration (for now use single abi option above)
         self.abis = {}
         for key in config['abis']:
             stringKey = str(key)
@@ -54,6 +58,14 @@ class Harvest:
             http_auth=auth,
             connection_class=RequestsHttpConnection
         )
+
+        # FUNCTIONS
+        def fetchAbi():
+            contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+            contractAbiFileData = requests.get(contractAbiFileLocation)
+            contractAbiJSONData = json.loads(contractAbiFileData.content)
+            return contractAbiJSONData
+        Abi = fetchAbi()
 
 
 # Driver - Start
