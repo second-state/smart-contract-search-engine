@@ -209,9 +209,3 @@ harvester = Harvest()
 harvester.harvest()
 # Harvest with a stop block
 harvester.harvest(True)
-
-
-
-# notes
-# loadDataIntoElastic now only has 2 arguments because we get the index globally
-# hasDataBeenIndexed also has no index arg anymore
