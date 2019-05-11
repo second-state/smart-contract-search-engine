@@ -1,3 +1,5 @@
+// There are only two variables which have to be set for this 
+
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 var currentAccount = "";
 
