@@ -4,57 +4,53 @@ The harvesting scripts are written in Python; they require a particular smart co
 
 ### Full - smart contract harvest
 
-The Python file, at `python/FairPlayHarvesterFull.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
+The Python file, at `python/harvest.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
 
 ```python3
-for blockNumber in reversed(range(latestBlockNumber)):
+harvester = Harvest()
+harvester.harvest()
 ```
 
-The full - smart contract harvest, technically, only needs to be run once. However, if you like you can set it to run once per day using a cron job such as the following. 
-
-```bash
-# m h  dom mon dow   command
-45 22 * * * cd ~/htdocs/python && /usr/bin/python3 FairPlayHarvesterFull.py
-# The above cron job will trigger at 10:45pm every day
-# Please note that you can obtain your system's time using the "date" command
-# Please note that the python path, for your unique system, can be obtained via the "which python3" command
-```
+The full - smart contract harvest, technically, only needs to be run once. However, if you like you can set it to run once per day using a cron job.
 
 Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside to running it daily or weekly). Think of this harvest as a full sweep of the entire blockchain.
 
-You can check to see if the `FairPlayHarvesterFull.py` script is running via the following command.
+**Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
 
 ```bash
-ps ax | grep FairPlayHarvesterFull.py
-```
-**Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
-```
->/dev/null 2>&1
+01 01 * * * cd ~/htdocs/python && /usr/bin/python3.6 harvest.py >/dev/null 2>&1
 ```
 
 ### Topup - smart contract harvest
 
-The Python file, at `python/FairPlayHarvesterTopup.py` must be run regularly. This script, when run regularly, will index brand new smart contracts by scanning the most recent 350 blocks. 
+The Python file, at `python/harvest.py` can also be called to harvest the 350 most recent blocks.
 
-```python3
-stop = latestBlockNumber - 350
-for blockNumber in reversed(range(stop, latestBlockNumber)):
+```
+harvester = Harvest()
+harvester.harvest(True)
 ```
 
-The topup - smart contract harvest, can be run once per minute using the following cron job. Again, remember that this script will only index contract instances which do not already exist in the index. If a contract instance already exists this script will just skip over it and continue looking for new unindexed contract instances. This is a very cheap and efficient script; essentially just sweeps a finite amount of upper blocks in the chain over and over as time goes on.
+Here is the source code which shows how this True False logic works; "_stop" argument defaults to False. However if set to True (as demonstrated above) then the harvest function will calculate the most recent 350 blocks and just harvest them.
 
-```bash
-* * * * * cd ~/htdocs/python && /usr/bin/python3 FairPlayHarvesterTopup.py
-# The above cron job will trigger at every minute of every hour of every day
+```
+def harvest(self, _stop=False):
+        latestBlockNumber = self.web3.eth.getBlock('latest').number
+        print("Latest block is %s" % latestBlockNumber)
+        stopAtBlock = 0
+        if _stop == True:
+            stopAtBlock = latestBlockNumber - 350
+        for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
+            print("\nProcessing block number %s" % blockNumber)
 ```
 
-### Incremental  - smart contract **STATE** update
+The Python file, at `python/harvest.py` can also be called to update the state of already harvested contracts.
 
-The above scripts primarily store the contract infrastructure (contract address, owner address etc.). Having the ABI and contract address means that we can create web3 instances of each contract instance; and then go ahead and read all of the contract's public variables. The above harvesting scripts do this **only once**.
+```
+harvester = Harvest()
+harvester.updateState()
+```
 
-The Python file, at `python/FairPlayStateUpdate.py` checks for changes in each contract's state in real-time. As soon as any change is detected, the main index is updated. The Python script does not repeatedly query the main index. Instead it locally compares hashes (hash(smart contract address + smart contract state)). This is very efficient and fast.
-
-The output from the incremental smart contract state update looks like this (when contract state is unchanged)
+This state update can be performed as frequently as once per second (as fast as the web3 function calls will allow). The output from the incremental smart contract state update looks like this (when contract state is unchanged)
 
 ```bash
 No change to 0x06bf38c9b46227cc551dab2a54bd8c21027d1f3ce4e6310c2db2be98bbba44d8 
@@ -68,11 +64,11 @@ No change to 0x5d7073be26976fe69ae8f4e0d546e3f3f106e4e2cb9285cad66752f468e9d0de
 No change to 0xb6023d7796882028d3f54c4dbc756ee6ace811484a99ab6d693058d65af62ccd 
 ```
 
-### Configuring your own search engine system
+# Configuring your own search engine system
 
 Using the publicly available frontend is easy and free. However, if you would like to run your own infrastructure, please following the instructions below. These examples are all for the latest Ubuntu LTS. More specifically, you must use 18.04 because it comes with Python 3.6 (which Py Web3 requires).
 
-#### Operating system libraries
+## Operating system libraries
 
 Python3
 
@@ -152,7 +148,7 @@ pip3 install elasticsearch --user
 #python3.6 -m pip install elasticsearch --user
 ```
 
-#### Elasticsearch
+## Elasticsearch
 
 **AWS provides Elasticsearch as a service. To set up an AWS Elasticsearch instance visit your AWS console using the following URL.**
 ```
@@ -168,7 +164,7 @@ https://console.aws.amazon.com/console/home
 
 Choose the appropriate machine[s] for your cluster, keeping in mind [the pricing of each machine](https://aws.amazon.com/ec2/pricing/on-demand/). Remember that you can also set up [cost, usage and reservation budgets](https://console.aws.amazon.com/billing/home?region=us-east-1#/budgets/create?type=COST) as well as [cost alerts and cost forecasts](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/monitor_estimated_charges_with_cloudwatch.html) to avoid surprises. Please also remember that Elasticsearch instances (domains and indexes) are region specific. Make sure that you remember which region you used to initialize the instance (you will also need this region information later for authentication and access control).
 
-#### Amazon Web Services (AWS)
+## Amazon Web Services (AWS)
 
 **Authentication and access control**
 
