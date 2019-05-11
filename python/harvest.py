@@ -69,32 +69,32 @@ class Harvest:
 
         ############################################
         # Functions
-        def createUniqueAbiComparisons():
-            keccakHashes = []
-            for item in self.contractAbiJSONData:
-                if item['type'] == 'function':
-                    if len(item['inputs']) == 0:
-                        stringToHash = str(item['name'] + '()')
-                        print("String to be hashed: %s" % stringToHash)
-                        hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
-                        print("Hash: %s" + hashCreated)
-                        keccakHashes.append(hashCreated)
-                    else:
-                        tempString = ""
-                        tempString += item['name'] + '('
-                        iterator = 1
-                        for functionInput in item['inputs']:
-                            if iterator == len(item['inputs']):
-                                tempString += str(functionInput['type'] + ')')
-                            else:
-                                tempString += str(functionInput['type'] + ',')
-                                iterator += 1
-                        stringToHash = tempString
-                        print("String to be hashed: %s" % stringToHash)
-                        hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
-                        print("Hash: %s" + hashCreated)
-                        keccakHashes.append(hashCreated)
-            return keccakHashes
+    def createUniqueAbiComparisons():
+        keccakHashes = []
+        for item in self.contractAbiJSONData:
+            if item['type'] == 'function':
+                if len(item['inputs']) == 0:
+                    stringToHash = str(item['name'] + '()')
+                    print("String to be hashed: %s" % stringToHash)
+                    hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
+                    print("Hash: %s" + hashCreated)
+                    keccakHashes.append(hashCreated)
+                else:
+                    tempString = ""
+                    tempString += item['name'] + '('
+                    iterator = 1
+                    for functionInput in item['inputs']:
+                        if iterator == len(item['inputs']):
+                            tempString += str(functionInput['type'] + ')')
+                        else:
+                            tempString += str(functionInput['type'] + ',')
+                            iterator += 1
+                    stringToHash = tempString
+                    print("String to be hashed: %s" % stringToHash)
+                    hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
+                    print("Hash: %s" + hashCreated)
+                    keccakHashes.append(hashCreated)
+        return keccakHashes
 
 
 
