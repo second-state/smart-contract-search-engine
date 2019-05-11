@@ -226,14 +226,14 @@ class Harvest:
                                 outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber 
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
-                                functionData = fetchPureViewFunctionData(contractInstance)
-                                functionDataId = getFunctionDataId(functionData)
+                                functionData = self.fetchPureViewFunctionData(contractInstance)
+                                functionDataId = self.getFunctionDataId(functionData)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                                dataStatus = hasDataBeenIndexed(itemId)
+                                dataStatus = self.hasDataBeenIndexed(itemId)
                                 if dataStatus == False:
-                                    indexResult = loadDataIntoElastic(itemId, json.dumps(outerData))
+                                    indexResult = self.loadDataIntoElastic(itemId, json.dumps(outerData))
                             except:
                                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                     else:
@@ -244,8 +244,8 @@ class Harvest:
                 continue
 
     def updateState(self):
-        uniqueContractList = fetchContractAddresses()
-        uniqueFunctionIds = fetchFunctionDataIds()
+        uniqueContractList = self.fetchContractAddresses()
+        uniqueFunctionIds = self.fetchFunctionDataIds()
         for ifi in uniqueFunctionIds:
             print(ifi)
         contractInstanceList = []
@@ -253,8 +253,8 @@ class Harvest:
             contractInstance = self.web3.eth.contract(abi=self.contractAbiJSONData, address=uniqueContracAddress)
             contractInstanceList.append(contractInstance)
         for uniqueContractInstance in contractInstanceList:
-            freshFunctionData = fetchPureViewFunctionData(uniqueContractInstance)
-            functionDataId = getFunctionDataId(freshFunctionData)
+            freshFunctionData = self.fetchPureViewFunctionData(uniqueContractInstance)
+            functionDataId = self.getFunctionDataId(freshFunctionData)
             if functionDataId in uniqueFunctionIds:
                 print("No change to %s " % functionDataId)
             else:
@@ -265,7 +265,7 @@ class Harvest:
                 outerData["functionData"] = freshFunctionData
                 outerData["functionDataId"] = functionDataId
                 doc["doc"] = outerData
-                indexResult = updateDataInElastic(itemId, json.dumps(doc))
+                indexResult = self.updateDataInElastic(itemId, json.dumps(doc))
 
 
 
