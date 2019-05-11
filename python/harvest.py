@@ -270,7 +270,7 @@ class Harvest:
 
 
 
-# Driver - Start
+# Instantiate the Harvest class 
 harvester = Harvest()
 
 # Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
