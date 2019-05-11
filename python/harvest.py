@@ -15,11 +15,11 @@ class Harvest:
 
         # Config
         print("Reading configuration file")
-        config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-        config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
+        self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+        self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
 
         # ABI (single abi)
-        self.fairPlayAbi = config['abis']['fair_play_v_one']
+        self.fairPlayAbi = self.config['abis']['fair_play_v_one']
         print("FairPlay ABI: %s" % self.fairPlayAbi)
 
         self.contractAbiFileData = requests.get(self.fairPlayAbi)
@@ -32,33 +32,33 @@ class Harvest:
 
         # ABI[s] possible future use, if storing abis in the configuration (for now use single abi option above)
         self.abis = {}
-        for key in config['abis']:
+        for key in self.config['abis']:
             stringKey = str(key)
-            self.abis[stringKey] = config['abis'][key]
+            self.abis[stringKey] = self.config['abis'][key]
         print("\nABIs:")
         for (ufaKey, ufaValue) in self.abis.items():
             print(ufaKey + ": " + ufaValue)
         # Blockchain RPC
-        self.blockchainRpc = config['blockchain']['rpc']
+        self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
         # Elasticsearch index
-        self.elasticSearchIndex = config['elasticSearch']['index']
+        self.elasticSearchIndex = self.config['elasticSearch']['index']
         print("ElasticSearch Index: %s" % self.elasticSearchIndex)
 
         # Elasticsearch endpoint
-        self.elasticSearchEndpoint = config['elasticSearch']['endpoint']
+        self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
         print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
 
         # Elasticsearch AWS region
-        self.elasticSearchAwsRegion = config['elasticSearch']['aws_region']
+        self.elasticSearchAwsRegion = self.config['elasticSearch']['aws_region']
 
         # Web 3 init
-        web3 = Web3(HTTPProvider(self.blockchainRpc))
+        self.web3 = Web3(HTTPProvider(self.blockchainRpc))
 
         # AWS Boto
-        auth = BotoAWSRequestsAuth(aws_host=self.elasticSearchEndpoint, aws_region=self.elasticSearchAwsRegion, aws_service='es')
-        es = Elasticsearch(
+        self.auth = BotoAWSRequestsAuth(aws_host=self.elasticSearchEndpoint, aws_region=self.elasticSearchAwsRegion, aws_service='es')
+        self.es = Elasticsearch(
             hosts=[{'host': self.elasticSearchEndpoint, 'port': 443}],
             region=self.elasticSearchAwsRegion,
             use_ssl=True,
