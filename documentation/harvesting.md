@@ -4,7 +4,7 @@ The harvesting scripts are written in Python; they require a particular smart co
 
 ### Full - smart contract harvest
 
-The Python file, at `python/SmartContractHarvesterFull.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
+The Python file, at `python/FairPlayHarvesterFull.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
 
 ```python3
 for blockNumber in reversed(range(latestBlockNumber)):
@@ -14,7 +14,7 @@ The full - smart contract harvest, technically, only needs to be run once. Howev
 
 ```bash
 # m h  dom mon dow   command
-45 22 * * * cd ~/htdocs/python && /usr/bin/python3 SmartContractHarvesterFull.py
+45 22 * * * cd ~/htdocs/python && /usr/bin/python3 FairPlayHarvesterFull.py
 # The above cron job will trigger at 10:45pm every day
 # Please note that you can obtain your system's time using the "date" command
 # Please note that the python path, for your unique system, can be obtained via the "which python3" command
@@ -22,10 +22,10 @@ The full - smart contract harvest, technically, only needs to be run once. Howev
 
 Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside to running it daily or weekly). Think of this harvest as a full sweep of the entire blockchain.
 
-You can check to see if the `SmartContractHarvesterFull.py` script is running via the following command.
+You can check to see if the `FairPlayHarvesterFull.py` script is running via the following command.
 
 ```bash
-ps ax | grep SmartContractHarvesterFull.py
+ps ax | grep FairPlayHarvesterFull.py
 ```
 **Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
 ```
@@ -34,7 +34,7 @@ ps ax | grep SmartContractHarvesterFull.py
 
 ### Topup - smart contract harvest
 
-The Python file, at `python/SmartContractHarvesterTopup.py` must be run regularly. This script, when run regularly, will index brand new smart contracts by scanning the most recent 350 blocks. 
+The Python file, at `python/FairPlayHarvesterTopup.py` must be run regularly. This script, when run regularly, will index brand new smart contracts by scanning the most recent 350 blocks. 
 
 ```python3
 stop = latestBlockNumber - 350
@@ -44,7 +44,7 @@ for blockNumber in reversed(range(stop, latestBlockNumber)):
 The topup - smart contract harvest, can be run once per minute using the following cron job. Again, remember that this script will only index contract instances which do not already exist in the index. If a contract instance already exists this script will just skip over it and continue looking for new unindexed contract instances. This is a very cheap and efficient script; essentially just sweeps a finite amount of upper blocks in the chain over and over as time goes on.
 
 ```bash
-* * * * * cd ~/htdocs/python && /usr/bin/python3 SmartContractHarvesterTopup.py
+* * * * * cd ~/htdocs/python && /usr/bin/python3 FairPlayHarvesterTopup.py
 # The above cron job will trigger at every minute of every hour of every day
 ```
 
