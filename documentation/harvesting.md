@@ -77,17 +77,19 @@ Using the publicly available frontend is easy and free. However, if you would li
 Python3
 
 ```bash
-sudo apt-get update
-sudo apt-get upgrade
-sudo apt-get install python3
+sudo apt-get -y update
+sudo apt-get -y upgrade
+sudo apt-get -y install python3
 
 # If cytoolz error, or if using older Ubuntu, stipulate 3.6-dev if/as required
+#sudo add-apt-repository ppa:jonathonf/python-3.6
+#sudo apt-get -y update
 #sudo apt-get install python3.6-dev 
 ```
 Pip3
 
 ```bash
-sudo apt-get install python3-pip
+sudo apt-get -y install python3-pip
 pip3 install --upgrade pip --user
 
 # Or if using older Ubuntu, stipulate 3.6 if/as required
