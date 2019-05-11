@@ -223,5 +223,17 @@ sudo apt-get remove python3-apt
 sudo apt-get install python3-apt
 ```
 
+## Error 2
+urllib3 (1.25.2) or chardet (3.0.4) doesn't match a supported version!
+
+## Fix 2
+```
+python3.6 -m pip uninstall chardet
+python3.6 -m pip uninstall urllib3
+python3.6 -m pip install urllib3 --user
+python3.6 -m pip install chardet --user
+```
+
+
 
 
