@@ -90,8 +90,13 @@ Pip3
 
 ```bash
 sudo apt-get -y install python3-pip
-pip3 install --upgrade pip --user
+pip3 install --upgrade pip
+```
 
+Web3
+
+```
+pip3 install web3 --user
 # Or if using older Ubuntu, stipulate 3.6 if/as required
 #python3.6 -m pip install web3 --user
 ```
@@ -116,6 +121,9 @@ AWS Command Line Interface (CLI)
 
 ```
 pip3 install awscli --user
+
+#Or if using older Ubuntu, stipulate 3.6 if/as required
+#python3.6 -m pip install awscli --user
 ```
 
 Configuring AWS CLI
