@@ -102,5 +102,5 @@ class Harvest:
 harvester = Harvest()
 
 # TEST functions
-self.createUniqueAbiComparisons()
+harvester.createUniqueAbiComparisons()
 
