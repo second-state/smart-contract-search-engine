@@ -67,7 +67,7 @@ class Harvest:
             connection_class=RequestsHttpConnection
         )
 
-        ############################################
+        #############################################
         # Functions
     def createUniqueAbiComparisons(self):
         keccakHashes = []
