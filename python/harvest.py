@@ -54,7 +54,7 @@ class Harvest:
         self.elasticSearchAwsRegion = self.config['elasticSearch']['aws_region']
 
         # Web 3 init
-        self.web3 = Web3(HTTPProvider(self.blockchainRpc))
+        self.web3 = Web3(HTTPProvider(str(self.blockchainRpc)))
 
         # AWS Boto
         self.auth = BotoAWSRequestsAuth(aws_host=self.elasticSearchEndpoint, aws_region=self.elasticSearchAwsRegion, aws_service='es')
