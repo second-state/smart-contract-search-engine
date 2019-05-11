@@ -16,6 +16,12 @@ class Harvest:
         print("\nABIs:")
         for (ufaKey, ufaValue) in self.abis.items():
             print(ufaKey + ": " + ufaValue)
+        self.blockchainRpc = config['blockchain']['rpc']
+        print("Blockchain RPC: %s" % self.blockchainRpc)
+        self.elasticSearchIndex = config['elasticSearch']['index']
+        print("ElasticSearch Index: %s" % self.elasticSearchIndex)
+        self.elasticSearchEndpoint = config['elasticSearch']['endpoint']
+        print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
 
 
 # Driver - Start
