@@ -205,10 +205,11 @@ class Harvest:
 
 # Driver - Start
 harvester = Harvest()
-# Harvest everything
+# Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
 harvester.harvest()
-# Harvest with a stop block
+# Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 harvester.harvest(True)
+
 
 
 
