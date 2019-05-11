@@ -148,7 +148,7 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddresses():
+    def fetchContractAddresses(self):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
@@ -166,7 +166,7 @@ class Harvest:
                 uniqueList.append(source['contractAddress'])
         return uniqueList
 
-    def fetchFunctionDataIds():
+    def fetchFunctionDataIds(self):
         dQuery = {}
         dWildCard = {}
         dFunctionDataId = {}
