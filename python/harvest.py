@@ -274,10 +274,10 @@ class Harvest:
 harvester = Harvest()
 
 # Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
-#harvester.harvest()
+harvester.harvest()
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
-#harvester.harvest(True)
+harvester.harvest(True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 harvester.updateState()
