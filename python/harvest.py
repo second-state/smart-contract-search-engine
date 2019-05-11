@@ -69,7 +69,7 @@ class Harvest:
 
         ############################################
         # Functions
-    def createUniqueAbiComparisons():
+    def createUniqueAbiComparisons(self):
         keccakHashes = []
         for item in self.contractAbiJSONData:
             if item['type'] == 'function':
