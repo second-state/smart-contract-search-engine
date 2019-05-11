@@ -22,6 +22,14 @@ class Harvest:
         self.fairPlayAbi = config['abis']['fair_play_v_one']
         print("FairPlay ABI: %s" % self.fairPlayAbi)
 
+        self.contractAbiFileData = requests.get(self.fairPlayAbi)
+        print("ABI file data")
+        print(self.contractAbiFileData)
+
+        self.contractAbiJSONData = json.loads(self.contractAbiFileData.content)
+        print("ABI JSON data")
+        print(self.contractAbiJSONData)
+
         # ABI[s] possible future use, if storing abis in the configuration (for now use single abi option above)
         self.abis = {}
         for key in config['abis']:
@@ -59,13 +67,6 @@ class Harvest:
             connection_class=RequestsHttpConnection
         )
 
-        # FUNCTIONS
-        def fetchAbi():
-            contractAbiFileLocation = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-            contractAbiFileData = requests.get(contractAbiFileLocation)
-            contractAbiJSONData = json.loads(contractAbiFileData.content)
-            return contractAbiJSONData
-        Abi = fetchAbi()
 
 
 # Driver - Start
