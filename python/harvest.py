@@ -63,7 +63,7 @@ class Harvest:
             region=self.elasticSearchAwsRegion,
             use_ssl=True,
             verify_certs=True,
-            http_auth=auth,
+            http_auth=self.auth,
             connection_class=RequestsHttpConnection
         )
 
@@ -76,7 +76,7 @@ class Harvest:
                 if len(item['inputs']) == 0:
                     stringToHash = str(item['name'] + '()')
                     print("String to be hashed: %s" % stringToHash)
-                    hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
+                    hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
                     print("Hash: %s" + hashCreated)
                     keccakHashes.append(hashCreated)
                 else:
@@ -91,7 +91,7 @@ class Harvest:
                             iterator += 1
                     stringToHash = tempString
                     print("String to be hashed: %s" % stringToHash)
-                    hashCreated = str(web3.toHex(web3.sha3(text=stringToHash)))[2:10]
+                    hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
                     print("Hash: %s" + hashCreated)
                     keccakHashes.append(hashCreated)
         return keccakHashes
