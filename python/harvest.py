@@ -39,9 +39,9 @@ class Harvest:
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
-        # Elasticsearch index
-        self.elasticSearchIndex = self.config['elasticSearch']['index']
-        print("ElasticSearch Index: %s" % self.elasticSearchIndex)
+        # Elasticsearch index - This is now derived from the ABI key name in the config.ini
+        #self.elasticSearchIndex = self.config['elasticSearch']['index']
+        #print("ElasticSearch Index: %s" % self.elasticSearchIndex)
 
         # Elasticsearch endpoint
         self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
@@ -93,21 +93,21 @@ class Harvest:
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
-    def loadDataIntoElastic(self, _theId, _thePayLoad):
-        esReponseD = self.es.index(index=self.elasticSearchIndex, id=_theId, body=_thePayLoad)
+    def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
+        esReponseD = self.es.index(index=_theIndex, id=_theId, body=_thePayLoad)
         print("\n %s \n" % thePayLoad)
         return esReponseD
 
-    def updateDataInElastic(_theId, _thePayLoad):
-        esReponseD = es.update(index=self.elasticSearchIndex, id=_theId, body=_thePayLoad)
+    def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
+        esReponseD = es.update(index=_theIndex, id=_theId, body=_thePayLoad)
         print("\n %s \n" % thePayLoad)
         return esReponseD
 
-    def hasDataBeenIndexed(self, _esId):
+    def hasDataBeenIndexed(self, _theIndex, _esId):
         print("Checking for %s " % _esId)
         returnVal = False
         try:
-            esReponse2 = self.es.get(index=self.elasticSearchIndex, id=_esId, _source="false")
+            esReponse2 = self.es.get(index=_theIndex, id=_esId, _source="false")
             if esReponse2['found'] == True:
                 returnVal = True
                 print("Item is already indexed.")
@@ -144,7 +144,7 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddresses(self):
+    def fetchContractAddresses(self, _theIndex):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
@@ -154,7 +154,7 @@ class Harvest:
         lContractAddress.append("contractAddress")
         dQuery["query"] = dWildCard
         dQuery["_source"] = lContractAddress
-        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.elasticSearchIndex, query=json.dumps(dQuery), preserve_order=True)
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
             source = doc.get('_source')
@@ -162,7 +162,7 @@ class Harvest:
                 uniqueList.append(source['contractAddress'])
         return uniqueList
 
-    def fetchFunctionDataIds(self):
+    def fetchFunctionDataIds(self, _theIndex):
         dQuery = {}
         dWildCard = {}
         dFunctionDataId = {}
@@ -172,7 +172,7 @@ class Harvest:
         lFunctionId.append("functionDataId")
         dQuery["query"] = dWildCard
         dQuery["_source"] = lFunctionId
-        esReponseIds = elasticsearch.helpers.scan(client=self.es, index=self.elasticSearchIndex, query=json.dumps(dQuery), preserve_order=True)
+        esReponseIds = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseIds):
             source = doc.get('_source')
@@ -180,7 +180,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _contractAbiJSONData,  _stop=False):
+    def harvest(self, _esIndex, _contractAbiJSONData,  _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
         stopAtBlock = 0
@@ -226,9 +226,9 @@ class Harvest:
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                                dataStatus = self.hasDataBeenIndexed(itemId)
+                                dataStatus = self.hasDataBeenIndexed(_esIndex, itemId)
                                 if dataStatus == False:
-                                    indexResult = self.loadDataIntoElastic(itemId, json.dumps(outerData))
+                                    indexResult = self.loadDataIntoElastic(_esIndex, itemId, json.dumps(outerData))
                             except:
                                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                     else:
@@ -238,9 +238,9 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
-    def updateState(self, _contractAbiJSONData):
-        uniqueContractList = self.fetchContractAddresses()
-        uniqueFunctionIds = self.fetchFunctionDataIds()
+    def updateState(self, _esIndex, _contractAbiJSONData):
+        uniqueContractList = self.fetchContractAddresses(_esIndex)
+        uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
         for ifi in uniqueFunctionIds:
             print(ifi)
         contractInstanceList = []
@@ -260,7 +260,7 @@ class Harvest:
                 outerData["functionData"] = freshFunctionData
                 outerData["functionDataId"] = functionDataId
                 doc["doc"] = outerData
-                indexResult = self.updateDataInElastic(itemId, json.dumps(doc))
+                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
 
 
@@ -274,7 +274,7 @@ def harvestFull():
         for innerKey, innerValue in outerValue.items():
             #print("\t %s" % innerKey)
             #print("\t %s" % innerValue)
-            harvester.harvest(innerValue)
+            harvester.harvest(str(outerKey), innerValue)
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 def harvestTopup():
@@ -284,7 +284,7 @@ def harvestTopup():
         for innerKey, innerValue in outerValue.items():
             #print("\t %s" % innerKey)
             #print("\t %s" % innerValue)
-            harvester.harvest(innerValue, True)
+            harvester.harvest(str(outerKey), innerValue, True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 def harvestStateUpdate():
@@ -294,8 +294,9 @@ def harvestStateUpdate():
         for innerKey, innerValue in outerValue.items():
             #print("\t %s" % innerKey)
             #print("\t %s" % innerValue)
-            harvester.updateState(innerValue)
+            harvester.updateState(str(outerKey), innerValue)
 
+# Call using the following commands
 harvestFull()
 harvestTopup()
 harvestStateUpdate()
