@@ -264,13 +264,12 @@ class Harvest:
 
 
 
-
-# Instantiate the Harvest class 
-harvester = Harvest()
+# Callable functions 
 
 # Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
 def harvestFull():
-    for (outerKey, outerValue) in self.abis.items():
+    harvester = Harvest()
+    for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
         for innerKey, innerValue in outerValue.items():
             print("\t %s" % innerKey)
@@ -279,7 +278,8 @@ def harvestFull():
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 def harvestTopup():
-    for (outerKey, outerValue) in self.abis.items():
+    harvester = Harvest()
+    for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
         for innerKey, innerValue in outerValue.items():
             print("\t %s" % innerKey)
@@ -288,11 +288,14 @@ def harvestTopup():
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 def harvestTopup():
-    for (outerKey, outerValue) in self.abis.items():
+    harvester = Harvest()
+    for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
         for innerKey, innerValue in outerValue.items():
             print("\t %s" % innerKey)
             print("\t %s" % innerValue)
             harvester.updateState(innerValue)
+
+harvestFull()
 
 
