@@ -18,17 +18,6 @@ class Harvest:
         print("Reading configuration file")
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
-        # ABI (single abi) - we now cater for multiple abis, see below...
-        #self.fairPlayAbi = self.config['abis']['fair_play_v_one']
-        #print("FairPlay ABI: %s" % self.fairPlayAbi)
-
-        #self.contractAbiFileData = requests.get(self.fairPlayAbi)
-        #print("ABI file data")
-        #print(self.contractAbiFileData)
-
-        #self.contractAbiJSONData = json.loads(self.contractAbiFileData.content)
-        #print("ABI JSON data")
-        #print(self.contractAbiJSONData)
 
         # ABI[s] Allow for multiple ABIs in the config.ini
         self.abis = {}
@@ -77,9 +66,9 @@ class Harvest:
 
         #############################################
         # Functions
-    def createUniqueAbiComparisons(self):
+    def createUniqueAbiComparisons(self, _contractAbiJSONData):
         keccakHashes = []
-        for item in self.contractAbiJSONData:
+        for item in _contractAbiJSONData:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     stringToHash = str(item['name'] + '()')
@@ -126,9 +115,9 @@ class Harvest:
             print("Item does not exist yet.")
         return returnVal
 
-    def getPureOrViewFunctionNames(self):
+    def getPureOrViewFunctionNames(self, _contractAbiJSONData):
         pureOrViewFunctions = []
-        for item in self.contractAbiJSONData:
+        for item in _contractAbiJSONData:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     if len(item['outputs']) > 0:
@@ -250,14 +239,14 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
-    def updateState(self):
+    def updateState(self, _contractAbiJSONData):
         uniqueContractList = self.fetchContractAddresses()
         uniqueFunctionIds = self.fetchFunctionDataIds()
         for ifi in uniqueFunctionIds:
             print(ifi)
         contractInstanceList = []
         for uniqueContracAddress in uniqueContractList:
-            contractInstance = self.web3.eth.contract(abi=self.contractAbiJSONData, address=uniqueContracAddress)
+            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContracAddress)
             contractInstanceList.append(contractInstance)
         for uniqueContractInstance in contractInstanceList:
             freshFunctionData = self.fetchPureViewFunctionData(uniqueContractInstance)
