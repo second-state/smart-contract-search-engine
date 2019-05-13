@@ -18,24 +18,27 @@ class Harvest:
         print("Reading configuration file")
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
+        # ABI (single abi) - we now cater for multiple abis, see below...
+        #self.fairPlayAbi = self.config['abis']['fair_play_v_one']
+        #print("FairPlay ABI: %s" % self.fairPlayAbi)
 
-        # ABI (single abi)
-        self.fairPlayAbi = self.config['abis']['fair_play_v_one']
-        print("FairPlay ABI: %s" % self.fairPlayAbi)
+        #self.contractAbiFileData = requests.get(self.fairPlayAbi)
+        #print("ABI file data")
+        #print(self.contractAbiFileData)
 
-        self.contractAbiFileData = requests.get(self.fairPlayAbi)
-        print("ABI file data")
-        print(self.contractAbiFileData)
-
-        self.contractAbiJSONData = json.loads(self.contractAbiFileData.content)
-        print("ABI JSON data")
-        print(self.contractAbiJSONData)
+        #self.contractAbiJSONData = json.loads(self.contractAbiFileData.content)
+        #print("ABI JSON data")
+        #print(self.contractAbiJSONData)
 
         # ABI[s] Allow for multiple ABIs in the config.ini
         self.abis = {}
         for key in self.config['abis']:
             stringKey = str(key)
-            self.abis[stringKey] = self.config['abis'][key]
+            tempData = {}
+            tempData["url"] = self.config['abis'][key]
+            tempData["json"] = json.loads(requests.get(self.config['abis'][key]))
+            self.abis[stringKey] = tempData
+        # Print the ABIs
         print("\nABIs:")
         for (ufaKey, ufaValue) in self.abis.items():
             print(ufaKey + ": " + ufaValue)
