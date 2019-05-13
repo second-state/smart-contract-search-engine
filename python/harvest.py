@@ -287,7 +287,7 @@ def harvestTopup():
             harvester.harvest(innerValue, True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
-def harvestTopup():
+def harvestStateUpdate():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
@@ -297,5 +297,7 @@ def harvestTopup():
             harvester.updateState(innerValue)
 
 harvestFull()
+harvestTopup()
+harvestStateUpdate()
 
 
