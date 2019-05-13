@@ -99,7 +99,7 @@ class Harvest:
         return esReponseD
 
     def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
-        esReponseD = es.update(index=_theIndex, id=_theId, body=_thePayLoad)
+        esReponseD = self.es.update(index=_theIndex, id=_theId, body=_thePayLoad)
         print("\n %s \n" % _thePayLoad)
         return esReponseD
 
