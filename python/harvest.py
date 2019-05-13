@@ -68,7 +68,7 @@ class Harvest:
         # Functions
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
         keccakHashes = []
-        for item in json.loads(_contractAbiJSONData):
+        for item in _contractAbiJSONData:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     stringToHash = str(item['name'] + '()')
@@ -95,12 +95,12 @@ class Harvest:
 
     def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.index(index=_theIndex, id=_theId, body=_thePayLoad)
-        print("\n %s \n" % thePayLoad)
+        print("\n %s \n" % _thePayLoad)
         return esReponseD
 
     def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = es.update(index=_theIndex, id=_theId, body=_thePayLoad)
-        print("\n %s \n" % thePayLoad)
+        print("\n %s \n" % _thePayLoad)
         return esReponseD
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
@@ -115,17 +115,13 @@ class Harvest:
             print("Item does not exist yet.")
         return returnVal
 
-    def getPureOrViewFunctionNames(self, _contractAbiJSONData):
-        pureOrViewFunctions = []
+    def fetchPureViewFunctionData(self, _contractAbiJSONData, _theContractInstance):
+        callableFunctions = []
         for item in _contractAbiJSONData:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     if len(item['outputs']) > 0:
-                        pureOrViewFunctions.append(str(item['name']))
-        return pureOrViewFunctions
-
-    def fetchPureViewFunctionData(self, _theContractInstance):
-        callableFunctions = self.getPureOrViewFunctionNames()
+                        callableFunctions.append(str(item['name']))
         theFunctionData = {}
         for callableFunction in callableFunctions:
             contract_func = _theContractInstance.functions[str(callableFunction)]
@@ -221,8 +217,8 @@ class Harvest:
                                 outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber 
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
-                                functionData = self.fetchPureViewFunctionData(contractInstance)
-                                functionDataId = self.getFunctionDataId(functionData, contractInstance.abi)
+                                functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
+                                functionDataId = self.getFunctionDataId(functionData)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
@@ -248,8 +244,8 @@ class Harvest:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContracAddress)
             contractInstanceList.append(contractInstance)
         for uniqueContractInstance in contractInstanceList:
-            freshFunctionData = self.fetchPureViewFunctionData(uniqueContractInstance)
-            functionDataId = self.getFunctionDataId(freshFunctionData, _contractAbiJSONData)
+            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
+            functionDataId = self.getFunctionDataId(freshFunctionData)
             if functionDataId in uniqueFunctionIds:
                 print("No change to %s " % functionDataId)
             else:
@@ -271,30 +267,24 @@ def harvestFull():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
-        for innerKey, innerValue in outerValue.items():
-            #print("\t %s" % innerKey)
-            #print("\t %s" % innerValue)
-            harvester.harvest(str(outerKey), innerValue)
+        jsonObject = json.loads(outerValue['json'])
+        harvester.harvest(str(outerKey),jsonObject)
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 def harvestTopup():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
-        for innerKey, innerValue in outerValue.items():
-            #print("\t %s" % innerKey)
-            #print("\t %s" % innerValue)
-            harvester.harvest(str(outerKey), innerValue, True)
+        jsonObject = json.loads(outerValue['json'])
+        harvester.harvest(str(outerKey), jsonObject, True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 def harvestStateUpdate():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
-        for innerKey, innerValue in outerValue.items():
-            #print("\t %s" % innerKey)
-            #print("\t %s" % innerValue)
-            harvester.updateState(str(outerKey), innerValue)
+        jsonObject = json.loads(outerValue['json'])
+        harvester.updateState(str(outerKey), jsonObject)
 
 # Call using the following commands
 harvestFull()
