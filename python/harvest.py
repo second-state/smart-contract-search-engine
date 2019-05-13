@@ -31,7 +31,7 @@ class Harvest:
         print("ABI JSON data")
         print(self.contractAbiJSONData)
 
-        # ABI[s] possible future use, if storing abis in the configuration (for now use single abi option above)
+        # ABI[s] Allow for multiple ABIs in the config.ini
         self.abis = {}
         for key in self.config['abis']:
             stringKey = str(key)
@@ -39,6 +39,7 @@ class Harvest:
         print("\nABIs:")
         for (ufaKey, ufaValue) in self.abis.items():
             print(ufaKey + ": " + ufaValue)
+            
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
