@@ -206,7 +206,7 @@ class Harvest:
                     if transactionContractAddress != None:
                         print("Found contract address: %s " % transactionContractAddress)
                         # We can now test the first 4 bytes of the Keccak hash of the ASCII form of all FairPlay.sol function signatures
-                        listOfKeccakHashes = self.createUniqueAbiComparisons()
+                        listOfKeccakHashes = self.createUniqueAbiComparisons(_contractAbiJSONData)
                         count = 0
                         for individualHash in listOfKeccakHashes:
                             if individualHash in transactionData.input:
