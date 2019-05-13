@@ -180,7 +180,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _stop=False, _contractAbiJSONData):
+    def harvest(self, _contractAbiJSONData,  _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
         stopAtBlock = 0
@@ -284,7 +284,7 @@ def harvestTopup():
         for innerKey, innerValue in outerValue.items():
             print("\t %s" % innerKey)
             print("\t %s" % innerValue)
-            harvester.harvest(True, innerValue)
+            harvester.harvest(innerValue, True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 def harvestTopup():
