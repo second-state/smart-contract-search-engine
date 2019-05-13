@@ -36,7 +36,7 @@ class Harvest:
             stringKey = str(key)
             tempData = {}
             tempData["url"] = self.config['abis'][key]
-            tempData["json"] = json.loads(requests.get(self.config['abis'][key]))
+            tempData["json"] = requests.get(self.config['abis'][key])
             self.abis[stringKey] = tempData
         # Print the ABIs
         print("\nABIs:")
