@@ -40,8 +40,11 @@ class Harvest:
             self.abis[stringKey] = tempData
         # Print the ABIs
         print("\nABIs:")
-        for (ufaKey, ufaValue) in self.abis.items():
-            print(ufaKey + ": " + ufaValue)
+        for (outerKey, outerValue) in self.abis.items():
+            print("%s:" % outerKey)
+            for innerKey, innerValue in outerValue.items():
+                print("\t %s" % innerKey)
+                print("\t %S" % innerValue)
             
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
