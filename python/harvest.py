@@ -180,7 +180,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _stop=False):
+    def harvest(self, _stop=False, _contractAbiJSONData):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
         stopAtBlock = 0
@@ -216,14 +216,13 @@ class Harvest:
                             print("All hashes match!")
                             print("Contract address: %s " % transactionContractAddress)
                             try:
-                                #Abi = fetchAbi()
                                 outerData = {}
-                                contractInstance = self.web3.eth.contract(abi=Abi, address=transactionContractAddress)
+                                contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=transactionContractAddress)
                                 outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber 
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 functionData = self.fetchPureViewFunctionData(contractInstance)
-                                functionDataId = self.getFunctionDataId(functionData)
+                                functionDataId = self.getFunctionDataId(functionData, contractInstance.abi)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
@@ -250,7 +249,7 @@ class Harvest:
             contractInstanceList.append(contractInstance)
         for uniqueContractInstance in contractInstanceList:
             freshFunctionData = self.fetchPureViewFunctionData(uniqueContractInstance)
-            functionDataId = self.getFunctionDataId(freshFunctionData)
+            functionDataId = self.getFunctionDataId(freshFunctionData, _contractAbiJSONData)
             if functionDataId in uniqueFunctionIds:
                 print("No change to %s " % functionDataId)
             else:
@@ -270,12 +269,30 @@ class Harvest:
 harvester = Harvest()
 
 # Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
-harvester.harvest()
+def harvestFull():
+    for (outerKey, outerValue) in self.abis.items():
+        print("%s:" % outerKey)
+        for innerKey, innerValue in outerValue.items():
+            print("\t %s" % innerKey)
+            print("\t %s" % innerValue)
+            harvester.harvest(innerValue)
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
-harvester.harvest(True)
+def harvestTopup():
+    for (outerKey, outerValue) in self.abis.items():
+        print("%s:" % outerKey)
+        for innerKey, innerValue in outerValue.items():
+            print("\t %s" % innerKey)
+            print("\t %s" % innerValue)
+            harvester.harvest(True, innerValue)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
-harvester.updateState()
+def harvestTopup():
+    for (outerKey, outerValue) in self.abis.items():
+        print("%s:" % outerKey)
+        for innerKey, innerValue in outerValue.items():
+            print("\t %s" % innerKey)
+            print("\t %s" % innerValue)
+            harvester.updateState(innerValue)
 
 
