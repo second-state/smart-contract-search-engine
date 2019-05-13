@@ -44,7 +44,7 @@ class Harvest:
             print("%s:" % outerKey)
             for innerKey, innerValue in outerValue.items():
                 print("\t %s" % innerKey)
-                print("\t %S" % innerValue)
+                print("\t %s" % innerValue)
             
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
