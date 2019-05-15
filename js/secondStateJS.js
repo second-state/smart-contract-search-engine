@@ -75,7 +75,7 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr('style', 'width:100%');
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             lShould = [];
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.player_addrs.' + i;
@@ -120,7 +120,7 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr('style', 'width:100%');
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             lShould = [];
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.winner_addrs.' + i;
@@ -215,7 +215,7 @@ $(document).ready(function() {
             lShould.push(dMatchDesc);
             // Start - Players and Winners
             // Players
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.player_addrs' + i;
@@ -224,7 +224,7 @@ $(document).ready(function() {
                 lShould.push(dPTemp2);
             }
             // Winners
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dWTemp = {};
                 var dWTemp2 = {};
                 var fStringW = 'functionData.player_addrs' + i;
@@ -272,7 +272,7 @@ $(document).ready(function() {
             lShould.push(dMatchFunctionDataOwner);
             // Start - Players and Winners
             // Players
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
                 var fString = 'functionData.player_addrs' + i;
@@ -281,7 +281,7 @@ $(document).ready(function() {
                 lShould.push(dPTemp2);
             }
             // Winners
-            for (i = 0; i < 20; i++) {
+            for (i = 0; i < 50; i++) {
                 var dWTemp = {};
                 var dWTemp2 = {};
                 var fStringW = 'functionData.winner_addrs' + i;
