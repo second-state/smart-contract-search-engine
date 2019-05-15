@@ -334,6 +334,9 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
 
 function getItemsUsingDataViaFlask(_data) {
     theUrlForData1 = publicIp + ":5000/data1";
+    console.log("getItemsUsingDataViaFlask");
+    console.log(theUrlForData1);
+    console.log(_data);
     $.ajax({
         url: theUrlForData1,
         type: "POST",
@@ -358,6 +361,9 @@ function getItems(_url) {
 
 function getItemsViaFlask() {
     theUrlforData2 = publicIp + ":5000/data2";
+    console.log("getItemsViaFlask");
+    console.log(theUrlforData2);
+    console.log("GET");
     $.get(theUrlforData2, function(data, status) {
         //console.log(data.hits.hits);
         renderItems(data.hits.hits);
