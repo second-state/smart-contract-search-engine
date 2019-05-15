@@ -4,6 +4,8 @@ Running this smart contract search engine in local mode can be done by simply do
 
 The data for this local mode operation is provided by an open and public Elasticsearch endpoint. The open and public Elasticsearch endpoint URL must be added to the `var elasticSearchUrl` in the [secondStateJS.js file](../js/secondStateJS.js).
 
+If running this in local mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to a blank string, as shown here `""`.
+
 **This (local mode) is really only intended for prototyping, development and testing.** The reason being, if the Elasticsearch endpoint is open then anyone can access, modify and delete the data. Seeings how blockchain data is completely public and open, running this search engine in local mode can facilitate rapid development and prototyping. 
 
 On one hand, if you are using a local (single user) Elasticsearch instance (i.e. localhost endpoint as apposed to a public endpoint) then of course you can simply configure your own local firewall to secure your data. 
