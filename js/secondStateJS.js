@@ -336,6 +336,7 @@ function getItemsUsingDataViaFlask(_data) {
     theUrlForData1 = publicIp + ":5000/data1";
     $.ajax({
         url: theUrlForData1,
+        type: "POST",
         data: _data,
         dataType: "json",
         contentType: "application/json",
