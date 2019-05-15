@@ -16,10 +16,11 @@
 		<script src="js/web3-cmt.js"></script>
 		<title>IO testing</title>
 		<script>
-
+			var publicIp = "http://54.66.215.89"; // This is the public IP of the global search engine server where this file is deployed
 			$(document).ready(function() {
     			$("#ITest").click(function() {
-    			    $.get("http://54.66.215.89:5000/py", function(data, status){
+    				var endpoint = publicIp + ":5000" + "/py";
+    			    $.get(endpoint, function(data, status){
       				alert("Data: " + data + "\nStatus: " + status);
     				});
     			});

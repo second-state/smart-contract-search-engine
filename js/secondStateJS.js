@@ -1,7 +1,9 @@
-// There are only two variables which have to be set for this 
+// Please set the following variables
 
+var publicIp = "http://54.66.215.89"; // This is the public IP of the global search engine server where this file is deployed
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 var currentAccount = "";
+
 
 $(document).ready(function() {
     window.addEventListener('load', function() {
