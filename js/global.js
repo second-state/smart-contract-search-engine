@@ -1,7 +1,9 @@
-var publicIp = "http://54.66.215.89"; // This is the public IP of the global search engine server where this file is deployed
+
+// var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
+var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 var currentAccount = "";
-
+// The above config must be placed in a better system (master config area)
 
 $(document).ready(function() {
     window.addEventListener('load', function() {
@@ -45,7 +47,13 @@ $(document).ready(function() {
             dQuery['query'] = dBool;
             $("#pbc").hide('slow');
             var jsonString = JSON.stringify(dQuery);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             $("#pb.progress-bar").replaceWith(originalState.clone());
         }
         setUpAndProgress();
@@ -83,7 +91,14 @@ $(document).ready(function() {
             dQuery['query'] = dBool;
             $("#pbc").hide('slow');
             var jsonString = JSON.stringify(dQuery);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             $("#pb.progress-bar").replaceWith(originalState.clone());
         }
         setUpAndProgress();
@@ -121,7 +136,13 @@ $(document).ready(function() {
             dQuery['query'] = dBool;
             $("#pbc").hide('slow');
             var jsonString = JSON.stringify(dQuery);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             $("#pb.progress-bar").replaceWith(originalState.clone());
         }
         setUpAndProgress();
@@ -136,7 +157,11 @@ $(document).ready(function() {
         //console.log($.trim(theAddress.length));
         if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
             //console.log("Address and text are both blank, fetching all results without a filter");
-            getItems(elasticSearchUrl);
+            if(publicIp){
+                getItemsViaFlask(elasticSearchUrl);
+            }else{
+                getItems(elasticSearchUrl);
+            }
         } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
             var dFields = {};
             var dQueryInner = {};
@@ -149,7 +174,14 @@ $(document).ready(function() {
             dMultiMatch["multi_match"] = dTemp;
             dQueryOuter["query"] = dMultiMatch;
             var jsonString = JSON.stringify(dQueryOuter);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+                        
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
             var dDesc = {};
@@ -213,7 +245,14 @@ $(document).ready(function() {
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+                        
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
             var dFunctionDataOwner = {};
@@ -263,7 +302,14 @@ $(document).ready(function() {
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
-            var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            
+            // If this is a public website then we need to call ES using Flask
+            if(publicIp){
+                var itemArray = getItemsUsingDataViaFlask(jsonString);
+            }else{
+                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+            }
+
             //console.log(itemArray);
         }
 
@@ -286,8 +332,32 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
     });
 }
 
+function getItemsUsingDataViaFlask(_data) {
+    theUrlForData1 = publicIp + ":5000/data1";
+    $.ajax({
+        url: theUrlForData1,
+        data: _data,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            renderItems(response.hits.hits);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+}
+
 function getItems(_url) {
     $.get(_url, function(data, status) {
+        //console.log(data.hits.hits);
+        renderItems(data.hits.hits);
+    });
+}
+
+function getItemsViaFlask() {
+    theUrlforData2 = publicIp + ":5000/data2";
+    $.get(theUrlforData2, function(data, status) {
         //console.log(data.hits.hits);
         renderItems(data.hits.hits);
     });
