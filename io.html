@@ -19,7 +19,7 @@
 
 			$(document).ready(function() {
     			$("#ITest").click(function() {
-    			    $.get("/py", function(data, status){
+    			    $.get("http://localhost:5000/py", function(data, status){
       				alert("Data: " + data + "\nStatus: " + status);
     				});
     			});
