@@ -23,16 +23,12 @@ es = Elasticsearch(
 
 app = Flask(__name__)
 
-cors = CORS(app, resources={r"/py/*": {"origins": "localhost"}})
+cors = CORS(app)
 
-@app.route("/py/sg")
+@app.route("/py")
 def output():
-    results = es.get(index='fairplay', id='0x9719bee8b984adde1bfd6ae432e79e323909dc2ea81fdeab02e019200b3fc3a5')
+    results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
     return jsonify(results['_source'])
 
-#@app.route("/output")
-#def output():
-#  return "Hello World!"
-
 if __name__ == "__main__":
-  app.run(debug=True)
+	app.run(host='0.0.0.0', port=5000, debug=True)
