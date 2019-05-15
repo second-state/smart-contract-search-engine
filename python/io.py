@@ -25,7 +25,12 @@ app = Flask(__name__)
 
 CORS(app)
 
-@app.route("/py")
+@app.route("/data1")
+def py():
+    results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
+    return jsonify(results['_source'])
+
+@app.route("/data2")
 def py():
     results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
     return jsonify(results['_source'])
