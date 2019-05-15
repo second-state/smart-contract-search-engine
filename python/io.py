@@ -27,12 +27,13 @@ CORS(app)
 
 @app.route("/data1")
 def data1():
-    results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
+    #es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
     return jsonify(results['_source'])
 
 @app.route("/data2")
 def data2():
-    results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
     return jsonify(results['_source'])
 
 if __name__ == "__main__":
