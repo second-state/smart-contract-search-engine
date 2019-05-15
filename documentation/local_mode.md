@@ -51,7 +51,7 @@ Please go ahead and paste your Elasticsearch endpoint URL into the elasticSearch
 
 ```
 [elasticSearch]
-index=fairplay
+index=fairplay_v1
 endpoint="search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com"
 ```
 #### Elasticsearch index name - Python
@@ -65,7 +65,7 @@ Please go ahead and enter your Elasticsearch endpoint URL in the `var elasticSea
 **Notice** that this URL contains the protocol, base domain URL, index name and a query string.
 
 ```
-var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
+var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay_v1/_search/?size=100"
 ```
 
 #### Elasticsearch index name - Javascript
