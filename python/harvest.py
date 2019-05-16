@@ -278,6 +278,11 @@ class Harvest:
                 outerData = {}
                 outerData["functionData"] = freshFunctionData
                 outerData["functionDataId"] = functionDataId
+                theStatus = freshFunctionData['status']
+                if theStatus == 0:
+                    outerData['requiresUpdating'] = "yes"
+                elif theStatus == 1:
+                    outerData['requiresUpdating'] = "no"
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
