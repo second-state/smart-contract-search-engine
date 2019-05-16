@@ -219,9 +219,14 @@ class Harvest:
                                 outerData['dappVersion'] = _version
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
+                                theStatus = functionData['status']
+                                print("* Status: %s" % theStatus)
+                                outerData['status'] = theStatus
+                                
                                 functionDataId = self.getFunctionDataId(functionData)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
+
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
                                 dataStatus = self.hasDataBeenIndexed(_esIndex, itemId)
                                 if dataStatus == False:
