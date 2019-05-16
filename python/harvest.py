@@ -176,7 +176,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _esIndex, _contractAbiJSONData,  _stop=False):
+    def harvest(self, _esIndex, _version, _contractAbiJSONData,  _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
         stopAtBlock = 0
@@ -216,6 +216,7 @@ class Harvest:
                                 contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=transactionContractAddress)
                                 outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber 
+                                outerData['dappVersion'] = _version
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
                                 functionDataId = self.getFunctionDataId(functionData)
@@ -267,24 +268,34 @@ def harvestFull():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
+        indexName = outerKey.split('_')[0]
+        version = outerKey.split('_')[1]
+        print("Processing index %s" % indexName)
+        print("Version %s" % version)
         jsonObject = json.loads(outerValue['json'])
-        harvester.harvest(str(outerKey),jsonObject)
+        harvester.harvest(indexName, version, jsonObject)
 
 # Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
 def harvestTopup():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
-        print("%s:" % outerKey)
+        indexName = outerKey.split('_')[0]
+        version = outerKey.split('_')[1]
+        print("Processing index %s" % indexName)
+        print("Version %s" % version)
         jsonObject = json.loads(outerValue['json'])
-        harvester.harvest(str(outerKey), jsonObject, True)
+        harvester.harvest(indexName, version, jsonObject, True)
 
 # Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
 def harvestStateUpdate():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
-        print("%s:" % outerKey)
+        indexName = outerKey.split('_')[0]
+        version = outerKey.split('_')[1]
+        print("Processing index %s" % indexName)
+        print("Version %s" % version)
         jsonObject = json.loads(outerValue['json'])
-        harvester.updateState(str(outerKey), jsonObject)
+        harvester.updateState(indexName, jsonObject)
 
 # Call using the following commands
 harvestFull()
