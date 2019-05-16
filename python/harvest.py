@@ -150,6 +150,8 @@ class Harvest:
         lContractAddress.append("contractAddress")
         dQuery["query"] = dWildCard
         dQuery["_source"] = lContractAddress
+        print("JSON to get addresses")
+        print(dQuery)
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -222,7 +224,10 @@ class Harvest:
                                 theStatus = functionData['status']
                                 print("* Status: %s" % theStatus)
                                 outerData['status'] = theStatus
-                                
+                                if theStatus == 0:
+                                    outerData['requiresUpdating'] = "yes"
+                                elif theStatus == 1:
+                                    outerData['requiresUpdating'] = "no"
                                 functionDataId = self.getFunctionDataId(functionData)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
