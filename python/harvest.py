@@ -225,30 +225,30 @@ class Harvest:
                         if count == len(listOfKeccakHashes):
                             print("All hashes match!")
                             print("Contract address: %s " % transactionContractAddress)
-                            #try:
-                            outerData = {}
-                            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=transactionContractAddress)
-                            outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                            outerData['blockNumber'] = transactionReceipt.blockNumber 
-                            outerData['dappVersion'] = _version
-                            outerData['contractAddress'] = transactionReceipt.contractAddress
-                            functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
-                            theStatus = functionData['status']
-                            print("* Status: %s" % theStatus)
-                            outerData['status'] = theStatus
-                            if theStatus == 0:
-                                outerData['requiresUpdating'] = "yes"
-                            elif theStatus == 1:
-                                outerData['requiresUpdating'] = "no"
-                            functionDataId = self.getFunctionDataId(functionData)
-                            outerData['functionDataId'] = functionDataId
-                            outerData['functionData'] = functionData
+                            try:
+                                outerData = {}
+                                contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=transactionContractAddress)
+                                outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+                                outerData['blockNumber'] = transactionReceipt.blockNumber 
+                                outerData['dappVersion'] = _version
+                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
+                                theStatus = functionData['status']
+                                print("* Status: %s" % theStatus)
+                                outerData['status'] = theStatus
+                                if theStatus == 0:
+                                    outerData['requiresUpdating'] = "yes"
+                                elif theStatus == 1:
+                                    outerData['requiresUpdating'] = "no"
+                                functionDataId = self.getFunctionDataId(functionData)
+                                outerData['functionDataId'] = functionDataId
+                                outerData['functionData'] = functionData
 
-                            itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                            dataStatus = self.hasDataBeenIndexed(_esIndex, itemId)
-                            if dataStatus == False:
-                                indexResult = self.loadDataIntoElastic(_esIndex, itemId, json.dumps(outerData))
-                            #except:
+                                itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
+                                dataStatus = self.hasDataBeenIndexed(_esIndex, itemId)
+                                if dataStatus == False:
+                                    indexResult = self.loadDataIntoElastic(_esIndex, itemId, json.dumps(outerData))
+                            except:
                                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                     else:
                         print("This transaction does not involve a contract, so we will ignore it")
