@@ -461,7 +461,7 @@ function renderItems(_hits) {
             var play = jQuery('<dd/>', {
 
             });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/v1/dapp/play.html?contract=" + value._source.contractAddress;
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
             var playButton = jQuery('<a/>', {
                 href: playUrl,
                 class: "btn btn-success",
@@ -473,6 +473,11 @@ function renderItems(_hits) {
             play.appendTo(dl);
 
         }
+
+        var version = jQuery('<dd/>', {
+            text: "DApp version: " + value._source.dappVersion
+        });
+        version.appendTo(dl);
 
         //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
 
