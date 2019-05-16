@@ -288,7 +288,7 @@ def harvestStateUpdate():
 
 # Call using the following commands
 harvestFull()
-harvestTopup()
-harvestStateUpdate()
+#harvestTopup()
+#harvestStateUpdate()
 
 

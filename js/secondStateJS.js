@@ -1,6 +1,6 @@
 
-// var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
-var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
+var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
+//var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay_v1/_search/?size=100"
 var currentAccount = "";
 // The above config must be placed in a better system (master config area)
