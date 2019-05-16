@@ -146,11 +146,23 @@ class Harvest:
         dContractAddress = {}
         lContractAddress = []
         dContractAddress["contractAddress"] = "0x*"
-        dWildCard["wildcard"] = dContractAddress
+        dWildCard["wildcard"] = dContractAddress 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["requiresUpdating"] = "yes"
+        dMatch["match"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
-        dQuery["query"] = dWildCard
         dQuery["_source"] = lContractAddress
-        print("JSON to get addresses")
         print(dQuery)
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
