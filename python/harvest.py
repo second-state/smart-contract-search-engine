@@ -290,8 +290,8 @@ class Harvest:
             if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
                 print("No change in contract addresses, for state update, at this stage")
             else:
-                self.fetchUniqueContractList(_esIndex)
                 self.fetchContractInstances(_contractAbiJSONData)
+                self.performStateUpdate(_esIndex, _contractAbiJSONData)
             self.upcomingCallTime = self.upcomingCallTime + 60
             time.sleep(self.upcomingCallTime - time.time())
 
