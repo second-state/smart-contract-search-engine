@@ -1,6 +1,8 @@
 import os
+import sys
 import json
 import boto3 
+import argparse
 import requests
 import configparser
 import elasticsearch.helpers
@@ -190,12 +192,24 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
+    def fetchUniqueContractList(self, _esIndex):
+        uniqueContractList = self.fetchContractAddresses(_esIndex)
+        return uniqueContractList
+
+    def fetchContractInstances(self, _contractAbiJSONData):
+        contractInstanceList = []
+        for uniqueContractAddress in self.uniqueContractList:
+            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
+            contractInstanceList.append(contractInstance)
+        return contractInstanceList
+
     def harvest(self, _esIndex, _version, _contractAbiJSONData,  _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
         stopAtBlock = 0
         if _stop == True:
-            stopAtBlock = latestBlockNumber - 350
+            # If run once per minute 24 is a satisfactory number (4 X the amount of blocks produced per minute)
+            stopAtBlock = latestBlockNumber - 24
         for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
             print("\nProcessing block number %s" % blockNumber)
             # Check to see if this block has any transactions in it
@@ -257,16 +271,9 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
-    def updateState(self, _esIndex, _contractAbiJSONData):
-        uniqueContractList = self.fetchContractAddresses(_esIndex)
+    def performStateUpdate(self):
         uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
-        for ifi in uniqueFunctionIds:
-            print(ifi)
-        contractInstanceList = []
-        for uniqueContracAddress in uniqueContractList:
-            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContracAddress)
-            contractInstanceList.append(contractInstance)
-        for uniqueContractInstance in contractInstanceList:
+        for uniqueContractInstance in self.contractInstanceList:
             freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
             functionDataId = self.getFunctionDataId(freshFunctionData)
             if functionDataId in uniqueFunctionIds:
@@ -286,12 +293,28 @@ class Harvest:
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
+    def updateStateDriver(self, _esIndex, _contractAbiJSONData):
+        self.uniqueContractListHashOld = "0x1234"
+        self.uniqueContractList = self.fetchUniqueContractList(_esIndex)
+        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
+        self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+        self.performStateUpdate(self.contractInstanceList)
+        self.uniqueContractListHashOld = self.uniqueContractListHashFresh
+        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
+        if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
+            self.performStateUpdate()
+        else:
+            uniqueContractList = self.fetchUniqueContractList()
+            uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(uniqueContractList))))
+            contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+            self.performStateUpdate()
 
 
-# Callable functions 
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
+    parser.add_argument("-m", "--mode", help="[full|topup|state]", type=str, default="full")
+    args = parser.parse_args()
 
-# Harvest everything (this is equivalent to the old FairPlayHarvesterFULL.py)
-def harvestFull():
     harvester = Harvest()
     for (outerKey, outerValue) in harvester.abis.items():
         print("%s:" % outerKey)
@@ -300,33 +323,21 @@ def harvestFull():
         print("Processing index %s" % indexName)
         print("Version %s" % version)
         jsonObject = json.loads(outerValue['json'])
+
+    if args.mode == "full":
+        print("Performing full harvest")
         harvester.harvest(indexName, version, jsonObject)
-
-# Harvest with a stop block (this is equivalent to the old FairPlayHarvesterTopup.py)
-def harvestTopup():
-    harvester = Harvest()
-    for (outerKey, outerValue) in harvester.abis.items():
-        indexName = outerKey.split('_')[0]
-        version = outerKey.split('_')[1]
-        print("Processing index %s" % indexName)
-        print("Version %s" % version)
-        jsonObject = json.loads(outerValue['json'])
+    elif args.mode == "topup":
+        print("Performing topup")
         harvester.harvest(indexName, version, jsonObject, True)
+    elif args.mode == "state":
+        print("Performing state update")
+        harvester.updateStateDriver(indexName, jsonObject)
+    else:
+        print("Invalid argument, please try any of the following")
+        print("harvest.py --mode full")
+        print("harvest.py --mode topup")
+        print("harvest.py --mode state")
 
-# Instantiate a web3 contract for each of the stored addresses and then get the "state" of the contract - this provides real-time variable data to the search engine
-def harvestStateUpdate():
-    harvester = Harvest()
-    for (outerKey, outerValue) in harvester.abis.items():
-        indexName = outerKey.split('_')[0]
-        version = outerKey.split('_')[1]
-        print("Processing index %s" % indexName)
-        print("Version %s" % version)
-        jsonObject = json.loads(outerValue['json'])
-        harvester.updateState(indexName, jsonObject)
-
-# Call using the following commands
-harvestFull()
-#harvestTopup()
-#harvestStateUpdate()
 
 
