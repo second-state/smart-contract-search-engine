@@ -281,13 +281,13 @@ class Harvest:
         while True:
             print("Refreshing the list of indexed contracts")
             self.uniqueContractListHashOld = self.uniqueContractListHashFresh
-            tmp_uniqueContractList = self.fetchUniqueContractList(_esIndex)
-            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(tmp_uniqueContractList))))
+            fetchUniqueContractList(_esIndex)
+            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
             if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
                 print("No change in contract addresses, for state update, at this stage")
             else:
-                self.uniqueContractList = self.tmp_uniqueContractList
-                self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+                self.fetchUniqueContractList(_esIndex)
+                self.fetchContractInstances(_contractAbiJSONData)
             self.upcomingCallTime = self.upcomingCallTime + 60
             time.sleep(self.upcomingCallTime - time.time())
 
@@ -316,9 +316,9 @@ class Harvest:
     def updateStateDriver(self, _esIndex, _contractAbiJSONData):
         self.stateUpdate = True
         # Initial setup of a list and its hash
-        self.uniqueContractList = self.fetchUniqueContractList(_esIndex)
+        self.fetchUniqueContractList(_esIndex)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-        self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+        self.fetchContractInstances(_contractAbiJSONData)
         # Allow a minute for variables to be set
         time.sleep(5)
         self.upcomingCallTime = time.time()
