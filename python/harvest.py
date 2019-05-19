@@ -271,7 +271,7 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
-    def performStateUpdate(self, _esIndex):
+    def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
         for uniqueContractInstance in self.contractInstanceList:
             freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
@@ -298,16 +298,16 @@ class Harvest:
         self.uniqueContractList = self.fetchUniqueContractList(_esIndex)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
-        self.performStateUpdate(_esIndex)
+        self.performStateUpdate(_esIndex, _contractAbiJSONData)
         self.uniqueContractListHashOld = self.uniqueContractListHashFresh
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
-            self.performStateUpdate(_esIndex)
+            self.performStateUpdate(_esIndex, _contractAbiJSONData)
         else:
             uniqueContractList = self.fetchUniqueContractList()
             uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(uniqueContractList))))
             contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
-            self.performStateUpdate(_esIndex)
+            self.performStateUpdate(_esIndex, _contractAbiJSONData)
 
 
 if __name__ == "__main__":
