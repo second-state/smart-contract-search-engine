@@ -268,23 +268,21 @@ class Harvest:
 
 
     def fetchUniqueContractList(self, _esIndex):
-        uniqueContractList = self.fetchContractAddresses(_esIndex)
-        return uniqueContractList
+        self.uniqueContractList = self.fetchContractAddresses(_esIndex)
 
     def fetchContractInstances(self, _contractAbiJSONData):
-        contractInstanceList = []
+        self.contractInstanceList = []
         for uniqueContractAddress in self.uniqueContractList:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
-            contractInstanceList.append(contractInstance)
-        return contractInstanceList
+            self.contractInstanceList.append(contractInstance)
 
     def refreshContractAddressList(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTime = time.time()
         while True:
             print("Refreshing the list of indexed contracts")
             self.uniqueContractListHashOld = self.uniqueContractListHashFresh
-            self.tmp_uniqueContractList = self.fetchUniqueContractList(_esIndex)
-            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.tmp_uniqueContractList))))
+            tmp_uniqueContractList = self.fetchUniqueContractList(_esIndex)
+            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(tmp_uniqueContractList))))
             if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
                 print("No change in contract addresses, for state update, at this stage")
             else:
