@@ -298,7 +298,7 @@ class Harvest:
         self.uniqueContractList = self.fetchUniqueContractList(_esIndex)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
-        self.performStateUpdate(self.contractInstanceList)
+        self.performStateUpdate()
         self.uniqueContractListHashOld = self.uniqueContractListHashFresh
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
