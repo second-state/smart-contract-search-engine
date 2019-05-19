@@ -1,6 +1,5 @@
 import os
 import sys
-import date
 import time
 import json
 import boto3 
@@ -275,7 +274,7 @@ class Harvest:
             contractInstanceList.append(contractInstance)
         return contractInstanceList
 
-    def refreshContractAddressList(self,_contractAbiJSONData):
+    def refreshContractAddressList(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTime = time.time()
         while True:
             print("Refreshing the list of indexed contracts")
@@ -321,7 +320,7 @@ class Harvest:
         # Allow a minute for variables to be set
         time.sleep(60)
         self.upcomingCallTime = time.time()
-        self.timerThread = threading.Thread(target=refreshContractAddressList(_contractAbiJSONData))
+        self.timerThread = threading.Thread(target=self.refreshContractAddressList(_esIndex, _contractAbiJSONData))
         self.timerThread.daemon = True
         self.timerThread.start()
         # Allow a minute for the lists to be created
