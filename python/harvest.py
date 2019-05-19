@@ -286,30 +286,31 @@ class Harvest:
             else:
                 self.uniqueContractList = self.tmp_uniqueContractList
                 self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
-            upcomingCallTime = upcomingCallTime + 60
-            time.sleep(upcomingCallTime - time.time())
+            self.upcomingCallTime = self.upcomingCallTime + 60
+            time.sleep(self.upcomingCallTime - time.time())
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
-        uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
-        for uniqueContractInstance in self.contractInstanceList:
-            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
-            functionDataId = self.getFunctionDataId(freshFunctionData)
-            if functionDataId in uniqueFunctionIds:
-                print("No change to %s " % functionDataId)
-            else:
-                print("Hash not found, we must now update this contract instance state")
-                itemId = str(self.web3.toHex(self.web3.sha3(text=uniqueContractInstance.address)))
-                doc = {}
-                outerData = {}
-                outerData["functionData"] = freshFunctionData
-                outerData["functionDataId"] = functionDataId
-                theStatus = freshFunctionData['status']
-                if theStatus == 0:
-                    outerData['requiresUpdating'] = "yes"
-                elif theStatus == 1:
-                    outerData['requiresUpdating'] = "no"
-                doc["doc"] = outerData
-                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+        while True:
+            uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
+            for uniqueContractInstance in self.contractInstanceList:
+                freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
+                functionDataId = self.getFunctionDataId(freshFunctionData)
+                if functionDataId in uniqueFunctionIds:
+                    print("No change to %s " % functionDataId)
+                else:
+                    print("Hash not found, we must now update this contract instance state")
+                    itemId = str(self.web3.toHex(self.web3.sha3(text=uniqueContractInstance.address)))
+                    doc = {}
+                    outerData = {}
+                    outerData["functionData"] = freshFunctionData
+                    outerData["functionDataId"] = functionDataId
+                    theStatus = freshFunctionData['status']
+                    if theStatus == 0:
+                        outerData['requiresUpdating'] = "yes"
+                    elif theStatus == 1:
+                        outerData['requiresUpdating'] = "no"
+                    doc["doc"] = outerData
+                    indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
     def updateStateDriver(self, _esIndex, _contractAbiJSONData):
         self.stateUpdate = True
@@ -324,9 +325,6 @@ class Harvest:
         self.timerThread.daemon = True
         self.timerThread.start()
         # Allow a minute for the lists to be created
-        time.sleep(60)
-        while self.stateUpdate == True:
-            self.performStateUpdate(_esIndex, _contractAbiJSONData)
 
 
 if __name__ == "__main__":
@@ -349,9 +347,12 @@ if __name__ == "__main__":
     elif args.mode == "topup":
         print("Performing topup")
         harvester.harvest(indexName, version, jsonObject, True)
-    elif args.mode == "state":
+    elif args.mode == "state1":
         print("Performing state update")
         harvester.updateStateDriver(indexName, jsonObject)
+    elif args.mode == "state2":
+        print("Performing state2 update")
+        harvester.performStateUpdate(indexName, jsonObject)
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
