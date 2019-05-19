@@ -1,9 +1,12 @@
 import os
 import sys
+import date
+import time
 import json
 import boto3 
 import argparse
 import requests
+import threading
 import configparser
 import elasticsearch.helpers
 from web3 import Web3, HTTPProvider
@@ -192,17 +195,6 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def fetchUniqueContractList(self, _esIndex):
-        uniqueContractList = self.fetchContractAddresses(_esIndex)
-        return uniqueContractList
-
-    def fetchContractInstances(self, _contractAbiJSONData):
-        contractInstanceList = []
-        for uniqueContractAddress in self.uniqueContractList:
-            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
-            contractInstanceList.append(contractInstance)
-        return contractInstanceList
-
     def harvest(self, _esIndex, _version, _contractAbiJSONData,  _stop=False):
         latestBlockNumber = self.web3.eth.getBlock('latest').number
         print("Latest block is %s" % latestBlockNumber)
@@ -271,6 +263,33 @@ class Harvest:
                 print("Skipping block number %s - No transactions found!" % blockNumber)
                 continue
 
+
+    def fetchUniqueContractList(self, _esIndex):
+        uniqueContractList = self.fetchContractAddresses(_esIndex)
+        return uniqueContractList
+
+    def fetchContractInstances(self, _contractAbiJSONData):
+        contractInstanceList = []
+        for uniqueContractAddress in self.uniqueContractList:
+            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
+            contractInstanceList.append(contractInstance)
+        return contractInstanceList
+
+    def refreshContractAddressList(self,_contractAbiJSONData):
+        self.upcomingCallTime = time.time()
+        while True:
+            print("Refreshing the list of indexed contracts")
+            self.uniqueContractListHashOld = self.uniqueContractListHashFresh
+            self.tmp_uniqueContractList = self.fetchUniqueContractList(_esIndex)
+            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.tmp_uniqueContractList))))
+            if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
+                print("No change in contract addresses, for state update, at this stage")
+            else:
+                self.uniqueContractList = self.tmp_uniqueContractList
+                self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+            upcomingCallTime = upcomingCallTime + 60
+            time.sleep(upcomingCallTime - time.time())
+
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
         for uniqueContractInstance in self.contractInstanceList:
@@ -294,19 +313,20 @@ class Harvest:
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
     def updateStateDriver(self, _esIndex, _contractAbiJSONData):
-        self.uniqueContractListHashOld = "0x1234"
+        self.stateUpdate = True
+        # Initial setup of a list and its hash
         self.uniqueContractList = self.fetchUniqueContractList(_esIndex)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         self.contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
-        self.performStateUpdate(_esIndex, _contractAbiJSONData)
-        self.uniqueContractListHashOld = self.uniqueContractListHashFresh
-        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-        if self.uniqueContractListHashOld == self.uniqueContractListHashFresh:
-            self.performStateUpdate(_esIndex, _contractAbiJSONData)
-        else:
-            uniqueContractList = self.fetchUniqueContractList()
-            uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(uniqueContractList))))
-            contractInstanceList = self.fetchContractInstances(_contractAbiJSONData)
+        # Allow a minute for variables to be set
+        time.sleep(60)
+        self.upcomingCallTime = time.time()
+        self.timerThread = threading.Thread(target=refreshContractAddressList(_contractAbiJSONData))
+        self.timerThread.daemon = True
+        self.timerThread.start()
+        # Allow a minute for the lists to be created
+        time.sleep(60)
+        while self.stateUpdate == True:
             self.performStateUpdate(_esIndex, _contractAbiJSONData)
 
 
