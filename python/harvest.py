@@ -327,15 +327,22 @@ class Harvest:
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
             
-            # Create a blank queue
+            print("Creating a blank queue")
             self.q = queue.Queue()
+            print(self.q)
             # Create a blank threads list
+            print("Creating blank threads list")
             self.threads = []
+            print(self.threads)
             # Set the number of threads
+            print("Setting the number of threads")
             for i in range(8):
                 t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
                 t.start()
                 self.threads.append(t)
+            print("Checking thread count")
+            print(self.threads)
+            print("Adding contract instances to the queue")
             for uniqueContractInstance in self.contractInstanceList:
                 # Put a web3 contract object instance in the queue
                 self.q.put(uniqueContractInstance)
