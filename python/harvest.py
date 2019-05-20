@@ -260,18 +260,18 @@ class Harvest:
                     continue
             self.qHarvestDriver.task_done()
             self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 12
-            if self.upcomingCallTimeHarvest > time.time()
+            if self.upcomingCallTimeHarvest > time.time():
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
 
     def harvestDriver(self, _stop=False):
         self.qHarvestDriver = queue.Queue()
         self.threadsFullDriver = []
         for i in range(2):
-            tFullDriver = threading.Thread(target=self.harvest(), args=[_stop])
+            tFullDriver = threading.Thread(target=self.harvest, args=[_stop])
             tFullDriver.daemon = True
             tFullDriver.start()
             self.threadsFullDriver.append(tFullDriver)
-        for abiConfig in self.harvester.abis:
+        for abiConfig in self.abis.items():
             self.qHarvestDriver.put(abiConfig)
         self.qHarvestDriver.join()
 
