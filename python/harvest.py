@@ -310,7 +310,7 @@ class Harvest:
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
             # do the work
-            q.task_done()
+            self.q.task_done()
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
@@ -339,7 +339,7 @@ class Harvest:
                 q.put(uniqueContractInstance)
 
             # block untill all tasks are done
-            q.join()
+            self.q.join()
             # set the time interval for when this task will be repeated
             self.upcomingCallTimeState = self.upcomingCallTimeState + 12
             # If this takes longer than the break time, then just continue straight away
