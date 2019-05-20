@@ -314,27 +314,29 @@ class Harvest:
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
-                # Create a blank queue
-        self.q = queue.Queue()
-                    # Create a blank threads list
-        self.threads = []
-        # Set the number of threads
-        for i in range(8):
-            t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
-            t.start()
-            self.threads.append(t)
-
         while True:
             self.fetchUniqueContractList(_esIndex)
             self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
+            print("Comparing:")
+            print(self.uniqueContractListHashOrig)
+            print(self.uniqueContractListHashFresh)
             if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
                 print("New contract instances are available, we will go and fetch them now ...")
                 self.fetchContractInstances(_contractAbiJSONData)
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
-           
-           for uniqueContractInstance in self.contractInstanceList:
+            
+            # Create a blank queue
+            self.q = queue.Queue()
+            # Create a blank threads list
+            self.threads = []
+            # Set the number of threads
+            for i in range(8):
+                t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
+                t.start()
+                self.threads.append(t)
+            for uniqueContractInstance in self.contractInstanceList:
                 # Put a web3 contract object instance in the queue
                 self.q.put(uniqueContractInstance)
 
