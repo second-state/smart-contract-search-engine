@@ -2,11 +2,13 @@ import os
 import sys
 import time
 import json
-import boto3 
+import boto3
+import queue
 import argparse
 import requests
 import threading
 import configparser
+#from threading import Thread
 import elasticsearch.helpers
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
@@ -283,6 +285,33 @@ class Harvest:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
             self.contractInstanceList.append(contractInstance)
 
+    def worker(self, _esIndex, _contractAbiJSONData):
+        while True:
+            item = self.q.get()
+            if item is None:
+                break
+            uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
+            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, item)
+            functionDataId = self.getFunctionDataId(freshFunctionData)
+            if functionDataId in uniqueFunctionIds:
+                print("No change to %s " % functionDataId)
+            else:
+                print("Hash not found, we must now update this contract instance state")
+                itemId = str(self.web3.toHex(self.web3.sha3(text=item.address)))
+                doc = {}
+                outerData = {}
+                outerData["functionData"] = freshFunctionData
+                outerData["functionDataId"] = functionDataId
+                theStatus = freshFunctionData['status']
+                if theStatus == 0:
+                    outerData['requiresUpdating'] = "yes"
+                elif theStatus == 1:
+                    outerData['requiresUpdating'] = "no"
+                doc["doc"] = outerData
+                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+            # do the work
+            q.task_done()
+
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
         while True:
@@ -294,26 +323,24 @@ class Harvest:
                 self.fetchContractInstances(_contractAbiJSONData)
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
-            uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
+            
+            # Create a blank queue
+            self.q = queue.Queue()
+            # Create a blank threads list
+            self.threads = []
+            # Set the number of threads
+            for i in range(8):
+                t = threading.Thread(target=self.worker)
+                t.start()
+                self.threads.append(t)
+
             for uniqueContractInstance in self.contractInstanceList:
-                freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, uniqueContractInstance)
-                functionDataId = self.getFunctionDataId(freshFunctionData)
-                if functionDataId in uniqueFunctionIds:
-                    print("No change to %s " % functionDataId)
-                else:
-                    print("Hash not found, we must now update this contract instance state")
-                    itemId = str(self.web3.toHex(self.web3.sha3(text=uniqueContractInstance.address)))
-                    doc = {}
-                    outerData = {}
-                    outerData["functionData"] = freshFunctionData
-                    outerData["functionDataId"] = functionDataId
-                    theStatus = freshFunctionData['status']
-                    if theStatus == 0:
-                        outerData['requiresUpdating'] = "yes"
-                    elif theStatus == 1:
-                        outerData['requiresUpdating'] = "no"
-                    doc["doc"] = outerData
-                    indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+                # Put a web3 contract object instance in the queue
+                q.put(uniqueContractInstance)
+
+            # block untill all tasks are done
+            q.join()
+            # set the time interval for when this task will be repeated
             self.upcomingCallTimeState = self.upcomingCallTimeState + 12
             # If this takes longer than the break time, then just continue straight away
             if self.upcomingCallTimeState > time.time():
