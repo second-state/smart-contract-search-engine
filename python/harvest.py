@@ -314,6 +314,16 @@ class Harvest:
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
+                # Create a blank queue
+        self.q = queue.Queue()
+                    # Create a blank threads list
+        self.threads = []
+        # Set the number of threads
+        for i in range(8):
+            t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
+            t.start()
+            self.threads.append(t)
+
         while True:
             self.fetchUniqueContractList(_esIndex)
             self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
@@ -323,18 +333,8 @@ class Harvest:
                 self.fetchContractInstances(_contractAbiJSONData)
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
-            
-            # Create a blank queue
-            self.q = queue.Queue()
-            # Create a blank threads list
-            self.threads = []
-            # Set the number of threads
-            for i in range(8):
-                t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
-                t.start()
-                self.threads.append(t)
-
-            for uniqueContractInstance in self.contractInstanceList:
+           
+           for uniqueContractInstance in self.contractInstanceList:
                 # Put a web3 contract object instance in the queue
                 self.q.put(uniqueContractInstance)
 
