@@ -196,54 +196,47 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _esIndex, _version, _contractAbiJSONData,  _stop=False):
+    def harvest(self, _stop=False):
         self.upcomingCallTimeHarvest = time.time()
         while True:
+            itemConf = self.qHarvestDriver.get()
+            if itemConf is None:
+                break
+            for (outerKey, outerValue) in itemConf.items():
+                esIndex = outerKey.split('_')[0]
+                version = outerKey.split('_')[1]
+                contractAbiJSONData = json.loads(outerValue['json'])
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
             if _stop == True:
-                # If run once per minute 24 is a satisfactory number (4 X the amount of blocks produced per minute)
                 stopAtBlock = latestBlockNumber - 24
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
-                # Check to see if this block has any transactions in it
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
                 if blockTransactionCount > 0:
-                    print("Transaction count: %s." % blockTransactionCount)
                     block = self.web3.eth.getBlock(blockNumber)
-                    # We could loop through the transactions
                     for singleTransaction in block.transactions:
                         singleTransactionHex = singleTransaction.hex()
-                        print("Processing transaction hex: %s " % singleTransactionHex)
-                        # Get the transaction data
                         transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
-                        # Get the transaction receipt
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                        # Determine if this transaction is contract related
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
-                            print("Found contract address: %s " % transactionContractAddress)
-                            # We can now test the first 4 bytes of the Keccak hash of the ASCII form of all FairPlay.sol function signatures
-                            listOfKeccakHashes = self.createUniqueAbiComparisons(_contractAbiJSONData)
+                            listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
                             count = 0
                             for individualHash in listOfKeccakHashes:
                                 if individualHash in transactionData.input:
                                     count += 1
-                                    print("Found a match: %s " % individualHash)
                             if count == len(listOfKeccakHashes):
-                                print("All hashes match!")
-                                print("Contract address: %s " % transactionContractAddress)
                                 try:
                                     outerData = {}
-                                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=transactionContractAddress)
+                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber 
-                                    outerData['dappVersion'] = _version
+                                    outerData['dappVersion'] = version
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
-                                    functionData = self.fetchPureViewFunctionData(_contractAbiJSONData, contractInstance)
+                                    functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
                                     theStatus = functionData['status']
-                                    print("* Status: %s" % theStatus)
                                     outerData['status'] = theStatus
                                     if theStatus == 0:
                                         outerData['requiresUpdating'] = "yes"
@@ -254,9 +247,9 @@ class Harvest:
                                     outerData['functionData'] = functionData
 
                                     itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                                    dataStatus = self.hasDataBeenIndexed(_esIndex, itemId)
+                                    dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                     if dataStatus == False:
-                                        indexResult = self.loadDataIntoElastic(_esIndex, itemId, json.dumps(outerData))
+                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
                                 except:
                                     print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                         else:
@@ -265,13 +258,22 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
+            self.qHarvestDriver.task_done()
             self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 12
-            time.sleep(self.upcomingCallTimeHarvest - time.time())
+            if self.upcomingCallTimeHarvest > time.time()
+                time.sleep(self.upcomingCallTimeHarvest - time.time())
 
-    def topUpDriver(self, _esIndex, _version, _contractAbiJSONData):
-        self.timerThreadTopUp = threading.Thread(target=self.harvest(_esIndex, _version, _contractAbiJSONData, True))
-        self.timerThreadTopUp.daemon = True
-        self.timerThreadTopUp.start()
+    def harvestDriver(self, _stop=False):
+        self.qHarvestDriver = queue.Queue()
+        self.threadsFullDriver = []
+        for i in range(2):
+            tFullDriver = threading.Thread(target=self.harvest(), args=[_stop])
+            tFullDriver.daemon = True
+            tFullDriver.start()
+            self.threadsFullDriver.append(tFullDriver)
+        for abiConfig in self.harvester.abis:
+            self.qHarvestDriver.put(abiConfig)
+        self.qHarvestDriver.join()
 
     # State related
     def fetchUniqueContractList(self, _esIndex):
@@ -370,20 +372,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     harvester = Harvest()
-    for (outerKey, outerValue) in harvester.abis.items():
-        print("%s:" % outerKey)
-        indexName = outerKey.split('_')[0]
-        version = outerKey.split('_')[1]
-        print("Processing index %s" % indexName)
-        print("Version %s" % version)
-        jsonObject = json.loads(outerValue['json'])
 
     if args.mode == "full":
         print("Performing full harvest")
-        harvester.harvest(indexName, version, jsonObject)
+        harvester.harvestDriver()
     elif args.mode == "topup":
         print("Performing topup")
-        harvester.topUpDriver(indexName, version, jsonObject)
+        harvester.harvestDriver(True)
     elif args.mode == "state":
         print("Performing state update")
         harvester.updateStateDriver(indexName, jsonObject)
