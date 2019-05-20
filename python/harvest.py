@@ -336,7 +336,7 @@ class Harvest:
 
             for uniqueContractInstance in self.contractInstanceList:
                 # Put a web3 contract object instance in the queue
-                q.put(uniqueContractInstance)
+                self.q.put(uniqueContractInstance)
 
             # block untill all tasks are done
             self.q.join()
