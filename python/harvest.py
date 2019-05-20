@@ -321,6 +321,7 @@ class Harvest:
 
     def updateStateDriver(self, _esIndex, _contractAbiJSONData):
         self.fetchUniqueContractList(_esIndex)
+        self.fetchContractInstances(_contractAbiJSONData)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         self.timerThread = threading.Thread(target=self.performStateUpdate(_esIndex, _contractAbiJSONData))
         self.timerThread.daemon = True
