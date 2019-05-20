@@ -337,7 +337,7 @@ class Harvest:
             # Set the number of threads
             print("Setting the number of threads")
             for i in range(8):
-                t = threading.Thread(target=self.worker(_esIndex, _contractAbiJSONData))
+                t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData])
                 t.start()
                 self.threads.append(t)
             print("Checking thread count")
