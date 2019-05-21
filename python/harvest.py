@@ -312,7 +312,7 @@ class Harvest:
             self.qList.append(q)
             self.threads = []
             # Set the number of threads
-            for i in range(32):
+            for i in range(16):
                 t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData, queueIndex])
                 t.start()
                 self.threads.append(t)
