@@ -8,7 +8,6 @@ import argparse
 import requests
 import threading
 import configparser
-#from threading import Thread
 import elasticsearch.helpers
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
@@ -36,13 +35,6 @@ class Harvest:
             tempData["url"] = self.config['abis'][key]
             tempData["json"] = requests.get(self.config['abis'][key]).content
             self.abis[stringKey] = tempData
-        # Print the ABIs
-        print("\nABIs:")
-        for (outerKey, outerValue) in self.abis.items():
-            print("%s:" % outerKey)
-            for innerKey, innerValue in outerValue.items():
-                print("\t %s" % innerKey)
-                print("\t %s" % innerValue)
             
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
@@ -73,17 +65,13 @@ class Harvest:
             connection_class=RequestsHttpConnection
         )
 
-        #############################################
-        # Functions
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
         keccakHashes = []
         for item in _contractAbiJSONData:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     stringToHash = str(item['name'] + '()')
-                    print("String to be hashed: %s" % stringToHash)
                     hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
-                    print("Hash: %s" % hashCreated)
                     keccakHashes.append(hashCreated)
                 else:
                     tempString = ""
@@ -96,24 +84,19 @@ class Harvest:
                             tempString += str(functionInput['type'] + ',')
                             iterator += 1
                     stringToHash = tempString
-                    print("String to be hashed: %s" % stringToHash)
                     hashCreated = str(self.web3.toHex(self.web3.sha3(text=stringToHash)))[2:10]
-                    print("Hash: %s" % hashCreated)
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
     def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.index(index=_theIndex, id=_theId, body=_thePayLoad)
-        print("\n %s \n" % _thePayLoad)
         return esReponseD
 
     def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.update(index=_theIndex, id=_theId, body=_thePayLoad)
-        print("\n %s \n" % _thePayLoad)
         return esReponseD
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
-        print("Checking for %s " % _esId)
         returnVal = False
         try:
             esReponse2 = self.es.get(index=_theIndex, id=_esId, _source="false")
@@ -172,7 +155,6 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
-        print(dQuery)
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -209,7 +191,6 @@ class Harvest:
         version = itemConf[0].split('_')[1]
         contractAbiJSONData = json.loads(itemConf[1]['json'])
         while True:
-
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
@@ -284,7 +265,6 @@ class Harvest:
     def fetchUniqueContractList(self, _esIndex):
         self.uniqueContractList = []
         self.uniqueContractList = self.fetchContractAddresses(_esIndex)
-        #print(self.uniqueContractList)
 
     def fetchContractInstances(self, _contractAbiJSONData):
         self.contractInstanceList = []
@@ -325,36 +305,23 @@ class Harvest:
             self.fetchUniqueContractList(_esIndex)
             self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            print("Comparing:")
-            print(self.uniqueContractListHashOrig)
-            print(self.uniqueContractListHashFresh)
             if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
                 print("New contract instances are available, we will go and fetch them now ...")
                 self.fetchContractInstances(_contractAbiJSONData)
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
-            
-            print("Creating a blank queue")
             q = queue.Queue()
             queueIndex = len(self.qList)
             self.qList.append(q)
-            # Create a blank threads list
-            print("Creating blank threads list")
             self.threads = []
-            print(self.threads)
             # Set the number of threads
-            print("Setting the number of threads")
             for i in range(32):
                 t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData, queueIndex])
                 t.start()
                 self.threads.append(t)
-            print("Checking thread count")
-            print(self.threads)
-            print("Adding contract instances to the queue")
             for uniqueContractInstance in self.contractInstanceList:
                 # Put a web3 contract object instance in the queue
                 self.qList[queueIndex].put(uniqueContractInstance)
-
             # block untill all tasks are done
             self.qList[queueIndex].join()
             # set the time interval for when this task will be repeated
