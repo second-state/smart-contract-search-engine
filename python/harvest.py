@@ -202,10 +202,10 @@ class Harvest:
             itemConf = self.qHarvestDriver.get()
             if itemConf is None:
                 break
-            for (outerKey, outerValue) in itemConf.items():
-                esIndex = outerKey.split('_')[0]
-                version = outerKey.split('_')[1]
-                contractAbiJSONData = json.loads(outerValue['json'])
+            
+            esIndex = itemConf[0].split('_')[0]
+            version = itemConf[0].split('_')[1]
+            contractAbiJSONData = json.loads(itemConf[1]['json'])
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
