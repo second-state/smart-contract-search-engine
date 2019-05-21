@@ -292,9 +292,9 @@ class Harvest:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
             self.contractInstanceList.append(contractInstance)
 
-    def worker(self, _esIndex, _contractAbiJSONData):
+    def worker(self, _esIndex, _contractAbiJSONData, _queueIndex):
         while True:
-            item = self.q.get()
+            item = self.qList[_queueIndex].get()
             if item is None:
                 break
             uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
@@ -317,7 +317,7 @@ class Harvest:
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
             # do the work
-            self.q.task_done()
+            self.qList[_queueIndex].task_done()
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
