@@ -181,7 +181,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _stop=False, _queueIndex):
+    def harvest(self, _queueIndex,  _stop=False):
         self.upcomingCallTimeHarvest = time.time()
         itemConf = self.qList[_queueIndex].get()
         if itemConf is None:
@@ -255,7 +255,7 @@ class Harvest:
         self.qList.append(qHarvestDriver)
         self.threadsFullDriver = []
         for i in range(2):
-            tFullDriver = threading.Thread(target=self.harvest, args=[_stop, queueIndex])
+            tFullDriver = threading.Thread(target=self.harvest, args=[queueIndex, _stop])
             tFullDriver.daemon = True
             tFullDriver.start()
             self.threadsFullDriver.append(tFullDriver)
