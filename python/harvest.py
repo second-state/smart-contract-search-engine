@@ -306,10 +306,7 @@ class Harvest:
             self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
             if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
-                print("New contract instances are available, we will go and fetch them now ...")
                 self.fetchContractInstances(_contractAbiJSONData)
-            else:
-                print("The unique contract list is the same, we will just recheck the existing contract instances")
             q = queue.Queue()
             queueIndex = len(self.qList)
             self.qList.append(q)
