@@ -198,14 +198,15 @@ class Harvest:
 
     def harvest(self, _stop=False):
         self.upcomingCallTimeHarvest = time.time()
+        itemConf = self.qHarvestDriver.get()
+        if itemConf is None:
+            break
+        
+        esIndex = itemConf[0].split('_')[0]
+        version = itemConf[0].split('_')[1]
+        contractAbiJSONData = json.loads(itemConf[1]['json'])
         while True:
-            itemConf = self.qHarvestDriver.get()
-            if itemConf is None:
-                break
-            
-            esIndex = itemConf[0].split('_')[0]
-            version = itemConf[0].split('_')[1]
-            contractAbiJSONData = json.loads(itemConf[1]['json'])
+
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
@@ -258,7 +259,8 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
-            self.qHarvestDriver.task_done()
+            if _stop == False:
+                self.qHarvestDriver.task_done()
             self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 12
             if self.upcomingCallTimeHarvest > time.time():
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
