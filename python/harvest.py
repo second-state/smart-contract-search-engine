@@ -359,6 +359,9 @@ class Harvest:
                 if self.upcomingCallTimeState > time.time():
                     time.sleep(self.upcomingCallTimeState - time.time())
 
+    def createStateUpdate():
+        return Harvest.StateUpdate(self)
+
     def updateStateDriver(self):
         itemConf = self.qupdateStateDriverPre.get()
         if itemConf is None:
@@ -369,7 +372,8 @@ class Harvest:
         while True:
             self.fetchUniqueContractList(esIndex)
             self.fetchContractInstances(contractAbiJSONData)
-            stateUpdateInstance = StateUpdate()
+            # Create inner class
+            stateUpdateInstance = self.createStateUpdate()
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
             self.timerThread = threading.Thread(target=stateUpdateInstance.StateUpdate.performStateUpdate(esIndex, contractAbiJSONData))
             self.timerThread.daemon = True
