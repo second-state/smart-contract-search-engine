@@ -316,48 +316,48 @@ class Harvest:
             # do the work
             self.q.task_done()
 
-class StateUpdate:
-    def __init__(self):
-        self.q = queue.Queue()
+    class StateUpdate:
+        def __init__(self):
+            self.q = queue.Queue()
 
-    def performStateUpdate(self, _esIndex, _contractAbiJSONData):
-        self.upcomingCallTimeState = time.time()
-        while True:
-            self.fetchUniqueContractList(_esIndex)
-            self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
-            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            print("Comparing:")
-            print(self.uniqueContractListHashOrig)
-            print(self.uniqueContractListHashFresh)
-            if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
-                print("New contract instances are available, we will go and fetch them now ...")
-                self.fetchContractInstances(_contractAbiJSONData)
-            else:
-                print("The unique contract list is the same, we will just recheck the existing contract instances")
-            # Create a blank threads list
-            print("Creating blank threads list")
-            self.threads = []
-            print(self.threads)
-            # Set the number of threads
-            print("Setting the number of threads")
-            for i in range(32):
-                t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData])
-                t.start()
-                self.threads.append(t)
-            print("Checking thread count")
-            print(self.threads)
-            print("Adding contract instances to the queue")
-            for uniqueContractInstance in self.contractInstanceList:
-                # Put a web3 contract object instance in the queue
-                self.q.put(uniqueContractInstance)
+        def performStateUpdate(self, _esIndex, _contractAbiJSONData):
+            self.upcomingCallTimeState = time.time()
+            while True:
+                self.fetchUniqueContractList(_esIndex)
+                self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
+                self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
+                print("Comparing:")
+                print(self.uniqueContractListHashOrig)
+                print(self.uniqueContractListHashFresh)
+                if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
+                    print("New contract instances are available, we will go and fetch them now ...")
+                    self.fetchContractInstances(_contractAbiJSONData)
+                else:
+                    print("The unique contract list is the same, we will just recheck the existing contract instances")
+                # Create a blank threads list
+                print("Creating blank threads list")
+                self.threads = []
+                print(self.threads)
+                # Set the number of threads
+                print("Setting the number of threads")
+                for i in range(32):
+                    t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData])
+                    t.start()
+                    self.threads.append(t)
+                print("Checking thread count")
+                print(self.threads)
+                print("Adding contract instances to the queue")
+                for uniqueContractInstance in self.contractInstanceList:
+                    # Put a web3 contract object instance in the queue
+                    self.q.put(uniqueContractInstance)
 
-            # block untill all tasks are done
-            self.q.join()
-            # set the time interval for when this task will be repeated
-            self.upcomingCallTimeState = self.upcomingCallTimeState + 12
-            # If this takes longer than the break time, then just continue straight away
-            if self.upcomingCallTimeState > time.time():
-                time.sleep(self.upcomingCallTimeState - time.time())
+                # block untill all tasks are done
+                self.q.join()
+                # set the time interval for when this task will be repeated
+                self.upcomingCallTimeState = self.upcomingCallTimeState + 12
+                # If this takes longer than the break time, then just continue straight away
+                if self.upcomingCallTimeState > time.time():
+                    time.sleep(self.upcomingCallTimeState - time.time())
 
     def updateStateDriver(self):
         itemConf = self.qupdateStateDriverPre.get()
@@ -371,7 +371,7 @@ class StateUpdate:
             self.fetchContractInstances(contractAbiJSONData)
             stateUpdateInstance = StateUpdate()
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            self.timerThread = threading.Thread(target=stateUpdateInstance.performStateUpdate(esIndex, contractAbiJSONData))
+            self.timerThread = threading.Thread(target=stateUpdateInstance.StateUpdate.performStateUpdate(esIndex, contractAbiJSONData))
             self.timerThread.daemon = True
             self.timerThread.start()
             self.qupdateStateDriverPre.task_done()
