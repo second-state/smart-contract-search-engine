@@ -359,13 +359,33 @@ class Harvest:
             if self.upcomingCallTimeState > time.time():
                 time.sleep(self.upcomingCallTimeState - time.time())
 
-    def updateStateDriver(self, _esIndex, _contractAbiJSONData):
-        self.fetchUniqueContractList(_esIndex)
-        self.fetchContractInstances(_contractAbiJSONData)
-        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-        self.timerThread = threading.Thread(target=self.performStateUpdate(_esIndex, _contractAbiJSONData))
-        self.timerThread.daemon = True
-        self.timerThread.start()
+    def updateStateDriver(self):
+        itemConf = self.qupdateStateDriverPre.get()
+        if itemConf is None:
+            print("itemConf is None")
+        esIndex = itemConf[0].split('_')[0]
+        version = itemConf[0].split('_')[1]
+        contractAbiJSONData = json.loads(itemConf[1]['json'])
+        while True:
+            self.fetchUniqueContractList(esIndex)
+            self.fetchContractInstances(contractAbiJSONData)
+            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
+            self.timerThread = threading.Thread(target=self.performStateUpdate(esIndex, contractAbiJSONData))
+            self.timerThread.daemon = True
+            self.timerThread.start()
+            self.qupdateStateDriverPre.task_done()
+
+    def updateStateDriverPre(self):
+        self.qupdateStateDriverPre = queue.Queue()
+        self.threadsupdateStateDriverPre = []
+        for i in range(2):
+            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver)
+            tupdateStateDriverPre.daemon = True
+            tupdateStateDriverPre.start()
+            self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
+        for abiConfig in self.abis.items():
+            self.qupdateStateDriverPre.put(abiConfig)
+        self.qupdateStateDriverPre.join()
 
 
 if __name__ == "__main__":
@@ -383,7 +403,7 @@ if __name__ == "__main__":
         harvester.harvestDriver(True)
     elif args.mode == "state":
         print("Performing state update")
-        harvester.updateStateDriver(indexName, jsonObject)
+        harvester.updateStateDriverPre()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
