@@ -3,6 +3,7 @@ var publicIp = ""; // This must be an empty string, unless you are hosting this 
 //var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 var currentAccount = "";
+var currentNetwork = "";
 // The above config must be placed in a better system (master config area)
 
 $(document).ready(function() {
@@ -12,6 +13,9 @@ $(document).ready(function() {
             console.log("Connected to web3 - Success!")
             web3.eth.getAccounts((err, accounts) => {
                 this.currentAccount = accounts[0]
+            });
+            web3.version.getNetwork((err, theNetwork) => {
+                this.currentNetwork = theNetwork
             });
         } else {
             // set the provider you want from Web3.providers
