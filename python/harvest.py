@@ -316,6 +316,10 @@ class Harvest:
             # do the work
             self.q.task_done()
 
+class StateUpdate:
+    def __init__(self):
+        self.q = queue.Queue()
+
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
         while True:
@@ -330,10 +334,6 @@ class Harvest:
                 self.fetchContractInstances(_contractAbiJSONData)
             else:
                 print("The unique contract list is the same, we will just recheck the existing contract instances")
-            
-            print("Creating a blank queue")
-            self.q = queue.Queue()
-            print(self.q)
             # Create a blank threads list
             print("Creating blank threads list")
             self.threads = []
@@ -369,8 +369,9 @@ class Harvest:
         while True:
             self.fetchUniqueContractList(esIndex)
             self.fetchContractInstances(contractAbiJSONData)
+            stateUpdateInstance = StateUpdate()
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            self.timerThread = threading.Thread(target=self.performStateUpdate(esIndex, contractAbiJSONData))
+            self.timerThread = threading.Thread(target=stateUpdateInstance.performStateUpdate(esIndex, contractAbiJSONData))
             self.timerThread.daemon = True
             self.timerThread.start()
             self.qupdateStateDriverPre.task_done()
