@@ -336,7 +336,7 @@ class Harvest:
             
             print("Creating a blank queue")
             q = queue.Queue()
-            queueIndex = len(qList)
+            queueIndex = len(self.qList)
             self.qList.append(q)
             # Create a blank threads list
             print("Creating blank threads list")
