@@ -200,7 +200,7 @@ class Harvest:
         self.upcomingCallTimeHarvest = time.time()
         itemConf = self.qHarvestDriver.get()
         if itemConf is None:
-            break
+            print("itemConf is None")
         
         esIndex = itemConf[0].split('_')[0]
         version = itemConf[0].split('_')[1]
