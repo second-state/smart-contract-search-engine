@@ -181,9 +181,9 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _stop=False):
+    def harvest(self, _stop=False, _queueIndex):
         self.upcomingCallTimeHarvest = time.time()
-        itemConf = self.qHarvestDriver.get()
+        itemConf = self.qList[_queueIndex].get()
         if itemConf is None:
             print("itemConf is None")
         
@@ -244,22 +244,24 @@ class Harvest:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
             if _stop == False:
-                self.qHarvestDriver.task_done()
+                self.qList[_queueIndex].task_done()
             self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 12
             if self.upcomingCallTimeHarvest > time.time():
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
 
     def harvestDriver(self, _stop=False):
-        self.qHarvestDriver = queue.Queue()
+        qHarvestDriver = queue.Queue()
+        queueIndex = len(self.qList)
+        self.qList.append(qHarvestDriver)
         self.threadsFullDriver = []
         for i in range(2):
-            tFullDriver = threading.Thread(target=self.harvest, args=[_stop])
+            tFullDriver = threading.Thread(target=self.harvest, args=[_stop, queueIndex])
             tFullDriver.daemon = True
             tFullDriver.start()
             self.threadsFullDriver.append(tFullDriver)
         for abiConfig in self.abis.items():
-            self.qHarvestDriver.put(abiConfig)
-        self.qHarvestDriver.join()
+            self.qList[queueIndex].put(abiConfig)
+        self.qList[queueIndex].join()
 
     # State related
     def fetchUniqueContractList(self, _esIndex):
@@ -296,7 +298,6 @@ class Harvest:
                     outerData['requiresUpdating'] = "no"
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
-            # do the work
             self.qList[_queueIndex].task_done()
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
@@ -327,8 +328,8 @@ class Harvest:
             if self.upcomingCallTimeState > time.time():
                 time.sleep(self.upcomingCallTimeState - time.time())
 
-    def updateStateDriver(self):
-        itemConf = self.qupdateStateDriverPre.get()
+    def updateStateDriver(self, _queueIndex):
+        itemConf = self.qList[_queueIndex].get()
         if itemConf is None:
             print("itemConf is None")
         esIndex = itemConf[0].split('_')[0]
@@ -341,19 +342,21 @@ class Harvest:
             self.timerThread = threading.Thread(target=self.performStateUpdate(esIndex, contractAbiJSONData))
             self.timerThread.daemon = True
             self.timerThread.start()
-            self.qupdateStateDriverPre.task_done()
+            self.qList[_queueIndex].task_done()
 
     def updateStateDriverPre(self):
-        self.qupdateStateDriverPre = queue.Queue()
+        qUpdateStateDriverPre = queue.Queue()
+        queueIndex = len(self.qList)
+        self.qList.append(qUpdateStateDriverPre)
         self.threadsupdateStateDriverPre = []
         for i in range(2):
-            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver)
+            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[queueIndex])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
         for abiConfig in self.abis.items():
             self.qupdateStateDriverPre.put(abiConfig)
-        self.qupdateStateDriverPre.join()
+        self.qList[queueIndex].join()
 
 
 if __name__ == "__main__":
