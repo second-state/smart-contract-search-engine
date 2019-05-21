@@ -451,6 +451,20 @@ function renderItems(_hits) {
                 class: "expired"
             });
             time.appendTo(dl);
+            // Allow user to VIEW this giveaway
+            var view = jQuery('<dd/>', {
+
+            });
+            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var viewButton = jQuery('<a/>', {
+                href: viewUrl,
+                class: "btn btn-info",
+                role: "button",
+                target: "_blank",
+                text: "View"
+            });
+            viewButton.appendTo(view);
+            view.appendTo(dl);
         } else if (currentDate < endDate) {
             var time = jQuery('<dd/>', {
                 text: "End date: " + endDate,
