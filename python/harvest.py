@@ -355,7 +355,7 @@ class Harvest:
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
         for abiConfig in self.abis.items():
-            self.qupdateStateDriverPre.put(abiConfig)
+            self.self.qList[_queueIndex].put(abiConfig)
         self.qList[queueIndex].join()
 
 
