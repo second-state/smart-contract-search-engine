@@ -339,7 +339,7 @@ class Harvest:
             self.fetchUniqueContractList(esIndex)
             self.fetchContractInstances(contractAbiJSONData)
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            self.timerThread = threading.Thread(target=self.performStateUpdate(esIndex, contractAbiJSONData))
+            self.timerThread = threading.Thread(target=self.performStateUpdate, args=[esIndex, contractAbiJSONData])
             self.timerThread.daemon = True
             self.timerThread.start()
             self.qList[_queueIndex].task_done()
