@@ -1,10 +1,26 @@
 
+// Local single user vs global multiuser
 var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
 //var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
-var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
-var currentAccount = "";
+
+// Check blockchain network and accounts
+// This is used to confirm that the user's chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
+var searchEngineNetwork = "19"; // CyberMiles TestNet
+//var searchEngineNetwork = "18"; // CyberMiles MainNet
+
 var currentNetwork = "";
+var currentAccount = "";
+
+// Elasticsearch / Data origin
+var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
 // The above config must be placed in a better system (master config area)
+
+// Check network
+function checkNetwork(){
+    if (this.searchEngineNetwork != this.currentNetwork){
+        alert("Please select the correct network in your Venus Chrome extension!");
+    }
+}
 
 $(document).ready(function() {
     window.addEventListener('load', function() {
@@ -39,6 +55,7 @@ $(document).ready(function() {
             });
             $("#pb.progress-bar").attr('style', 'width:100%');
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            checkNetwork();
             var dFunctionDataOwner = {};
             dFunctionDataOwner['functionData.owner'] = this.currentAccount;
             var dMatchFunctionDataOwner = {};
@@ -78,6 +95,7 @@ $(document).ready(function() {
             });
             $("#pb.progress-bar").attr('style', 'width:100%');
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            checkNetwork();
             lShould = [];
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
@@ -123,6 +141,7 @@ $(document).ready(function() {
             });
             $("#pb.progress-bar").attr('style', 'width:100%');
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
+            checkNetwork();
             lShould = [];
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
