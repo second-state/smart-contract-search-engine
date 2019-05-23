@@ -245,7 +245,7 @@ class Harvest:
                     continue
             if _stop == False:
                 self.qList[_queueIndex].task_done()
-            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 12
+            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
             if self.upcomingCallTimeHarvest > time.time():
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
 
@@ -301,7 +301,6 @@ class Harvest:
             self.qList[_queueIndex].task_done()
 
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
-        print("performStateUpdate")
         self.upcomingCallTimeState = time.time()
         while True:
             self.fetchUniqueContractList(_esIndex)
@@ -315,8 +314,6 @@ class Harvest:
             self.threads = []
             # Set the number of threads
             threadCount = len(self.uniqueContractList)
-            if threadCount > 100:
-                threadCount == 100
             for i in range(threadCount):
                 t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData, queueIndex])
                 t.start()
@@ -337,15 +334,12 @@ class Harvest:
                 time.sleep(self.upcomingCallTimeState - time.time())
 
     def updateStateDriver(self, _queueIndex):
-        print("updateStateDriver")
         if self.qList[_queueIndex].empty():
             time.sleep(3)
         else:
             self.qList[_queueIndex].empty()
         itemConf = self.qList[_queueIndex].get()
-        print("Got itemConf")
         if itemConf is None:
-            print("itemConf is None")
             sys.exit("No ABIs left to process")
         esIndex = itemConf[0].split('_')[0]
         version = itemConf[0].split('_')[1]
@@ -363,15 +357,12 @@ class Harvest:
 
         self.threadsupdateStateDriverPre = []
         for i in range(len(self.abis)):
-            print("i")
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[queueIndex])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
         for abiConfig in self.abis.items():
-            print("ii")
             self.qList[queueIndex].put(abiConfig)
-            print("Abi added to the queue")
         self.qList[queueIndex].join()
 
 
