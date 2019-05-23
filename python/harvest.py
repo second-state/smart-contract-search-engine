@@ -387,3 +387,13 @@ if __name__ == "__main__":
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
+        
+# Monitor the total number of threads on the operating system
+# ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
+
+# Monitor the number of threads per pid; run any of the following commands and paste THE_PID into the watch command below
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+
+# watch -n 2 -d "ps -eL THE_PID | wc -l"
