@@ -222,16 +222,8 @@ class Harvest:
                                 try:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-
                                     if byteCode in transactionData.input:
                                         outerData['byteCodeURL'] = str(self.config['bytecode'][itemConf[0]])
-
-                                    else:
-
-                                        print(byteCode)
-                                        print("Not in:")
-                                        print(transactionData.input)
-
                                     outerData['abiURL'] = itemConf[1]['url']
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
