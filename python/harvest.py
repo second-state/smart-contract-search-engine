@@ -221,9 +221,8 @@ class Harvest:
                             if count == len(listOfKeccakHashes):
                                 try:
                                     outerData = {}
-                                    #print(transactionContractAddress)
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress, bytecode=byteCode)
-                                    contractInstanceByteCode = contractInstance.bytecode
+                                    contractInstanceByteCode = self.web3.toHex(contractInstance.bytecode)
                                     if contractInstanceByteCode == byteCode:
                                         outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                         outerData['blockNumber'] = transactionReceipt.blockNumber 
