@@ -187,7 +187,7 @@ class Harvest:
         itemConf = self.qList[_queueIndex].get()
         if itemConf is None:
             print("itemConf is None")
-        
+
         esIndex = itemConf[0].split('_')[0]
         version = itemConf[0].split('_')[1]
         contractAbiJSONData = json.loads(itemConf[1]['json'])
@@ -222,15 +222,23 @@ class Harvest:
                                 try:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+
                                     if byteCode in transactionData.input:
                                         outerData['byteCodeURL'] = str(self.config['bytecode'][itemConf[0]])
+
+                                    else:
+
+                                        print(byteCode)
+                                        print("Not in:")
+                                        print(transactionData.input)
+
                                     outerData['abiURL'] = itemConf[1]['url']
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                                    outerData['blockNumber'] = transactionReceipt.blockNumber 
+                                    outerData['blockNumber'] = transactionReceipt.blockNumber
                                     outerData['dappVersion'] = version
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
-                                    
+
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
                                     theStatus = functionData['status']
                                     outerData['status'] = theStatus
