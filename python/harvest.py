@@ -216,7 +216,7 @@ class Harvest:
                                 try:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    contractCodeBin = contractInstance.getCode()
+                                    contractCodeBin = contractInstance.bytecode
                                     print(contractCodeBin)
                                     contractCodeHash = str(self.web3.toHex(self.web3.sha3(text=contractCodeBin)))
                                     pring(contractCodeHash)
