@@ -215,12 +215,12 @@ class Harvest:
                             if count == len(listOfKeccakHashes):
                                 try:
                                     outerData = {}
-                                    print(transactionContractAddress)
+                                    #print(transactionContractAddress)
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    contractCodeBin = contractInstance.bytecode
-                                    print(contractCodeBin)
-                                    contractCodeHash = str(self.web3.toHex(self.web3.sha3(text=contractCodeBin)))
-                                    print(contractCodeHash)
+                                    #contractCodeBin = contractInstance.bytecode
+                                    #print(contractCodeBin)
+                                    #contractCodeHash = str(self.web3.toHex(self.web3.sha3(text=contractCodeBin)))
+                                    #print(contractCodeHash)
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber 
                                     outerData['dappVersion'] = version
