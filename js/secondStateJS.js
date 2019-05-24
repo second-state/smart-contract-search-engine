@@ -582,20 +582,20 @@ function renderItems(_hits) {
         });
         blockNumber.appendTo(dl2);
 
-        if(value._source.TxHash.toString().length > 0 && value._source.TxHash !== undefined){
+        if(value._source.TxHash !== undefined){
         var txHash = jQuery('<dd/>', {
             text: 'Original transaction hash: ' + '<a href="' + blockExplorer + 'tx/' + value._source.TxHash + '" target="_blank">' +  value._source.TxHash + '</a>'
         });
         txHash.appendTo(dl2);
         }
-        if(value._source.byteCodeURL.toString().length > 0 && value._source.byteCodeURL !== undefined){
+        if(value._source.byteCodeURL !== undefined){
         var byteCodeURLO = jQuery('<dd/>', {
             text: 'Original bytecode: ' + '<a href="' + value._source.byteCodeURL + '" target="_blank">Click to view source</a>'
         });
         byteCodeURLO.appendTo(dl2);
         }
 
-        if(value._source.abiURL.toString().length > 0 && value._source.abiURL !== undefined){
+        if(value._source.abiURL !== undefined){
         var abiURLO = jQuery('<dd/>', {
         });
             text: 'Original ABI: ' + '<a href="' + value._source.abiURL + '" target="_blank">Click to view source</a>'
