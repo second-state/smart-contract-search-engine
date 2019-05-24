@@ -221,30 +221,31 @@ class Harvest:
                             if count == len(listOfKeccakHashes):
                                 try:
                                     outerData = {}
-                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress, bytecode=byteCode)
-                                    contractInstanceByteCode = self.web3.toHex(contractInstance.bytecode)
-                                    if contractInstanceByteCode == byteCode:
-                                        outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                                        outerData['blockNumber'] = transactionReceipt.blockNumber 
-                                        outerData['dappVersion'] = version
-                                        outerData['contractAddress'] = transactionReceipt.contractAddress
-                                        functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                        theStatus = functionData['status']
-                                        outerData['status'] = theStatus
-                                        if theStatus == 0:
-                                            outerData['requiresUpdating'] = "yes"
-                                        elif theStatus == 1:
-                                            outerData['requiresUpdating'] = "no"
-                                        functionDataId = self.getFunctionDataId(functionData)
-                                        outerData['functionDataId'] = functionDataId
-                                        outerData['functionData'] = functionData
-
-                                        itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                                        dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
-                                        if dataStatus == False:
-                                            indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
-                                    else:
-                                        print("Contract bytecode is not the same as what is stored in the config, we are not going to index this one.")
+                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+                                    if byteCode in transactionData.input:
+                                        outerData['byteCodeURL'] = str(self.config['bytecode'][itemConf[0]])
+                                    outerData['abiURL'] = itemConf[1]['url']
+                                    outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                    outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+                                    outerData['blockNumber'] = transactionReceipt.blockNumber 
+                                    outerData['dappVersion'] = version
+                                    outerData['contractAddress'] = transactionReceipt.contractAddress
+                                    
+                                    functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
+                                    theStatus = functionData['status']
+                                    outerData['status'] = theStatus
+                                    if theStatus == 0:
+                                        outerData['requiresUpdating'] = "yes"
+                                    elif theStatus == 1:
+                                        outerData['requiresUpdating'] = "no"
+                                    functionDataId = self.getFunctionDataId(functionData)
+                                    outerData['functionDataId'] = functionDataId
+                                    outerData['functionData'] = functionData
+                                    print(outerData)
+                                    itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
+                                    dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                    if dataStatus == False:
+                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
                                 except:
                                     print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                         else:
