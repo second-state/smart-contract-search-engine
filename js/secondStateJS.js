@@ -573,7 +573,7 @@ function renderItems(_hits) {
         var byteCodeURLO = jQuery('<dd/>', {
         });
         var byteCodeURLI = jQuery('<a/>', {
-            text: "Bytecode: " + value._source.byteCodeURL,
+            text: value._source.byteCodeURL,
             href: value._source.byteCodeURL,
             target: "_blank"
         });
@@ -583,7 +583,7 @@ function renderItems(_hits) {
         var abiURLO = jQuery('<dd/>', {
         });
         var abiURLI = jQuery('<a/>', {
-            text: "ABI: " + value._source.abiURL,
+            text: value._source.abiURL,
             href: value._source.abiURL,
             target: "_blank"
         });
