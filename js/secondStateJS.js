@@ -1,4 +1,6 @@
 
+// CONFIG START
+// STATIC
 // Local single user vs global multiuser
 var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
 //var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
@@ -11,10 +13,25 @@ var searchEngineNetwork = "19"; // CyberMiles TestNet
 var currentNetwork = "";
 var currentAccount = "";
 
-// Elasticsearch / Data origin
-var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay/_search/?size=100"
-// The above config must be placed in a better system (master config area)
+// DYNAMIC
+// Set up endpoints based on the above config
+var esIndexName = "";
+var blockExplorer = "";
 
+if (searchEngineNetwork == "19"){
+    blockExplorer = "https://testnet.cmttracking.io/";
+    esIndexName = "fairplay";
+}
+
+if(searchEngineNetwork == "18"){
+    blockExplorer = "https://www.cmttracking.io/";
+    esIndexName = "mainnetfairplay";
+}
+
+var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+// CONFIG END
+
+// CODE START
 // Check network
 function checkNetwork(){
     if (this.searchEngineNetwork != this.currentNetwork){
@@ -433,7 +450,7 @@ function renderItems(_hits) {
         description.appendTo(dl);
 
         var winners = jQuery('<dd/>', {
-            text: "Number of winners: " + value._source.functionData.info[4]
+            text: "Number of potential winners: " + value._source.functionData.info[4]
         });
         winners.appendTo(dl);
 
@@ -561,42 +578,37 @@ function renderItems(_hits) {
         dl2.appendTo(pBody);
 
         var blockNumber = jQuery('<dd/>', {
-            text: "Original block number: " + value._source.blockNumber
+            text: 'Original block number: ' + '<a href="' + blockExplorer + 'block/' + value._source.blockNumber + '" target="_blank">' + value._source.blockNumber + '</a>'
         });
         blockNumber.appendTo(dl2);
 
+        if(value._source.TxHash.toString().length > 0 && value._source.TxHash !== undefined){
         var txHash = jQuery('<dd/>', {
-            text: "Original transaction hash: " + value._source.TxHash
+            text: 'Original transaction hash: ' + '<a href="' + blockExplorer + 'tx/' + value._source.TxHash + '" target="_blank">' +  value._source.TxHash + '</a>'
         });
         txHash.appendTo(dl2);
-
+        }
+        if(value._source.byteCodeURL.toString().length > 0 && value._source.byteCodeURL !== undefined){
         var byteCodeURLO = jQuery('<dd/>', {
+            text: 'Original bytecode: ' + '<a href="' + value._source.byteCodeURL + '" target="_blank">Click to view source</a>'
         });
-        var byteCodeURLI = jQuery('<a/>', {
-            text: value._source.byteCodeURL,
-            href: value._source.byteCodeURL,
-            target: "_blank"
-        });
-        byteCodeURLI.appendTo(byteCodeURLO)
         byteCodeURLO.appendTo(dl2);
+        }
 
+        if(value._source.abiURL.toString().length > 0 && value._source.abiURL !== undefined){
         var abiURLO = jQuery('<dd/>', {
         });
-        var abiURLI = jQuery('<a/>', {
-            text: value._source.abiURL,
-            href: value._source.abiURL,
-            target: "_blank"
-        });
-        abiURLI.appendTo(abiURLO)
+            text: 'Original ABI: ' + '<a href="' + value._source.abiURL + '" target="_blank">Click to view source</a>'
         abiURLO.appendTo(dl2);
+        }
 
         var cOwner = jQuery('<dd/>', {
-            text: "Contract's owner: " + value._source.functionData.owner
+            text: 'Contract owner:' + '<a href="' + blockExplorer + 'address/' + value._source.functionData.owner + '" target="_blank">' +  value._source.functionData.owner + '</a>'
         });
         cOwner.appendTo(dl2);
 
         var cAddress = jQuery('<dd/>', {
-            text: "Contract's address: " + value._source.contractAddress
+            text: 'Contract address:' + '<a href="' + blockExplorer + 'address/' + value._source.contractAddress + '" target="_blank">' +  value._source.contractAddress + '</a>'
         });
         cAddress.appendTo(dl2);
 
@@ -639,3 +651,4 @@ function renderItems(_hits) {
         lineBreak.appendTo('.results');
     });
 }
+// CODE END
