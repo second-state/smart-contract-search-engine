@@ -578,9 +578,16 @@ function renderItems(_hits) {
         dl2.appendTo(pBody);
 
         var blockNumber = jQuery('<dd/>', {
-            text: 'Original block number: ' + '<a href="' + blockExplorer + 'block/' + value._source.blockNumber + '" target="_blank">' + value._source.blockNumber + '</a>'
+           
         });
         blockNumber.appendTo(dl2);
+
+        var blockNumberA = jQuery('<a/>', {
+            text: value._source.blockNumber,
+            href: blockExplorer + "block/" + value._source.blockNumber,
+            target: "_blank"
+        });
+        blockNumberA.appendTo(blockNumber);
 
         if(value._source.TxHash !== undefined){
         var txHash = jQuery('<dd/>', {
