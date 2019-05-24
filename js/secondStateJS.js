@@ -570,16 +570,26 @@ function renderItems(_hits) {
         });
         txHash.appendTo(dl2);
 
-        var byteCodeURL = jQuery('<dd/>', {
-            text: "Original transaction hash: " + value._source.byteCodeURL
+        var byteCodeURLO = jQuery('<dd/>', {
         });
-        byteCodeURL.appendTo(dl2);
+        var byteCodeURLI = jQuery('<a/>', {
+            text: "Bytecode: " + value._source.byteCodeURL,
+            href: value._source.byteCodeURL,
+            target: "_blank"
+        });
+        byteCodeURLI.appendTo(byteCodeURLO)
+        byteCodeURLO.appendTo(dl2);
 
-        var abiURL = jQuery('<dd/>', {
-            text: "Original transaction hash: " + value._source.abiURL
+        var abiURLO = jQuery('<dd/>', {
         });
-        abiURL.appendTo(dl2);
-        
+        var abiURLI = jQuery('<a/>', {
+            text: "ABI: " + value._source.abiURL,
+            href: value._source.abiURL,
+            target: "_blank"
+        });
+        abiURLI.appendTo(abiURLO)
+        abiURLO.appendTo(dl2);
+
         var cOwner = jQuery('<dd/>', {
             text: "Contract's owner: " + value._source.functionData.owner
         });
