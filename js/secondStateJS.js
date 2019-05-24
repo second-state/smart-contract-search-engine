@@ -561,10 +561,25 @@ function renderItems(_hits) {
         dl2.appendTo(pBody);
 
         var blockNumber = jQuery('<dd/>', {
-            text: "Block number: " + value._source.blockNumber
+            text: "Original block number: " + value._source.blockNumber
         });
         blockNumber.appendTo(dl2);
 
+        var txHash = jQuery('<dd/>', {
+            text: "Original transaction hash: " + value._source.TxHash
+        });
+        txHash.appendTo(dl2);
+
+        var byteCodeURL = jQuery('<dd/>', {
+            text: "Original transaction hash: " + value._source.byteCodeURL
+        });
+        byteCodeURL.appendTo(dl2);
+
+        var abiURL = jQuery('<dd/>', {
+            text: "Original transaction hash: " + value._source.abiURL
+        });
+        abiURL.appendTo(dl2);
+        
         var cOwner = jQuery('<dd/>', {
             text: "Contract's owner: " + value._source.functionData.owner
         });
