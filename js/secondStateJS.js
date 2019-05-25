@@ -1,4 +1,3 @@
-
 // CONFIG START
 // STATIC
 // Local single user vs global multiuser
@@ -18,12 +17,12 @@ var currentAccount = "";
 var esIndexName = "";
 var blockExplorer = "";
 
-if (searchEngineNetwork == "19"){
+if (searchEngineNetwork == "19") {
     blockExplorer = "https://testnet.cmttracking.io/";
     esIndexName = "fairplay";
 }
 
-if(searchEngineNetwork == "18"){
+if (searchEngineNetwork == "18") {
     blockExplorer = "https://www.cmttracking.io/";
     esIndexName = "mainnetfairplay";
 }
@@ -33,8 +32,8 @@ var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop3
 
 // CODE START
 // Check network
-function checkNetwork(){
-    if (this.searchEngineNetwork != this.currentNetwork){
+function checkNetwork() {
+    if (this.searchEngineNetwork != this.currentNetwork) {
         alert("Please select the correct network in your Venus Chrome extension!");
     }
 }
@@ -86,9 +85,9 @@ $(document).ready(function() {
             $("#pbc").hide('slow');
             var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -132,9 +131,9 @@ $(document).ready(function() {
             var jsonString = JSON.stringify(dQuery);
 
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -177,9 +176,9 @@ $(document).ready(function() {
             $("#pbc").hide('slow');
             var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -197,9 +196,9 @@ $(document).ready(function() {
         //console.log($.trim(theAddress.length));
         if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
             //console.log("Address and text are both blank, fetching all results without a filter");
-            if(publicIp){
+            if (publicIp) {
                 getItemsViaFlask(elasticSearchUrl);
-            }else{
+            } else {
                 getItems(elasticSearchUrl);
             }
         } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
@@ -214,11 +213,11 @@ $(document).ready(function() {
             dMultiMatch["multi_match"] = dTemp;
             dQueryOuter["query"] = dMultiMatch;
             var jsonString = JSON.stringify(dQueryOuter);
-                        
+
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -285,11 +284,11 @@ $(document).ready(function() {
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
-                        
+
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -342,11 +341,11 @@ $(document).ready(function() {
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
-            
+
             // If this is a public website then we need to call ES using Flask
-            if(publicIp){
+            if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
-            }else{
+            } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
 
@@ -578,46 +577,84 @@ function renderItems(_hits) {
         dl2.appendTo(pBody);
 
         var blockNumber = jQuery('<dd/>', {
-           
+
         });
         blockNumber.appendTo(dl2);
 
         var blockNumberA = jQuery('<a/>', {
-            text: value._source.blockNumber,
+            text: "Block " + value._source.blockNumber,
             href: blockExplorer + "block/" + value._source.blockNumber,
             target: "_blank"
         });
         blockNumberA.appendTo(blockNumber);
 
-        if(value._source.TxHash !== undefined){
-        var txHash = jQuery('<dd/>', {
-            text: 'Original transaction hash: ' + '<a href="' + blockExplorer + 'tx/' + value._source.TxHash + '" target="_blank">' +  value._source.TxHash + '</a>'
-        });
-        txHash.appendTo(dl2);
-        }
-        if(value._source.byteCodeURL !== undefined){
-        var byteCodeURLO = jQuery('<dd/>', {
-            text: 'Original bytecode: ' + '<a href="' + value._source.byteCodeURL + '" target="_blank">Click to view source</a>'
-        });
-        byteCodeURLO.appendTo(dl2);
+        if (value._source.TxHash !== undefined) {
+            var txHash = jQuery('<dd/>', {
+
+            });
+            txHash.appendTo(dl2);
+
+            var txHashA = jQuery('<a/>', {
+                text: "Transaction " + value._source.TxHash,
+                href: blockExplorer + 'tx/' + value._source.TxHash,
+                target: "_blank"
+            });
+            txHashA.appendTo(txHash);
         }
 
-        if(value._source.abiURL !== undefined){
-        var abiURLO = jQuery('<dd/>', {
-        });
-            text: 'Original ABI: ' + '<a href="' + value._source.abiURL + '" target="_blank">Click to view source</a>'
-        abiURLO.appendTo(dl2);
+        if (value._source.byteCodeURL !== undefined) {
+            var byteCodeURLO = jQuery('<dd/>', {
+
+            });
+            byteCodeURLO.appendTo(dl2);
+
+            var byteCodeURLOA = jQuery('<a/>', {
+                text: "Bytecode source",
+                href: value._source.byteCodeURL,
+                target: "_blank"
+            });
+            byteCodeURLOA.appendTo(byteCodeURLO);
+        }
+
+        if (value._source.abiURL !== undefined) {
+            var abiURLO = jQuery('<dd/>', {
+                
+            });
+            abiURLO.appendTo(dl2);
+
+            var abiURLOA = jQuery('<a/>', {
+                text: "ABI source",
+                href: value._source.abiURL,
+                target: "_blank"
+            });
+            abiURLOA.appendTo(abiURLO);
+
         }
 
         var cOwner = jQuery('<dd/>', {
-            text: 'Contract owner:' + '<a href="' + blockExplorer + 'address/' + value._source.functionData.owner + '" target="_blank">' +  value._source.functionData.owner + '</a>'
+
         });
         cOwner.appendTo(dl2);
 
+        var cOwnerA = jQuery('<a/>', {
+            text: "Contract owner" + value._source.functionData.owner,
+            href: blockExplorer + 'address/' + value._source.functionData.owner,
+            target: "_blank"
+        });
+        cOwnerA.appendTo(cOwner);
+
         var cAddress = jQuery('<dd/>', {
-            text: 'Contract address:' + '<a href="' + blockExplorer + 'address/' + value._source.contractAddress + '" target="_blank">' +  value._source.contractAddress + '</a>'
+
         });
         cAddress.appendTo(dl2);
+
+        var cAddressA = jQuery('<a/>', {
+            text: "Contract address "
+            value._source.contractAddress,
+            href: blockExplorer + 'address/' + value._source.contractAddress,
+            target: "_blank"
+        });
+        cAddressA.appendTo(cAddress);
 
         if (value._source.functionData.player_addrs == undefined) {
             var lineBreak = jQuery('<hr/>', {});
