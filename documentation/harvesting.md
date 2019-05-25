@@ -12,7 +12,7 @@ git clone https://github.com/second-state/smart-contract-search-engine.git
 Open the [config.ini](https://github.com/second-state/smart-contract-search-engine/blob/master/python/config.ini) file. 
 
 **Please note that there is a convention which must be followed in the configuration.**
-Please use index name underscore contract version i.e. `fairlpay_v1` as shown below. For example, do not use double underscores or more than one underscore in the string. If this convention is properly followed, the harvester will automaticall create an index called "fairplay" (if it does not already exist) and it will also index all contracts which match the abi and bytecode with a version attribute of "v1".
+Please use index name underscore contract version i.e. `fairlpay_v1` as shown below. For example, do not use double underscores or more than one underscore in the string. If this convention is properly followed, the harvester will automatically create an index called "fairplay" (if it does not already exist) and it will also index all contracts which match the abi and bytecode with a version attribute of "v1".
 
 You can add multiple abi URLs and bytecode URLs, but remember - they are in relation to specific smart contract and as such they need to be appropriately named with the convention.
 
@@ -85,6 +85,7 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py 
 
 This state update will also run repeatedly without the need for calling this command again. 
 
+### Recommended usage - Run once at startup!
 **Run at startup**
 Technically speaking you will just want to run all of these commands the **one** time, at startup!. 
 The system will take care of itself. Here is an example of how to run this once at startup.
