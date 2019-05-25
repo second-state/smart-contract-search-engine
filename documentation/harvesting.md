@@ -1,14 +1,64 @@
-## Harvesting - Backend
+## Harvesting 
 
-The harvesting scripts are written in Python; they require a particular smart contract's ABI file and a link to the blockchain's RPC endpoint.
+The harvesting code is written in Python; it requires a particular smart contract's ABI and bytecode as well as a link to the blockchain (an RPC endpoint to the network where the contract was deployed)
+
+### Getting the code
+Simply clone the repository.
+```
+git clone https://github.com/second-state/smart-contract-search-engine.git
+```
+
+### Configuring the harvesting code
+Open the [config.ini](https://github.com/second-state/smart-contract-search-engine/blob/master/python/config.ini) file. 
+
+**Please note that there is a convention which must be followed in the configuration.**
+Please use index name underscore contract version i.e. `fairlpay_v1` as shown below. For example, do not use double underscores or more than one underscore in the string. If this convention is properly followed, the harvester will automaticall create an index called "fairplay" (if it does not already exist) and it will also index all contracts which match the abi and bytecode with a version attribute of "v1".
+
+You can add multiple abi URLs and bytecode URLs, but remember - they are in relation to specific smart contract and as such they need to be appropriately named with the convention.
+
+- Provide one or more links to each specific RAW abi file under the abis section heading
+```
+[abis]
+fairplay_v1 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi
+fairplay_v2 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi
+```
+- Provide one or more links to each specific RAW bytecode file under the bytecode section heading
+```
+[bytecode]
+fairplay_v1 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin
+fairplay_v2 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin
+```
+- Provide a single link to the blockchain's RPC endpoint in the blockchain section
+```
+[blockchain]
+rpc = https://testnet-rpc.cybermiles.io:8545
+```
+- Provide a link to the Elasticsearch endpoint in the elasticSearch section
+```
+[elasticSearch]
+endpoint = search-smart-contract-search-engine-12345.ap-southeast-2.es.amazonaws.com
+aws_region = ap-southeast-2
+```
+
+Usage is as follows
+```
+cd ~/smart-contract-search-engine/python
+
+python3.6 harvest.py -h
+
+usage: harvest.py [-h] [-m MODE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MODE, --mode MODE  [full|topup|state]
+```
 
 ### Full - smart contract harvest
 
 The Python file, at `python/harvest.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
 
 ```python3
-harvester = Harvest()
-harvester.harvest()
+python3.6 harvest.py -m full
 ```
 
 The full - smart contract harvest, technically, only needs to be run once. However, if you like you can set it to run once per day using a cron job.
@@ -18,51 +68,44 @@ Keep in mind, the full - smart contract harvest does check if each contract inst
 **Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
 
 ```bash
-01 01 * * * cd ~/htdocs/python && /usr/bin/python3.6 harvest.py >/dev/null 2>&1
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
 ```
 
 ### Topup - smart contract harvest
 
-The Python file, at `python/harvest.py` can also be called to harvest the 350 most recent blocks.
-
-```
-harvester = Harvest()
-harvester.harvest(True)
-```
-
-Here is the source code which shows how this True False logic works; "_stop" argument defaults to False. However if set to True (as demonstrated above) then the harvest function will calculate the most recent 350 blocks and just harvest them.
-
-```
-def harvest(self, _stop=False):
-        latestBlockNumber = self.web3.eth.getBlock('latest').number
-        print("Latest block is %s" % latestBlockNumber)
-        stopAtBlock = 0
-        if _stop == True:
-            stopAtBlock = latestBlockNumber - 350
-        for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
-            print("\nProcessing block number %s" % blockNumber)
-```
-
-The Python file, at `python/harvest.py` can also be called to update the state of already harvested contracts.
-
-```
-harvester = Harvest()
-harvester.updateState()
-```
-
-This state update can be performed as frequently as once per second (as fast as the web3 function calls will allow). The output from the incremental smart contract state update looks like this (when contract state is unchanged)
+The Python file, at `python/harvest.py` can also be called to harvest only the most recent blocks in the chain. This does not have to be repeated in a cron task etc. This will loop over the most recent blocks in the chain over and over without stopping.
 
 ```bash
-No change to 0x06bf38c9b46227cc551dab2a54bd8c21027d1f3ce4e6310c2db2be98bbba44d8 
-No change to 0xa899b93e1f99ade55665b79f4fdb879ecbb1598fa72dd433a6927861170d4d52 
-No change to 0x0386dabea26abe1d76b80ed41da1fbb610f6f69b01d1da1766748e776f7b9da6 
-No change to 0xe44d14f137d76faca652cc274d9e49907805569823a1847faea5712afcc77808 
-No change to 0x296c32fef02a7a22601d6969b0d62ed24f8d43e36c11037f636512a5a06e8be2 
-No change to 0x635a3120a62fcbdfc6f096f97e7144436ca5b76abd22109df0e31e8773222caa 
-No change to 0x604a42cb3141c22d33517f403cb8a8cdccd85549f31bcccbb7e4ab73f7b2fb56 
-No change to 0x5d7073be26976fe69ae8f4e0d546e3f3f106e4e2cb9285cad66752f468e9d0de 
-No change to 0xb6023d7796882028d3f54c4dbc756ee6ace811484a99ab6d693058d65af62ccd 
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
 ```
+
+### Update - smart contract harvest
+
+The Python file, at `python/harvest.py` also continously updates the state of already harvested contracts.
+
+```bash
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+```
+
+This state update will also run repeatedly without the need for calling this command again. 
+
+**Run at startup**
+Technically speaking you will just want to run all of these commands the one time, at startup. The system will take care of itself. Here is an example of how to run this once at startup.
+
+**Step 1**
+Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+```bash
+#!/bin/bash
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+``` 
+**Step 2**
+Add the following command to cron using `crontab -e` command.
+```bash
+@reboot ~/startup.sh
+```
+The smart contract search engine will autonamously harvest upon bootup.
 
 # Configuring your own search engine system
 
