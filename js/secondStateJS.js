@@ -582,7 +582,7 @@ function renderItems(_hits) {
         blockNumber.appendTo(dl2);
 
         var blockNumberA = jQuery("<a/>", {
-            text: "Block " + value._source.blockNumber,
+            text: "- Block " + value._source.blockNumber,
             href: blockExplorer + "block/" + value._source.blockNumber,
             target: "_blank"
         });
@@ -595,7 +595,7 @@ function renderItems(_hits) {
             txHash.appendTo(dl2);
 
             var txHashA = jQuery("<a/>", {
-                text: "Transaction " + value._source.TxHash,
+                text: "- Transaction " + value._source.TxHash,
                 href: blockExplorer + "tx/" + value._source.TxHash,
                 target: "_blank"
             });
@@ -609,7 +609,7 @@ function renderItems(_hits) {
             byteCodeURLO.appendTo(dl2);
 
             var byteCodeURLOA = jQuery("<a/>", {
-                text: "Bytecode source",
+                text: "- Bytecode source",
                 href: value._source.byteCodeURL,
                 target: "_blank"
             });
@@ -623,7 +623,7 @@ function renderItems(_hits) {
             abiURLO.appendTo(dl2);
 
             var abiURLOA = jQuery("<a/>", {
-                text: "ABI source",
+                text: "- ABI source",
                 href: value._source.abiURL,
                 target: "_blank"
             });
@@ -637,7 +637,7 @@ function renderItems(_hits) {
         cOwner.appendTo(dl2);
 
         var cOwnerA = jQuery("<a/>", {
-            text: "Contract owner " + value._source.functionData.owner,
+            text: "- Contract owner " + value._source.functionData.owner,
             href: blockExplorer + "address/" + value._source.functionData.owner,
             target: "_blank"
         });
@@ -649,7 +649,7 @@ function renderItems(_hits) {
         cAddress.appendTo(dl2);
 
         var cAddressA = jQuery("<a/>", {
-            text: "Contract address " + value._source.contractAddress,
+            text: "- Contract address " + value._source.contractAddress,
             href: blockExplorer + "address/" + value._source.contractAddress,
             target: "_blank"
         });
