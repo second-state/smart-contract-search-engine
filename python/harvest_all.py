@@ -82,7 +82,7 @@ class Harvest:
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
-
+                                outerData['from'] = transactionReceipt['from']
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
