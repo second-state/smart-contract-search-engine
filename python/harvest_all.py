@@ -9,9 +9,13 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 
 class Harvest:
     def __init__(self):
-
         self.scriptExecutionLocation = os.getcwd()
-       
+        
+        # Config
+        print("Reading configuration file")
+        self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+        self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
+
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
