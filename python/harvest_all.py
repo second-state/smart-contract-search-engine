@@ -94,4 +94,4 @@ class Harvest:
 
 if __name__ == "__main__":
     harvester = Harvest()
-    harvester.harvest("all")
+    harvester.harvestAllContracts("all")
