@@ -22,8 +22,39 @@ rpc = https://testnet-rpc.cybermiles.io:8545
 endpoint = search-smart-contract-search-engine-12345.ap-southeast-2.es.amazonaws.com
 aws_region = ap-southeast-2
 ```
+## Initial harvest - Phase 1 (must commence before phase 2)
+```
+python3.6 harvest_all.py -h
+usage: harvest_all.py [-h] [-m MODE]
 
-Usage is as follows
+Harvester < https://github.com/second-state/smart-contract-search-engine >
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MODE, --mode MODE  [full|topup]
+```
+
+### Recommended usage - Run once at startup!
+**Run at startup**
+
+Technically speaking (in the long term) once the project is well underway, you will just want to run all of these commands the **one** time, at startup! i.e. ensure that they are always running.
+
+The system will take care of itself. Here is an example of how to run this once at startup.
+
+**Phase 1 - Step 1**
+Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+```bash
+#!/bin/bash
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
+cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+``` 
+**Phase 1 - Step 2**
+Add the following command to cron using `crontab -e` command.
+```bash
+@reboot ~/startup.sh
+```
+
+## Subsequent harvest - Phase 2 (must only commence once phase 1 is well underway)
 ```
 cd ~/smart-contract-search-engine/python
 
@@ -74,7 +105,7 @@ This state update will also run repeatedly without the need for calling this com
 Technically speaking you will just want to run all of these commands the **one** time, at startup!. 
 The system will take care of itself. Here is an example of how to run this once at startup.
 
-**Step 1**
+**Phase 2 - Step 1**
 Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
 ```bash
 #!/bin/bash
@@ -82,7 +113,7 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py 
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
 ``` 
-**Step 2**
+**Phase 2 - Step 2**
 Add the following command to cron using `crontab -e` command.
 ```bash
 @reboot ~/startup.sh
