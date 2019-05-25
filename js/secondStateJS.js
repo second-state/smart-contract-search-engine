@@ -637,7 +637,7 @@ function renderItems(_hits) {
         cOwner.appendTo(dl2);
 
         var cOwnerA = jQuery("<a/>", {
-            text: "Contract owner" + value._source.functionData.owner,
+            text: "Contract owner " + value._source.functionData.owner,
             href: blockExplorer + "address/" + value._source.functionData.owner,
             target: "_blank"
         });
