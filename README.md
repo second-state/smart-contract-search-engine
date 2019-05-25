@@ -10,7 +10,7 @@ This search engine is designed to run in two modalities:
 
 We have put together a: 
 - live TestNet [demonstration of the search engine running on the CyberMiles TestNet](http://54.252.173.219)
-- live MainNet [demonstration of the search engine running on the CyberMiles MainNet](http://54.252.173.219)
+- live MainNet [demonstration of the search engine running on the CyberMiles MainNet](http://13.211.31.225)
 
 Specifically, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity) from both the aforementioned networks (TestNet and MainNet).
 
