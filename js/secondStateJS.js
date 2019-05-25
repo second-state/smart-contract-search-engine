@@ -5,7 +5,7 @@ var publicIp = ""; // This must be an empty string, unless you are hosting this 
 //var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 
 // Check blockchain network and accounts
-// This is used to confirm that the user's chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
+// This is used to confirm that the user"s chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
 var searchEngineNetwork = "19"; // CyberMiles TestNet
 //var searchEngineNetwork = "18"; // CyberMiles MainNet
 
@@ -39,8 +39,8 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    window.addEventListener('load', function() {
-        if (typeof web3 !== 'undefined') {
+    window.addEventListener("load", function() {
+        if (typeof web3 !== "undefined") {
             web3 = new Web3(web3.currentProvider);
             console.log("Connected to web3 - Success!")
             web3.eth.getAccounts((err, accounts) => {
@@ -62,27 +62,27 @@ $(document).ready(function() {
         async function setUpAndProgress() {
             var originalState = $("#pb.progress-bar").clone();
             $("#pbc").show()
-            $('#collapseAdvancedSearch').removeClass('show');
+            $("#collapseAdvancedSearch").removeClass("show");
             this.currentAccount = "";
-            $('.results').empty();
-            $("#pb.progress-bar").attr('style', 'width:25%');
+            $(".results").empty();
+            $("#pb.progress-bar").attr("style", "width:25%");
             await web3.eth.getAccounts((err, accounts) => {
                 this.currentAccount = accounts[0]
             });
-            $("#pb.progress-bar").attr('style', 'width:100%');
+            $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             var dFunctionDataOwner = {};
-            dFunctionDataOwner['functionData.owner'] = this.currentAccount;
+            dFunctionDataOwner["functionData.owner"] = this.currentAccount;
             var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             var dMust = {};
-            dMust['must'] = dMatchFunctionDataOwner;
+            dMust["must"] = dMatchFunctionDataOwner;
             var dBool = {};
-            dBool['bool'] = dMust;
+            dBool["bool"] = dMust;
             var dQuery = {};
-            dQuery['query'] = dBool;
-            $("#pbc").hide('slow');
+            dQuery["query"] = dBool;
+            $("#pbc").hide("slow");
             var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
@@ -102,32 +102,32 @@ $(document).ready(function() {
         async function setUpAndProgress() {
             var originalState = $("#pb.progress-bar").clone();
             $("#pbc").show()
-            $('#collapseAdvancedSearch').removeClass('show');
+            $("#collapseAdvancedSearch").removeClass("show");
             this.currentAccount = "";
-            $('.results').empty();
-            $("#pb.progress-bar").attr('style', 'width:25%');
+            $(".results").empty();
+            $("#pb.progress-bar").attr("style", "width:25%");
             await web3.eth.getAccounts((err, accounts) => {
                 this.currentAccount = accounts[0]
             });
-            $("#pb.progress-bar").attr('style', 'width:100%');
+            $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             lShould = [];
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
-                var fString = 'functionData.player_addrs.' + i;
+                var fString = "functionData.player_addrs." + i;
                 dPTemp[fString] = this.currentAccount;
-                dPTemp2['match'] = dPTemp;
+                dPTemp2["match"] = dPTemp;
                 lShould.push(dPTemp2);
             }
             var dMust = {};
-            dMust['should'] = lShould;
+            dMust["should"] = lShould;
             var dBool = {};
-            dBool['bool'] = dMust;
+            dBool["bool"] = dMust;
             var dQuery = {};
-            dQuery['query'] = dBool;
-            $("#pbc").hide('slow');
+            dQuery["query"] = dBool;
+            $("#pbc").hide("slow");
             var jsonString = JSON.stringify(dQuery);
 
             // If this is a public website then we need to call ES using Flask
@@ -148,32 +148,32 @@ $(document).ready(function() {
         async function setUpAndProgress() {
             var originalState = $("#pb.progress-bar").clone();
             $("#pbc").show()
-            $('#collapseAdvancedSearch').removeClass('show');
+            $("#collapseAdvancedSearch").removeClass("show");
             this.currentAccount = "";
-            $('.results').empty();
-            $("#pb.progress-bar").attr('style', 'width:25%');
+            $(".results").empty();
+            $("#pb.progress-bar").attr("style", "width:25%");
             await web3.eth.getAccounts((err, accounts) => {
                 this.currentAccount = accounts[0]
             });
-            $("#pb.progress-bar").attr('style', 'width:100%');
+            $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             lShould = [];
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
-                var fString = 'functionData.winner_addrs.' + i;
+                var fString = "functionData.winner_addrs." + i;
                 dPTemp[fString] = this.currentAccount;
-                dPTemp2['match'] = dPTemp;
+                dPTemp2["match"] = dPTemp;
                 lShould.push(dPTemp2);
             }
             var dMust = {};
-            dMust['should'] = lShould;
+            dMust["should"] = lShould;
             var dBool = {};
-            dBool['bool'] = dMust;
+            dBool["bool"] = dMust;
             var dQuery = {};
-            dQuery['query'] = dBool;
-            $("#pbc").hide('slow');
+            dQuery["query"] = dBool;
+            $("#pbc").hide("slow");
             var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
@@ -190,7 +190,7 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
-        $('.results').empty()
+        $(".results").empty()
         var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
         //console.log($.trim(theAddress.length));
@@ -224,28 +224,28 @@ $(document).ready(function() {
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
             var dDesc = {};
-            dDesc['desc'] = theText;
+            dDesc["desc"] = theText;
             //console.log(dDesc);
             var dTitle = {};
-            dTitle['title'] = theText;
+            dTitle["title"] = theText;
             //console.log(dTitle);
             var dFunctionDataOwner = {};
-            dFunctionDataOwner['functionData.owner'] = theAddress;
+            dFunctionDataOwner["functionData.owner"] = theAddress;
             //console.log(dFunctionDataOwner);
             var dContractAddress = {};
-            dContractAddress['contractAddress'] = theAddress;
+            dContractAddress["contractAddress"] = theAddress;
             //console.log(dContractAddress);
             var dMatchContractAddress = {};
-            dMatchContractAddress['match'] = dContractAddress;
+            dMatchContractAddress["match"] = dContractAddress;
             //console.log(dMatchContractAddress);
             var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             //console.log(dMatchFunctionDataOwner);
             var dMatchTitle = {};
-            dMatchTitle['match'] = dTitle;
+            dMatchTitle["match"] = dTitle;
             //console.log(dMatchTitle);
             var dMatchDesc = {};
-            dMatchDesc['match'] = dDesc;
+            dMatchDesc["match"] = dDesc;
             //console.log(dMatchDesc);
             var lShould = [];
             lShould.push(dMatchContractAddress);
@@ -257,30 +257,30 @@ $(document).ready(function() {
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
-                var fString = 'functionData.player_addrs' + i;
+                var fString = "functionData.player_addrs" + i;
                 dPTemp[fString] = theAddress;
-                dPTemp2['match'] = dPTemp;
+                dPTemp2["match"] = dPTemp;
                 lShould.push(dPTemp2);
             }
             // Winners
             for (i = 0; i < 50; i++) {
                 var dWTemp = {};
                 var dWTemp2 = {};
-                var fStringW = 'functionData.player_addrs' + i;
+                var fStringW = "functionData.player_addrs" + i;
                 dWTemp[fStringW] = theAddress;
-                dWTemp2['match'] = dWTemp;
+                dWTemp2["match"] = dWTemp;
                 lShould.push(dWTemp2);
             }
             // End - Players and Winners
             //console.log(lShould);
             var dShould = {};
-            dShould['should'] = lShould;
+            dShould["should"] = lShould;
             //console.log(dShould);
             var dBool = {};
-            dBool['bool'] = dShould;
+            dBool["bool"] = dShould;
             //console.log(dBool);
             var dQuery = {};
-            dQuery['query'] = dBool;
+            dQuery["query"] = dBool;
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
@@ -295,16 +295,16 @@ $(document).ready(function() {
             //console.log(itemArray);
         } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
             var dFunctionDataOwner = {};
-            dFunctionDataOwner['functionData.owner'] = theAddress;
+            dFunctionDataOwner["functionData.owner"] = theAddress;
             //console.log(dFunctionDataOwner);
             var dContractAddress = {};
-            dContractAddress['contractAddress'] = theAddress;
+            dContractAddress["contractAddress"] = theAddress;
             //console.log(dContractAddress);
             var dMatchContractAddress = {};
-            dMatchContractAddress['match'] = dContractAddress;
+            dMatchContractAddress["match"] = dContractAddress;
             //console.log(dMatchContractAddress);
             var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner['match'] = dFunctionDataOwner;
+            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             //console.log(dMatchFunctionDataOwner);
             var lShould = [];
             lShould.push(dMatchContractAddress);
@@ -314,30 +314,30 @@ $(document).ready(function() {
             for (i = 0; i < 50; i++) {
                 var dPTemp = {};
                 var dPTemp2 = {};
-                var fString = 'functionData.player_addrs' + i;
+                var fString = "functionData.player_addrs" + i;
                 dPTemp[fString] = theAddress;
-                dPTemp2['match'] = dPTemp;
+                dPTemp2["match"] = dPTemp;
                 lShould.push(dPTemp2);
             }
             // Winners
             for (i = 0; i < 50; i++) {
                 var dWTemp = {};
                 var dWTemp2 = {};
-                var fStringW = 'functionData.winner_addrs' + i;
+                var fStringW = "functionData.winner_addrs" + i;
                 dWTemp[fStringW] = theAddress;
-                dWTemp2['match'] = dWTemp;
+                dWTemp2["match"] = dWTemp;
                 lShould.push(dWTemp2);
             }
             // End - Players and Winners
             //console.log(lShould);
             var dShould = {};
-            dShould['should'] = lShould;
+            dShould["should"] = lShould;
             //console.log(dShould);
             var dBool = {};
-            dBool['bool'] = dShould;
+            dBool["bool"] = dShould;
             //console.log(dBool);
             var dQuery = {};
-            dQuery['query'] = dBool;
+            dQuery["query"] = dBool;
             //console.log(dQuery);
             //console.log(JSON.stringify(dQuery));
             var jsonString = JSON.stringify(dQuery);
@@ -410,45 +410,45 @@ function getItemsViaFlask() {
 }
 
 function renderItems(_hits) {
-    $('.results').empty();
+    $(".results").empty();
     $.each(_hits, function(index, value) {
 
-        var row = jQuery('<div/>', {
-            class: 'row',
+        var row = jQuery("<div/>", {
+            class: "row",
         });
-        row.appendTo('.results');
+        row.appendTo(".results");
 
-        var imageContainer = jQuery('<div/>', {
-            class: 'col-sm-4'
+        var imageContainer = jQuery("<div/>", {
+            class: "col-sm-4"
         });
         imageContainer.appendTo(row);
 
-        var image = jQuery('<img/>', {
-            class: 'img-thumbnail',
+        var image = jQuery("<img/>", {
+            class: "img-thumbnail",
             src: value._source.functionData.info[3],
-            alt: 'giveaway'
+            alt: "giveaway"
         });
         image.appendTo(imageContainer);
 
-        var details = jQuery('<div/>', {
-            class: 'col-sm-8'
+        var details = jQuery("<div/>", {
+            class: "col-sm-8"
         });
         details.appendTo(row);
 
-        var dl = jQuery('<dl/>', {});
+        var dl = jQuery("<dl/>", {});
         dl.appendTo(details);
 
-        var title = jQuery('<dt/>', {
+        var title = jQuery("<dt/>", {
             text: "Title: " + value._source.functionData.info[1]
         });
         title.appendTo(dl);
 
-        var description = jQuery('<dd/>', {
+        var description = jQuery("<dd/>", {
             text: "Description: " + value._source.functionData.info[2]
         });
         description.appendTo(dl);
 
-        var winners = jQuery('<dd/>', {
+        var winners = jQuery("<dd/>", {
             text: "Number of potential winners: " + value._source.functionData.info[4]
         });
         winners.appendTo(dl);
@@ -456,19 +456,19 @@ function renderItems(_hits) {
         var textStatus = "";
         if (value._source.functionData.status == 0) {
             textStatus = "Winners have not been declared as yet";
-            var status = jQuery('<dd/>', {
+            var status = jQuery("<dd/>", {
                 text: textStatus,
                 // Optional color change?
-                // class: 'current'
+                // class: "current"
             });
             status.appendTo(dl);
 
         } else if (value._source.functionData.status == 1) {
             textStatus = "Winners have been declared";
-            var status = jQuery('<dd/>', {
+            var status = jQuery("<dd/>", {
                 text: textStatus,
                 // Optional color change?
-                // class: 'expired'
+                // class: "expired"
             });
             status.appendTo(dl);
         }
@@ -485,17 +485,17 @@ function renderItems(_hits) {
         var currentDate = new Date();
 
         if (currentDate > endDate) {
-            var time = jQuery('<dd/>', {
+            var time = jQuery("<dd/>", {
                 text: "End date: " + endDate,
                 class: "expired"
             });
             time.appendTo(dl);
             // Allow user to VIEW this giveaway
-            var view = jQuery('<dd/>', {
+            var view = jQuery("<dd/>", {
 
             });
             var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
-            var viewButton = jQuery('<a/>', {
+            var viewButton = jQuery("<a/>", {
                 href: viewUrl,
                 class: "btn btn-info",
                 role: "button",
@@ -505,17 +505,17 @@ function renderItems(_hits) {
             viewButton.appendTo(view);
             view.appendTo(dl);
         } else if (currentDate < endDate) {
-            var time = jQuery('<dd/>', {
+            var time = jQuery("<dd/>", {
                 text: "End date: " + endDate,
                 class: "current"
             });
             time.appendTo(dl);
             // Allow user to play this giveaway
-            var play = jQuery('<dd/>', {
+            var play = jQuery("<dd/>", {
 
             });
             var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
-            var playButton = jQuery('<a/>', {
+            var playButton = jQuery("<a/>", {
                 href: playUrl,
                 class: "btn btn-success",
                 role: "button",
@@ -527,7 +527,7 @@ function renderItems(_hits) {
 
         }
 
-        var version = jQuery('<dd/>', {
+        var version = jQuery("<dd/>", {
             text: "DApp version: " + value._source.dappVersion
         });
         version.appendTo(dl);
@@ -535,53 +535,53 @@ function renderItems(_hits) {
         //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
 
         /* More details */
-        var pGroup = jQuery('<div/>', {
-            class: 'panel-group'
+        var pGroup = jQuery("<div/>", {
+            class: "panel-group"
         });
         pGroup.appendTo(details);
 
-        var pDefault = jQuery('<div/>', {
-            class: 'panel panel-default'
+        var pDefault = jQuery("<div/>", {
+            class: "panel panel-default"
         });
         pDefault.appendTo(pGroup);
 
-        var pHeading = jQuery('<div/>', {
-            class: 'panel-heading'
+        var pHeading = jQuery("<div/>", {
+            class: "panel-heading"
         });
         pHeading.appendTo(pDefault);
 
-        var pTitle = jQuery('<p/>', {
-            class: 'panel-title'
+        var pTitle = jQuery("<p/>", {
+            class: "panel-title"
         });
         pTitle.appendTo(pHeading);
 
-        var pToggle = jQuery('<a/>', {
-            "data-toggle": 'collapse',
+        var pToggle = jQuery("<a/>", {
+            "data-toggle": "collapse",
             href: "#collapse1",
             text: "Show/Hide Details"
         });
         pToggle.appendTo(pTitle);
 
-        var pCollapse = jQuery('<div/>', {
-            id: 'collapse1',
-            class: 'panel-collapse collapse'
+        var pCollapse = jQuery("<div/>", {
+            id: "collapse1",
+            class: "panel-collapse collapse"
         });
         pCollapse.appendTo(pDefault);
 
-        var pBody = jQuery('<div/>', {
-            class: 'panel-body'
+        var pBody = jQuery("<div/>", {
+            class: "panel-body"
         });
         pBody.appendTo(pCollapse);
 
-        var dl2 = jQuery('<dl/>', {});
+        var dl2 = jQuery("<dl/>", {});
         dl2.appendTo(pBody);
 
-        var blockNumber = jQuery('<dd/>', {
+        var blockNumber = jQuery("<dd/>", {
 
         });
         blockNumber.appendTo(dl2);
 
-        var blockNumberA = jQuery('<a/>', {
+        var blockNumberA = jQuery("<a/>", {
             text: "Block " + value._source.blockNumber,
             href: blockExplorer + "block/" + value._source.blockNumber,
             target: "_blank"
@@ -589,26 +589,26 @@ function renderItems(_hits) {
         blockNumberA.appendTo(blockNumber);
 
         if (value._source.TxHash !== undefined) {
-            var txHash = jQuery('<dd/>', {
+            var txHash = jQuery("<dd/>", {
 
             });
             txHash.appendTo(dl2);
 
-            var txHashA = jQuery('<a/>', {
+            var txHashA = jQuery("<a/>", {
                 text: "Transaction " + value._source.TxHash,
-                href: blockExplorer + 'tx/' + value._source.TxHash,
+                href: blockExplorer + "tx/" + value._source.TxHash,
                 target: "_blank"
             });
             txHashA.appendTo(txHash);
         }
 
         if (value._source.byteCodeURL !== undefined) {
-            var byteCodeURLO = jQuery('<dd/>', {
+            var byteCodeURLO = jQuery("<dd/>", {
 
             });
             byteCodeURLO.appendTo(dl2);
 
-            var byteCodeURLOA = jQuery('<a/>', {
+            var byteCodeURLOA = jQuery("<a/>", {
                 text: "Bytecode source",
                 href: value._source.byteCodeURL,
                 target: "_blank"
@@ -617,12 +617,12 @@ function renderItems(_hits) {
         }
 
         if (value._source.abiURL !== undefined) {
-            var abiURLO = jQuery('<dd/>', {
+            var abiURLO = jQuery("<dd/>", {
 
             });
             abiURLO.appendTo(dl2);
 
-            var abiURLOA = jQuery('<a/>', {
+            var abiURLOA = jQuery("<a/>", {
                 text: "ABI source",
                 href: value._source.abiURL,
                 target: "_blank"
@@ -631,42 +631,42 @@ function renderItems(_hits) {
 
         }
 
-        var cOwner = jQuery('<dd/>', {
+        var cOwner = jQuery("<dd/>", {
 
         });
         cOwner.appendTo(dl2);
 
-        var cOwnerA = jQuery('<a/>', {
+        var cOwnerA = jQuery("<a/>", {
             text: "Contract owner" + value._source.functionData.owner,
-            href: blockExplorer + 'address/' + value._source.functionData.owner,
+            href: blockExplorer + "address/" + value._source.functionData.owner,
             target: "_blank"
         });
         cOwnerA.appendTo(cOwner);
 
-        var cAddress = jQuery('<dd/>', {
+        var cAddress = jQuery("<dd/>", {
 
         });
         cAddress.appendTo(dl2);
 
-        var cAddressA = jQuery('<a/>', {
+        var cAddressA = jQuery("<a/>", {
             text: "Contract address " + value._source.contractAddress,
-            href: blockExplorer + 'address/' + value._source.contractAddress,
+            href: blockExplorer + "address/" + value._source.contractAddress,
             target: "_blank"
         });
         cAddressA.appendTo(cAddress);
 
         if (value._source.functionData.player_addrs == undefined) {
-            var lineBreak = jQuery('<hr/>', {});
+            var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            var pAddress = jQuery('<dd/>', {
+            var pAddress = jQuery("<dd/>", {
                 text: "Players: There are no players yet!"
             });
             pAddress.appendTo(dl2);
         } else {
-            var lineBreak = jQuery('<hr/>', {});
+            var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             $.each(value._source.functionData.player_addrs, function(playerIndex, playerValue) {
-                var pAddress = jQuery('<dd/>', {
+                var pAddress = jQuery("<dd/>", {
                     text: "Player : " + playerValue
                 });
                 pAddress.appendTo(dl2);
@@ -674,24 +674,24 @@ function renderItems(_hits) {
         }
 
         if (value._source.functionData.winner_addrs == undefined) {
-            var lineBreak = jQuery('<hr/>', {});
+            var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            var wAddress = jQuery('<dd/>', {
+            var wAddress = jQuery("<dd/>", {
                 text: "Winners: There are no winners yet!"
             });
             wAddress.appendTo(dl2);
         } else {
-            var lineBreak = jQuery('<hr/>', {});
+            var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             $.each(value._source.functionData.winner_addrs, function(winnerIndex, winnerValue) {
-                var wAddress = jQuery('<dd/>', {
+                var wAddress = jQuery("<dd/>", {
                     text: "Winner : " + winnerValue
                 });
                 wAddress.appendTo(dl2);
             });
         }
-        var lineBreak = jQuery('<hr/>', {});
-        lineBreak.appendTo('.results');
+        var lineBreak = jQuery("<hr/>", {});
+        lineBreak.appendTo(".results");
     });
 }
 // CODE END
