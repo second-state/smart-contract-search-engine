@@ -339,7 +339,7 @@ class Harvest:
             for t in self.threads:
                 t.join()
             # set the time interval for when this task will be repeated
-            self.upcomingCallTimeState = self.upcomingCallTimeState + 12
+            self.upcomingCallTimeState = self.upcomingCallTimeState + 10
             # If this takes longer than the break time, then just continue straight away
             if self.upcomingCallTimeState > time.time():
                 time.sleep(self.upcomingCallTimeState - time.time())

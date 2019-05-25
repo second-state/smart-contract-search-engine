@@ -10,7 +10,7 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 class Harvest:
     def __init__(self):
         self.scriptExecutionLocation = os.getcwd()
-        
+
         # Config
         print("Reading configuration file")
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
@@ -57,6 +57,8 @@ class Harvest:
         return returnVal
 
     def harvestAllContracts(self, esIndex,  _stop=False):
+        self.upcomingCallTimeHarvest = time.time()
+        while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
@@ -91,7 +93,24 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
+            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+            if self.upcomingCallTimeHarvest > time.time():
+                time.sleep(self.upcomingCallTimeHarvest - time.time())
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
+    parser.add_argument("-m", "--mode", help="[full|topup]", type=str, default="full")
+    args = parser.parse_args()
+
     harvester = Harvest()
-    harvester.harvestAllContracts("all")
+
+    if args.mode == "full":
+        print("Performing full harvest")
+        harvester.harvestAllContracts("all")
+    elif args.mode == "topup":
+        print("Performing topup")
+        harvester.harvestAllContracts("all", True)
+    else:
+        print("Invalid argument, please try any of the following")
+        print("harvest.py --mode full")
+        print("harvest.py --mode topup")
