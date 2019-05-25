@@ -618,7 +618,7 @@ function renderItems(_hits) {
 
         if (value._source.abiURL !== undefined) {
             var abiURLO = jQuery('<dd/>', {
-                
+
             });
             abiURLO.appendTo(dl2);
 
@@ -649,8 +649,7 @@ function renderItems(_hits) {
         cAddress.appendTo(dl2);
 
         var cAddressA = jQuery('<a/>', {
-            text: "Contract address "
-            value._source.contractAddress,
+            text: "Contract address " + value._source.contractAddress,
             href: blockExplorer + 'address/' + value._source.contractAddress,
             target: "_blank"
         });
