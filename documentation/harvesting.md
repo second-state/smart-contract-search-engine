@@ -54,7 +54,7 @@ Add the following command to cron using `crontab -e` command.
 @reboot ~/startup.sh
 ```
 
-## Subsequent harvest - Phase 2 (must only commence once phase one is well underway)
+## Subsequent harvest - Phase 2 (must only commence once phase 1 is well underway)
 ```
 cd ~/smart-contract-search-engine/python
 
