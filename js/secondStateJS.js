@@ -9,6 +9,7 @@ var publicIp = ""; // This must be an empty string, unless you are hosting this 
 var searchEngineNetwork = "19"; // CyberMiles TestNet
 //var searchEngineNetwork = "18"; // CyberMiles MainNet
 
+
 var currentNetwork = "";
 var currentAccount = "";
 
