@@ -61,11 +61,7 @@ The Python file, at `python/harvest.py` harvests the entire blockchain (in rever
 python3.6 harvest.py -m full
 ```
 
-The full - smart contract harvest, technically, only needs to be run once. However, if you like you can set it to run once per day using a cron job.
-
-Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside to running it daily or weekly). Think of this harvest as a full sweep of the entire blockchain.
-
-**Note:** You can supress the output from the cron job by adding the following to the end of the line. This prevents the /var/mail of your OS from growing too large.
+Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside if it ever runs more than once.
 
 ```bash
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
@@ -73,7 +69,7 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py 
 
 ### Topup - smart contract harvest
 
-The Python file, at `python/harvest.py` can also be called to harvest only the most recent blocks in the chain. This does not have to be repeated in a cron task etc. This will loop over the most recent blocks in the chain over and over without stopping.
+The Python file, at `python/harvest.py` harvests only the most recent blocks in the chain. This does not have to be repeated in a cron task etc. This will loop over the most recent blocks in the chain over and over without stopping.
 
 ```bash
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
@@ -90,7 +86,8 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py 
 This state update will also run repeatedly without the need for calling this command again. 
 
 **Run at startup**
-Technically speaking you will just want to run all of these commands the one time, at startup. The system will take care of itself. Here is an example of how to run this once at startup.
+Technically speaking you will just want to run all of these commands the **one** time, at startup!. 
+The system will take care of itself. Here is an example of how to run this once at startup.
 
 **Step 1**
 Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
@@ -105,7 +102,7 @@ Add the following command to cron using `crontab -e` command.
 ```bash
 @reboot ~/startup.sh
 ```
-The smart contract search engine will autonamously harvest upon bootup.
+The smart contract search engine will autonomously harvest upon bootup.
 
 # Configuring your own search engine system
 
