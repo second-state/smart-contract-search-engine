@@ -80,7 +80,7 @@ sudo systemctl reload apache2
 ```
 
 ## Python
-Please perform the steps in the [harvesting documentation](./harvesting.md) to ensure that your system can run the Python code. Once that is done, you can continue with installing Flask (as shown directly below)
+Please perform the steps in this [subsection of the harvesting documentation](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#preparing-your-system-for-harvesting) to ensure that your system can run the Python code. Once that is done, you can continue with installing Flask (as shown directly below)
 
 ## Flask
 ```
