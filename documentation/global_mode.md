@@ -84,9 +84,6 @@ Please perform the steps in this [subsection of the harvesting documentation](ht
 
 ## Flask
 ```
-pip3 --user install Flask
-
-#Or if using older Ubuntu, stipulate 3.6 if/as required
 python3.6 -m pip install Flask --user
 ```
 
