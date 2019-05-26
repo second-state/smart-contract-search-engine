@@ -103,4 +103,31 @@ Set final permissions on all files
 sudo chown -R $USER:$USER /var/www/search-engine.com/*
 ```
 
+## Python Flask / Apache2 Integration
 
+```bash
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo systemctl restart apache2
+```
+
+```bash
+cd ~
+FLASK_APP=/var/www/search-engine.com/python/io.py flask run --port=8080 >/dev/null 2>&1 &
+```
+
+
+```bash
+sudo ufw allow ssh
+sudo ufw enable
+sudo ufw allow 8080/tcp
+```
+
+Open crontab for editing
+```bash
+crontab -e
+```
+Add the following line inside crontab
+```bash
+@reboot sudo ufw enable
+```

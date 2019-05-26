@@ -23,7 +23,11 @@ es = Elasticsearch(
 
 app = Flask(__name__)
 
-CORS(app)
+#CORS(app)
+
+@app.route("/test")
+def home():
+    return 'Success!'
 
 @app.route("/data1", methods=['POST'])
 def data1():
