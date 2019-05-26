@@ -131,9 +131,10 @@ Python3
 ```bash
 sudo apt-get -y update
 sudo apt-get -y upgrade
-sudo apt-get -y install python3
 
-# If cytoolz error, or if using older Ubuntu, stipulate 3.6-dev if/as required
+# If using Ubuntu 18.04LTS Python 3.6 will already be installed
+
+# If using older Ubuntu, you will need to install Python3.6 and Python3.6-dev 
 #sudo add-apt-repository ppa:jonathonf/python-3.6
 #sudo apt-get -y update
 #sudo apt-get install python3.6-dev 
