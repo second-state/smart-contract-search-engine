@@ -143,40 +143,29 @@ Pip3
 
 ```bash
 sudo apt-get -y install python3-pip
-pip3 install --upgrade pip
 ```
 
 Web3
 
 ```
-pip3 install web3 --user
-# Or if using older Ubuntu, stipulate 3.6 if/as required
-#python3.6 -m pip install web3 --user
+python3.6 -m pip install web3 --user
 ```
 
 Boto3
 
 ```bash
-pip3 install boto3
-#Or if using older Ubuntu, stipulate 3.6 if/as required
-#python3.6 -m pip install boto3 --user
+python3.6 -m pip install boto3 --user
 ```
 AWS Requests Auth
 ```
-pip3 install aws_requests_auth --user
-
-#Or if using older Ubuntu, stipulate 3.6 if/as required
-#python3.6 -m pip install aws_requests_auth --user
+python3.6 -m pip install aws_requests_auth --user
 
 ```
 
 AWS Command Line Interface (CLI)
 
 ```
-pip3 install awscli --user
-
-#Or if using older Ubuntu, stipulate 3.6 if/as required
-#python3.6 -m pip install awscli --user
+python3.6 -m pip install awscli --user
 ```
 
 Configuring AWS CLI
@@ -199,10 +188,7 @@ aws configure
 Elasticsearch
 
 ```
-pip3 install elasticsearch --user
-
-#Or if using older Ubuntu, stipulate 3.6 if/as required
-#python3.6 -m pip install elasticsearch --user
+python3.6 -m pip install elasticsearch --user
 ```
 
 ## Elasticsearch
