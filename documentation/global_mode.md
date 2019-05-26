@@ -87,9 +87,20 @@ Please perform the steps in this [subsection of the harvesting documentation](ht
 python3.6 -m pip install Flask --user
 ```
 
-# Search engine source code
+Search engine source code
+```bash
 cd ~
 git clone https://github.com/second-state/smart-contract-search-engine.git
+```
 
-# Place the code in the html directory
-cp -rp ~/smart-contract-search-engine/* /var/www/13.236.179.58/html/
+Place the code in the appropriate directories
+```bash
+cp -rp ~/smart-contract-search-engine/* /var/www/search-engine.com/
+mv /var/www/search-engine.com/*.html /var/www/search-engine.com/html/
+```
+Set final permissions on all files
+```bash
+sudo chown -R $USER:$USER /var/www/search-engine.com/*
+```
+
+
