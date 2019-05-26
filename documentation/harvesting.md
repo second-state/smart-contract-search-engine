@@ -159,7 +159,6 @@ python3.6 -m pip install boto3 --user
 AWS Requests Auth
 ```
 python3.6 -m pip install aws_requests_auth --user
-
 ```
 
 AWS Command Line Interface (CLI)
