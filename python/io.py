@@ -40,5 +40,5 @@ def data2():
     results = elasticsearch.helpers.scan(client=es, index="fairplay_v1", query=json.dumps(request), preserve_order=True)
     return jsonify(results['_source'])
 
-if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=5000, debug=True)
+#if __name__ == "__main__":
+#	app.run(host='0.0.0.0', port=8080, debug=True)
