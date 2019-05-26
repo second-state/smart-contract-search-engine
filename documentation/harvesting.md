@@ -120,9 +120,9 @@ Add the following command to cron using `crontab -e` command.
 ```
 The smart contract search engine will autonomously harvest upon bootup.
 
-# Configuring your own search engine system
+# Preparing your system for harvesting
 
-Using the publicly available frontend is easy and free. However, if you would like to run your own infrastructure, please following the instructions below. These examples are all for the latest Ubuntu LTS. More specifically, you must use 18.04 because it comes with Python 3.6 (which Py Web3 requires).
+The harvesting/indexing requires a few software libraries (to enable Python to talk to blockchain RPC, Elasticsearch as well as fetch data from URLs etc.). Please follow these instructions to ensure that your system can successfully run the Python scripts.
 
 ## Operating system libraries
 
