@@ -20,59 +20,7 @@ You will notice that this search engine is currently configured to demonstrate t
 
 If you would like assistance in uniquely customizing this search engine for your own DApp, please [contact us](https://www.secondstate.io/)
 
-### Smart Contract Data
-
-Every individually designed smart contract is bound to have unique data and functions. Thankfully, this search engine can dynamically call all of the public/view functions and in turn read all of the public variables. All that is required to dynamically read the smart contract variables and public functions is a link to the raw ABI.
-
-The raw ABI url must be added to the smartContract, abi section of the [config.ini file](../python/config.ini)
-
-```
-[smartContract]
-abi="https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-```
-
-### Blockchain endpoint
-
-This search engine requires a link to the blockchain RPC endpoint. This can be a local full node or a remote RPC endpoint. Below is an example of an RPC endpoint in the blockchain section of the [config.ini file](../python/config.ini).
-```
-[blockchain]
-rpc="https://testnet-rpc.cybermiles.io:8545"
-```
-
-### Elasticsearch endpoint
-
-At present this endpoint is required in two places (Javascript and Python files).
-
-#### Elasticsearch endpoint - Python
-
-Please go ahead and paste your Elasticsearch endpoint URL into the elasticSearch, endpoint section of the [config.ini file](../python/config.ini). 
-
-**Notice** that this is just the base domain URL (no protocol and no path or query string etc.)
-
-```
-[elasticSearch]
-index=fairplay_v1
-endpoint="search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com"
-```
-#### Elasticsearch index name - Python
-
-Please go ahead and type the name of your Elasticsearch index into the elasticSearch, index section of the [config.ini file](../python/config.ini). **Please note** that the index name must be lowercase (Elasticsearch requirement)
-
-#### Elasticsearch endpoint - Javascript
-
-Please go ahead and enter your Elasticsearch endpoint URL in the `var elasticSearchUrl` variable which is located in the [secondStateJS.js file](../js/secondStateJS.js).
-
-**Notice** that this URL contains the protocol, base domain URL, index name and a query string.
-
-```
-var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/fairplay_v1/_search/?size=100"
-```
-
-#### Elasticsearch index name - Javascript
-
-**Notice** As mentioned directly above, the index name is entered as part of the elasticSearchUrl string.
-
 # Harvesting / Indexing
 
-Once you have downloaded this project and configured the above URLs it will be time to harvest the blockchain (populate the search engine). The harvesting process is automated using Cron (in combination with Python 3.6 scripts). Please see the [harvesting documentation](./harvesting.md) section for more assistance.
+Once you have downloaded this project and configured the above URLs it will be time to harvest the blockchain (populate the search engine). The harvesting process is performed using Python 3.6 scripts. Please see the [harvesting documentation](./harvesting.md) section for more assistance.
 
