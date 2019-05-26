@@ -37,9 +37,12 @@ Create the following configuration file
 ```
 sudo vi /etc/apache2/sites-available/search-engine.com.conf
 ```
-Add the following content to the file which you just created
+Add the following content to the file which you just created (note: we will explain the Proxy component a little later in this document). Obviously you will need to replace search-engine.com with your public IP/Domain
 ```
 <VirtualHost *:80>
+    ProxyPreserveHost On
+    ProxyPass /api http://127.0.0.1:8080/api
+    ProxyPassReverse /api http://127.0.0.1:8080/api
     ServerAdmin admin@search-engine.com
     ServerName search-engine.com
     ServerAlias www.search-engine.com
