@@ -132,7 +132,7 @@ Add the following line inside crontab
 
 ## Front-end configuration
 
-Update the "publicIp" variable in the [js/secondStateJS.js](https://github.com/second-state/smart-contract-search-engine/blob/master/js/secondStateJS.js) file. Make sure that the IP address does not have a trailing slash. This is because the Javascript appends the path and provides the appropriate slash (we don't want double slashes)
+Update the "publicIp" variable in the [js/secondStateJS.js](https://github.com/second-state/smart-contract-search-engine/blob/master/js/secondStateJS.js) file. Make sure that the IP address does not have a trailing slash. This is because the Javascript appends the path and provides the appropriate slash (we don't want double slashes) 
 
 ```
 // Local single user vs global multiuser
