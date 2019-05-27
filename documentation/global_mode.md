@@ -17,6 +17,7 @@ List the firewall rules and add Apache2 on port 80 only
 sudo ufw app list
 sudo ufw allow 'Apache'
 ```
+Please also make sure that any overarching AWS ports are open (if this server is being hosted inside an AWS account).
 
 Check that Apache is running
 ```
