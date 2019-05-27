@@ -384,7 +384,7 @@ function getItemsUsingDataViaFlask(_data) {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            renderItems(response.hits.hits);
+            renderItems(response);
         },
         error: function(xhr) {
             console.log("Get items failed");
@@ -400,14 +400,30 @@ function getItems(_url) {
 }
 
 function getItemsViaFlask() {
-    theUrlforData2 = publicIp + "/api/data2";
+    theUrlForData2 = publicIp + "/api/data2";
     console.log("getItemsViaFlask");
-    console.log(theUrlforData2);
-    console.log("GET");
-    $.get(theUrlforData2, function(data, status) {
-        //console.log(data.hits.hits);
-        renderItems(data.hits.hits);
+    console.log(theUrlForData2);
+    console.log("POST");
+    _data = {
+        "query": {
+                "match_all": {}
+        }
+    }
+    var _dataString = JSON.stringify(_data);
+    $.ajax({
+        url: theUrlForData2,
+        type: "POST",
+        data: _dataString,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
     });
+
 }
 
 function renderItems(_hits) {
