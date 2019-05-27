@@ -23,6 +23,12 @@ Check that Apache is running
 ```
 sudo systemctl status apache2
 ```
+Enable modules for the proxy 
+```bash
+sudo a2enmod proxy
+sudo a2enmod proxy_http
+sudo systemctl restart apache2
+```
 
 Get the public IP address or domain name (as discussed at the start of this page) and use it in the following steps
 i.e. search-engine.com or 13.236.179.58 (just the IP without the protocol). In this example, we are just using fictitious search-engine.com 
@@ -108,18 +114,6 @@ sudo chown -R $USER:$USER /var/www/search-engine.com/*
 ```
 
 ## Python Flask / Apache2 Integration
-
-```bash
-sudo a2enmod proxy
-sudo a2enmod proxy_http
-sudo systemctl restart apache2
-```
-
-```bash
-cd ~
-FLASK_APP=/var/www/search-engine.com/python/io.py flask run --port=8080 >/dev/null 2>&1 &
-```
-
 
 ```bash
 sudo ufw allow ssh
