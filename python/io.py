@@ -9,11 +9,21 @@ from aws_requests_auth.boto_utils import BotoAWSRequestsAuth
 from elasticsearch import Elasticsearch, RequestsHttpConnection 
 
 # CONFIG
-host = 'search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com'
-auth = BotoAWSRequestsAuth(aws_host='search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com', aws_region='ap-southeast-2', aws_service='es')
+
+# CWD
+scriptExecutionLocation = os.getcwd()
+config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
+
+host = config['elasticSearch']['endpoint']
+print("ElasticSearch Endpoint: %s" % host)
+
+elasticSearchAwsRegion = config['elasticSearch']['aws_region']
+
+auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
 es = Elasticsearch(
     hosts=[{'host': host, 'port': 443}],
-    region='ap-southeast-2',
+    region=elasticSearchAwsRegion,
     use_ssl=True,
     verify_certs=True,
     http_auth=auth,
