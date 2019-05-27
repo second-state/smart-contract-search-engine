@@ -164,7 +164,7 @@ python3.6 -m pip install aws_requests_auth --user
 AWS Command Line Interface (CLI)
 
 ```
-python3.6 -m pip install awscli --user
+sudo apt-get install awscli
 ```
 
 Configuring AWS CLI
