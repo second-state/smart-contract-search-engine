@@ -133,4 +133,5 @@ crontab -e
 Add the following line inside crontab
 ```bash
 @reboot sudo ufw enable
+@reboot cd /var/www/search-engine.com/python && nohup /usr/bin/python3.6 io.py >/dev/null 2>&1 &
 ```
