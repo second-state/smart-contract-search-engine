@@ -105,8 +105,7 @@ git clone https://github.com/second-state/smart-contract-search-engine.git
 
 Place the code in the appropriate directories
 ```bash
-sudo cp -rp ~/smart-contract-search-engine/* /var/www/search-engine.com/
-sudo mv /var/www/search-engine.com/*.html /var/www/search-engine.com/html/
+cp -rp ~/smart-contract-search-engine/* /var/www/search-engine.com/html/
 ```
 Set final permissions on all files
 ```bash
