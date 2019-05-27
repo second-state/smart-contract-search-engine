@@ -129,3 +129,16 @@ Add the following line inside crontab
 @reboot sudo ufw enable
 @reboot cd /var/www/search-engine.com/python && nohup /usr/bin/python3.6 io.py >/dev/null 2>&1 &
 ```
+
+## Front-end configuration
+
+Update the "publicIp" variable in the [js/secondStateJS.js](https://github.com/second-state/smart-contract-search-engine/blob/master/js/secondStateJS.js) file.
+
+
+```
+// Local single user vs global multiuser
+//var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
+var publicIp = "http://54.252.157.165"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
+```
+
+
