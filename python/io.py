@@ -31,8 +31,8 @@ def home():
 
 @app.route("/api/data1", methods=['GET', 'POST'])
 def data1():
-    #results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
-    results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
+    #results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
     return jsonify(results['_source'])
 
 @app.route("/api/data2", methods=['GET', 'POST'])

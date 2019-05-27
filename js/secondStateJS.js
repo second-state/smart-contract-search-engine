@@ -373,7 +373,7 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
 }
 
 function getItemsUsingDataViaFlask(_data) {
-    theUrlForData1 = publicIp + "/api//data1";
+    theUrlForData1 = publicIp + "/api/data1";
     console.log("getItemsUsingDataViaFlask");
     console.log(theUrlForData1);
     console.log(_data);
