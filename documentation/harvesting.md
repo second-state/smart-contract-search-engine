@@ -218,7 +218,8 @@ To modify the policy, for a specific index, click on the "Modify access policy" 
 
 ![Demonstration image](images/modify_access.png)
 
-**Restrict public to view only (HTTP GET only) while allowing your AWS user to perform any task**
+**Restrict everyone, but allow your AWS user to perform any task**
+We have just set up `aws configure` on our search engine server, so now its file system has the ability to communicate with the Elasticsearch index. It does so on behalf of a particular end user who's entry point into our system is that end user's web browser. In the global set up we use a combination of Python flask, Apache2 and a ReverseProxy. It is all very easy to set up, as documented in the [global_mode.md](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/global_mode.md)
 ```
 {
   "Version": "2012-10-17",
@@ -226,17 +227,9 @@ To modify the policy, for a specific index, click on the "Modify access policy" 
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::007383469891:user/tpmccallum"
+        "AWS": "arn:aws:iam::007383469891:root"
       },
       "Action": "es:*",
-      "Resource": "arn:aws:es:ap-southeast-2:007383469891:domain/smart-contract-search-engine/*"
-    },
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "AWS": "*"
-      },
-      "Action": "es:ESHttpGet",
       "Resource": "arn:aws:es:ap-southeast-2:007383469891:domain/smart-contract-search-engine/*"
     }
   ]
