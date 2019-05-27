@@ -227,7 +227,7 @@ We have just set up `aws configure` on our search engine server, so now its file
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::007383469891:root"
+        "AWS": "arn:aws:iam::007383469891:user/tpmccallum"
       },
       "Action": "es:*",
       "Resource": "arn:aws:es:ap-southeast-2:007383469891:domain/smart-contract-search-engine/*"
