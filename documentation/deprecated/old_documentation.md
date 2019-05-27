@@ -15,3 +15,29 @@ fairplay_v2 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/maste
 fairplay_v1 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin
 fairplay_v2 = https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin
 ```
+
+
+Creating a web3 contract instance in the command line for testing
+
+```python
+import os
+import sys
+import time
+import json
+import boto3
+import queue
+import argparse
+import requests
+import threading
+import configparser
+import elasticsearch.helpers
+from web3 import Web3, HTTPProvider
+from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
+from elasticsearch import Elasticsearch, RequestsHttpConnection
+# Testnet
+blockchainRpc = "https://testnet-rpc.cybermiles.io:8545"
+web3 = Web3(HTTPProvider(blockchainRpc))
+transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
+
+```
+
