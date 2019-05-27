@@ -4,7 +4,6 @@ import json
 import boto3 
 import requests
 import elasticsearch.helpers
-#from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection 
@@ -23,22 +22,27 @@ es = Elasticsearch(
 
 app = Flask(__name__)
 
-#CORS(app)
-
-@app.route("/api/test")
-def home():
-    return 'Success!'
-
 @app.route("/api/data1", methods=['GET', 'POST'])
 def data1():
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
-    #results = es.get(index='fairplay', id='0x5bebceb6f96973a3fa4e377760637d8515c1beec17c664aa26747ccf99ad866c')
-    return jsonify(results['_source'])
+    jsonRequestData = json.loads(request.data)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, preserve_order=True)
+    obj = {}
+    num = 1
+    for item in results:
+        obj[str(num)] = item
+    print(obj)
+    return jsonify(obj)
 
 @app.route("/api/data2", methods=['GET', 'POST'])
 def data2():
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=json.dumps(request), preserve_order=True)
-    return jsonify(results['_source'])
+    jsonRequestData = json.loads(request.data)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, preserve_order=True)
+    obj = {}
+    num = 1
+    for item in results:
+        obj[str(num)] = item
+    print(obj)
+    return jsonify(obj)
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=8080, debug=True)
+        app.run(host='0.0.0.0', port=8080, debug=True)
