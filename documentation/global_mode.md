@@ -141,6 +141,10 @@ var publicIp = "http://54.252.157.165"; // If you are hosting this on a public s
 ```
 **Please note:** You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed.
 
+
+## Activate the harvesting
+Please carry out the [Phase1](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#initial-harvest---phase-1-must-commence-before-phase-2) and [Phase2](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#recommended-usage---run-once-at-startup-1) automated cron/bash harvesting procedures.
+
 Also once all of this is done, please just give the server a quick reboot; during this time all of the processes will fire off as per the cron etc.
 ```
 sudo shutdown -r now
