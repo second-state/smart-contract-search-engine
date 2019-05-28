@@ -37,7 +37,7 @@ app = Flask(__name__)
 @app.route("/api/data1", methods=['GET', 'POST'])
 def data1():
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, scroll='2m')
     print(results)
     obj = {}
     num = 1
@@ -49,7 +49,7 @@ def data1():
 @app.route("/api/data2", methods=['GET', 'POST'])
 def data2():
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, scroll='2')
     print(results)
     obj = {}
     num = 1
