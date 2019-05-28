@@ -139,5 +139,5 @@ Update the "publicIp" variable in the [js/secondStateJS.js](https://github.com/s
 //var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
 var publicIp = "http://54.252.157.165"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 ```
-
+**Please note:** You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed.
 
