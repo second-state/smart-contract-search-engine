@@ -1,6 +1,7 @@
 
 #IMPORTS
 import os
+import time
 import json
 import boto3 
 import requests
@@ -38,7 +39,9 @@ app = Flask(__name__)
 def data1():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, size=1000)
-    print(results)
+    print("Pre" + results)
+    time.sleep(2)
+    print("Post" + results)
     obj = {}
     num = 1
     for item in results:
@@ -50,7 +53,9 @@ def data1():
 def data2():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, size=1000)
-    print(results)
+    print("Pre" + results)
+    time.sleep(2)
+    print("Post" + results)
     obj = {}
     num = 1
     for item in results:
