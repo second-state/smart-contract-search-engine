@@ -141,3 +141,7 @@ var publicIp = "http://54.252.157.165"; // If you are hosting this on a public s
 ```
 **Please note:** You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed.
 
+Also once all of this is done, please just give the server a quick reboot; during this time all of the processes will fire off as per the cron etc.
+```
+sudo shutdown -r now
+```
