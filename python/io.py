@@ -57,5 +57,20 @@ def data2():
         num = num+1
     return jsonify(obj)
 
+@app.route("/api/getAll", methods=['GET', 'POST'])
+def getAll():
+    matchAll = {}
+    matchAll["match_all"] = {}
+    query = {}
+    query["query"] = matchAll
+    allQuery = json.loads(json.dumps(query))
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=allQuery)
+    obj = {}
+    num = 1
+    for item in results:
+        obj[str(num)] = item
+        num = num+1
+    return jsonify(obj)
+
 if __name__ == "__main__":
         app.run(host='0.0.0.0', port=8080, debug=True)
