@@ -38,29 +38,23 @@ app = Flask(__name__)
 @app.route("/api/data1", methods=['GET', 'POST'])
 def data1():
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, size=1000)
-    print("Pre" + results)
-    time.sleep(2)
-    print("Post" + results)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
     obj = {}
     num = 1
     for item in results:
         obj[str(num)] = item
-    print(obj)
+        num = num+1
     return jsonify(obj)
 
 @app.route("/api/data2", methods=['GET', 'POST'])
 def data2():
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData, size=1000)
-    print("Pre" + results)
-    time.sleep(2)
-    print("Post" + results)
+    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
     obj = {}
     num = 1
     for item in results:
         obj[str(num)] = item
-    print(obj)
+        num = num+1
     return jsonify(obj)
 
 if __name__ == "__main__":
