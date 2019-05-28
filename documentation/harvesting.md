@@ -42,7 +42,7 @@ Technically speaking (in the long term) once the project is well underway, you w
 The system will take care of itself. Here is an example of how to run this once at startup.
 
 **Phase 1 - Step 1**
-Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+Create a bash file, say, `~/startup1.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
 ```bash
 #!/bin/bash
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
@@ -51,7 +51,7 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all
 **Phase 1 - Step 2**
 Add the following command to cron using `crontab -e` command.
 ```bash
-@reboot ~/startup.sh
+@reboot ~/startup1.sh
 ```
 
 ## Subsequent harvest - Phase 2 (must only commence once phase 1 is well underway)
@@ -106,7 +106,7 @@ Technically speaking you will just want to run all of these commands the **one**
 The system will take care of itself. Here is an example of how to run this once at startup.
 
 **Phase 2 - Step 1**
-Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+Create a bash file, say, `~/startup2.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
 ```bash
 #!/bin/bash
 cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
@@ -116,7 +116,7 @@ cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py 
 **Phase 2 - Step 2**
 Add the following command to cron using `crontab -e` command.
 ```bash
-@reboot ~/startup.sh
+@reboot ~/startup2.sh
 ```
 The smart contract search engine will autonomously harvest upon bootup.
 
