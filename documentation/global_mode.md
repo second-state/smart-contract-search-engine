@@ -151,6 +151,7 @@ python3.6 -m pip install Flask --user
 sudo ufw allow ssh
 sudo ufw enable
 sudo ufw allow 8080/tcp
+sudo ufw allow 443/tcp
 ```
 
 Open crontab for editing
