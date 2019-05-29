@@ -1,7 +1,5 @@
 # Global mode
 
-If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name of the server which is hosting the search engine (including the protocol) i.e. http://search-engine.com
-
 ## Apache 2
 The following instructions will facilitate a fresh Apache 2 and Virtual Host installation on Ubuntu 18.04LTS
 
@@ -104,6 +102,30 @@ Set final permissions on all files
 sudo chown -R $USER:$USER /var/www/search-engine.com/*
 ```
 
+## Global mode config
+
+**publicIp in secondStateJS.js**
+If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name of the server which is hosting the search engine (including the protocol) i.e. 
+```
+var publicIp = "https://www.search-engine.com"; //No trailing slash please
+```
+
+**searchEngineNetwork in secondStateJS.js**
+Please ensure that the correct network id is set in the "searchEngineNetwork" variable in the secondStateJS.js file i.e.
+```
+var searchEngineNetwork = "18"; // CyberMiles MainNet
+```
+
+**index variable in io.py** 
+You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed. At present CMT TestNet is `index="fairplay"` and CMT MainNet is `index="mainnetfairplay"`
+
+**Blockchain -> rpc variable in config.ini**
+It is important that the search engine is pointing to the correct RPC endpoint i.e. CMT TestNet vs MainNet
+```
+[blockchain]
+rpc = https://testnet-rpc.cybermiles.io:8545
+```
+
 ## SSL (HTTPS) using "lets encrypt"
 ```
 sudo wget https://dl.eff.org/certbot-auto -O /usr/sbin/certbot-auto
@@ -140,18 +162,6 @@ Add the following line inside crontab
 @reboot sudo ufw enable
 @reboot cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 io.py >/dev/null 2>&1 &
 ```
-
-## Front-end configuration
-
-Update the "publicIp" variable in the [js/secondStateJS.js](https://github.com/second-state/smart-contract-search-engine/blob/master/js/secondStateJS.js) file. Make sure that the IP address does not have a trailing slash. This is because the Javascript appends the path and provides the appropriate slash (we don't want double slashes) 
-
-```
-// Local single user vs global multiuser
-//var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
-var publicIp = "http://54.252.157.165"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
-```
-**Please note:** You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed.
-
 
 ## Activate the harvesting
 Please carry out the [Phase1](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#initial-harvest---phase-1-must-commence-before-phase-2) and [Phase2](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#recommended-usage---run-once-at-startup-1) automated cron/bash harvesting procedures.
