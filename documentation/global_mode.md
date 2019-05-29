@@ -89,7 +89,22 @@ sudo systemctl restart apache2
 sudo systemctl reload apache2
 ```
 
-# SSL (HTTPS) using "lets encrypt"
+## Search engine source code
+```bash
+cd ~
+git clone https://github.com/second-state/smart-contract-search-engine.git
+```
+
+Place the code in the appropriate directories
+```bash
+cp -rp ~/smart-contract-search-engine/* /var/www/search-engine.com/html/
+```
+Set final permissions on all files
+```bash
+sudo chown -R $USER:$USER /var/www/search-engine.com/*
+```
+
+## SSL (HTTPS) using "lets encrypt"
 ```
 sudo wget https://dl.eff.org/certbot-auto -O /usr/sbin/certbot-auto
 ```
@@ -106,21 +121,6 @@ sudo certbot-auto --apache -d search-engine.com  -d www.search-engine.com
 ## Flask
 ```
 python3.6 -m pip install Flask --user
-```
-
-Search engine source code
-```bash
-cd ~
-git clone https://github.com/second-state/smart-contract-search-engine.git
-```
-
-Place the code in the appropriate directories
-```bash
-cp -rp ~/smart-contract-search-engine/* /var/www/search-engine.com/html/
-```
-Set final permissions on all files
-```bash
-sudo chown -R $USER:$USER /var/www/search-engine.com/*
 ```
 
 ## Python Flask / Apache2 Integration
