@@ -373,7 +373,7 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
 }
 
 function getItemsUsingDataViaFlask(_data) {
-    theUrlForData1 = publicIp + "/api/data1";
+    theUrlForData1 = publicIp + "/api/es_search";
     console.log("getItemsUsingDataViaFlask");
     console.log(theUrlForData1);
     console.log(_data);
@@ -400,7 +400,7 @@ function getItems(_url) {
 }
 
 function getItemsViaFlask() {
-    theUrlForData2 = publicIp + "/api/data2";
+    theUrlForData2 = publicIp + "/api/es_search";
     console.log("getItemsViaFlask");
     console.log(theUrlForData2);
     console.log("POST");
