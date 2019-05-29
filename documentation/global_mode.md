@@ -1,6 +1,6 @@
 # Global mode
 
-If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name OR public IP address of the server which is hosting the search engine (including the protocol) i.e. http://search-engine.com OR http://123.45.6.7
+If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name of the server which is hosting the search engine (including the protocol) i.e. http://search-engine.com
 
 ## Apache 2
 The following instructions will facilitate a fresh Apache 2 and Virtual Host installation on Ubuntu 18.04LTS
@@ -30,7 +30,7 @@ sudo a2enmod proxy_http
 sudo systemctl restart apache2
 ```
 
-Get the public IP address or domain name (as discussed at the start of this page) and use it in the following steps
+Get the domain name (as discussed at the start of this page) and use it in the following steps
 i.e. search-engine.com or 13.236.179.58 (just the IP without the protocol). In this example, we are just using fictitious search-engine.com 
 
 Set up Virtual Host
@@ -87,6 +87,17 @@ sudo systemctl start apache2
 sudo systemctl restart apache2
 ## Reload without interuption
 sudo systemctl reload apache2
+```
+
+# SSL (HTTPS) using "lets encrypt"
+```
+sudo wget https://dl.eff.org/certbot-auto -O /usr/sbin/certbot-auto
+```
+```
+sudo chmod a+x /usr/sbin/certbot-auto
+```
+```
+sudo certbot-auto --apache -d search-engine.com  -d www.search-engine.com
 ```
 
 ## Python
