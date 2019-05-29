@@ -39,5 +39,19 @@ blockchainRpc = "https://testnet-rpc.cybermiles.io:8545"
 web3 = Web3(HTTPProvider(blockchainRpc))
 transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
 
+
+# ES
+
+
+
+auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
+es = Elasticsearch(
+    hosts=[{'host': host, 'port': 443}],
+    region=elasticSearchAwsRegion,
+    use_ssl=True,
+    verify_certs=True,
+    http_auth=auth,
+    connection_class=RequestsHttpConnection
+)
 ```
 
