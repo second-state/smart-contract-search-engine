@@ -35,19 +35,19 @@ es = Elasticsearch(
 
 app = Flask(__name__)
 
-@app.route("/api/data1", methods=['GET', 'POST'])
-def data1():
-    jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
-    obj = {}
-    num = 1
-    for item in results:
-        obj[str(num)] = item
-        num = num+1
-    return jsonify(obj)
+# @app.route("/api/data1", methods=['GET', 'POST'])
+# def data1():
+#     jsonRequestData = json.loads(request.data)
+#     results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
+#     obj = {}
+#     num = 1
+#     for item in results:
+#         obj[str(num)] = item
+#         num = num+1
+#     return jsonify(obj)
 
-@app.route("/api/data2", methods=['GET', 'POST'])
-def data2():
+@app.route("/api/es_search", methods=['GET', 'POST'])
+def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
     obj = {}
