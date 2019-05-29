@@ -6,7 +6,7 @@ The search engine can be used, by end users, via their web browser. It can also 
 
 ** Curl **
 ```bash
-curl -X GET "http://54.252.157.165/api/data1" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x0fEB15a0F7029b0F4aF355aa2Fc3CFa6Df7C8483"}}}'
+curl -X GET "https://cmt-testnet.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x909350a510BCf568e66019E21F1598D8282be26C"}}}'
 ```
 Returns
 ```bash
