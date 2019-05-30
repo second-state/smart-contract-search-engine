@@ -174,6 +174,7 @@ else
   if [ $HARVEST_COUNT -le 2 ]; then 
     echo "Obviously the system just rebooted so we are still waiting for the startup1.sh & startup2.sh scripts to activate (this will only happen when the RPC endpoint is back in service)"
   else
+    echo "It seems that we have harvesting processes running but no working RPC endpoint, time to reboot... "
     sudo shutdown -r now
   fi 
 fi
