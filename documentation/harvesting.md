@@ -23,24 +23,6 @@ endpoint = search-smart-contract-search-engine-12345.ap-southeast-2.es.amazonaws
 aws_region = ap-southeast-2
 ```
 
-## Keep alive
-The following script ensures that the system will wait out any time periods where the RPC endpoint is not available. The system will essentially perform a quick reboot if the RPC goes down. After this it will wait untill the RPC is alive, before starting any harvesting.
-
-Please create the following bash script and make it executable using `chmod`. Please be sure to use your own RPC endpoint as apposed to the `https://testnet-rpc.cybermiles.io:8545` here.
-```
-i#!/bin/bash
-STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
-if [ $STATUS -eq 200 ]; then
-echo "Got 200! All done!"
-else
-sudo shutdown -r now
-fi
-```
-
-Please add the following to your crontab -e
-```
-* * * * * nohup ~/rpcCheck.sh >/dev/null 2>&1 &
-```
 ## Initial harvest - Phase 1 (must commence before phase 2)
 
 **UPDATE - now 100x faster than before** 
@@ -178,7 +160,31 @@ Add the following command to cron using `crontab -e` command.
 ```
 The smart contract search engine will autonomously harvest upon bootup.
 
-# Preparing your system for harvesting
+## Keep alive
+The following script ensures that the system will wait out any time periods where the RPC endpoint is not available. The system will essentially perform a quick reboot if the RPC goes down. You may have already noticed that the startup1.sh and startup2.sh scripts perform a similar URL status check; so rest assured that they will not start harvesting again until the RPC endpoint is back up.
+
+Please create the following bash script and make it executable using `chmod`. Please be sure to use your own RPC endpoint as apposed to the `https://testnet-rpc.cybermiles.io:8545` here.
+```
+#!/bin/bash
+STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+if [ $STATUS -eq 200 ]; then
+  echo "Got 200! All done!"
+else
+  HARVEST_COUNT=$(ps ax | grep harvest.py | wc -l)
+  if [ $HARVEST_COUNT -le 2 ]; then 
+    echo "waiting"
+  else
+    sudo shutdown -r now
+  fi 
+fi
+```
+
+Please add the following to your crontab -e
+```
+* * * * * nohup ~/rpcCheck.sh >/dev/null 2>&1 &
+```
+
+# Preparing your operating system for harvesting - installing the necessary libraries
 
 The harvesting/indexing requires a few software libraries (to enable Python to talk to blockchain RPC, Elasticsearch as well as fetch data from URLs etc.). Please follow these instructions to ensure that your system can successfully run the Python scripts.
 
