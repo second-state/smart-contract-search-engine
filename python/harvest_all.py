@@ -90,6 +90,10 @@ class Harvest:
                                 outerData['blockNumber'] = transactionReceipt.blockNumber
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 outerData['from'] = transactionReceipt['from']
+                                outerData['abi'] = ''
+                                outerData['bytecode'] = ''
+                                outerData['inProgress'] = 'false'
+                                outerdata['epochOfLastUpdate'] = 
                                 itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
@@ -137,7 +141,8 @@ if __name__ == "__main__":
         harvester.harvestAllContracts("all")
     elif args.mode == "topup":
         print("Performing topup")
-        harvester.harvestAllContracts("all", True)
+        argsList = []
+        harvester.harvestAllContracts("all", argsList, True)
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
