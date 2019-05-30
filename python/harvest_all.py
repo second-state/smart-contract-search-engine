@@ -58,14 +58,17 @@ class Harvest:
             print("Item does not exist yet.")
         return returnVal
 
-    def harvestAllContracts(self, esIndex,  _stop=False):
+    def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
-            if _stop == True:
+            if _topup == True and len(_argList) == 0:
                 stopAtBlock = latestBlockNumber - 24
+            if _topup == False and len(_argList) == 2:
+                latestBlockNumber = _argList[0]
+                stopAtBlock = latestBlockNumber - _argList[1]
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
@@ -95,9 +98,13 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
-            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
-            if self.upcomingCallTimeHarvest > time.time():
-                time.sleep(self.upcomingCallTimeHarvest - time.time())
+            if _topup == True and len(_argList) == 0:
+                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+                    if self.upcomingCallTimeHarvest > time.time():
+                        time.sleep(self.upcomingCallTimeHarvest - time.time())
+            else:
+                if _topup == False and len(_argList) == 2:
+                    break
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
@@ -108,6 +115,21 @@ if __name__ == "__main__":
 
     if args.mode == "full":
         print("Performing full harvest")
+        latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+        threadsToUse = 100
+        blocksPerThread = int(latestBlockNumber / threadsToUse)
+        harvester.fastThreads = []
+        for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+            argList = []
+            argList.append(startingBlock)
+            argList.append(blocksPerThread)
+            tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=["all", argList, False])
+            tFullDriver.daemon = True
+            tFullDriver.start()
+            harvester.fastThreads.append(tFullDriver)
+        for tt in harvester.fastThreads:
+            tt.join()
+
         harvester.harvestAllContracts("all")
     elif args.mode == "topup":
         print("Performing topup")
