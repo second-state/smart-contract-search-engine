@@ -23,6 +23,19 @@ endpoint = search-smart-contract-search-engine-12345.ap-southeast-2.es.amazonaws
 aws_region = ap-southeast-2
 ```
 ## Initial harvest - Phase 1 (must commence before phase 2)
+
+**UPDATE** 
+This harvest_all.py script has been upgraded to perform the `-m full` mode of harvesting 100x faster than it used to. Here is the logic of the code. This code logic is just for your interest; the code will just work 100x faster now if you just run the same command.
+```
+# -m full code gets the latest block number
+latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+# then facilitates one hundred separate IO threads
+threadsToUse = 100
+# then it will work out how many blocks will be harvested per thread
+blocksPerThread = int(latestBlockNumber / threadsToUse)
+# the harvestAllContracts function is then called 100 separate times simultaneously using these unique block number parameters
+```
+**Command line usage**
 ```
 python3.6 harvest_all.py -h
 usage: harvest_all.py [-h] [-m MODE]
