@@ -34,7 +34,7 @@ class Harvest:
             stringKey = str(key)
             tempData = {}
             tempData["url"] = self.config['abis'][key]
-            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get("URLToAbi.abi").content)))
+            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
             self.abis[stringKey] = tempData
             
         # Blockchain RPC
