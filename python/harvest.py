@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import time
 import json
@@ -33,7 +34,7 @@ class Harvest:
             stringKey = str(key)
             tempData = {}
             tempData["url"] = self.config['abis'][key]
-            tempData["json"] = requests.get(self.config['abis'][key]).content
+            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get("URLToAbi.abi").content)))
             self.abis[stringKey] = tempData
             
         # Blockchain RPC
