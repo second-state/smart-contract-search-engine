@@ -2,9 +2,8 @@
 
 The search engine can be used, by end users, via their web browser. It can also provide data to users and machines via the public facing API.
 
-## API usage
+## API usage - using curl at the command line
 
-** Curl **
 ```bash
 curl -X GET "https://cmt-testnet.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x909350a510BCf568e66019E21F1598D8282be26C"}}}'
 ```
@@ -55,7 +54,7 @@ Returns
 
 ```
 
-** Javascript **
+## API usage - using Javascript/JQuery AJAX via browser or console
 ```javascript
 _data = {
     "query": {
@@ -109,4 +108,6 @@ __proto__: Object
 status: 0
 title: "Test SSL"
 ```
+
+The above examples demonstrate how to query the `api/es_search` endpoint. The great thing about the `api/es_search` endpoint is that it is 100% Elasticsearch (DSL Query) compatible. Please see the official Elasticsearch documentation on [Match all Queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html), [Full text queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html), [Exists query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html), [Wildcard query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html) and many more [query examples](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html).
 
