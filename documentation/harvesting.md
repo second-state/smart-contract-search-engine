@@ -58,10 +58,21 @@ The system will take care of itself. Here is an example of how to run this once 
 
 **Phase 1 - Step 1**
 Create a bash file, say, `~/startup1.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+Please be sure to replace `https://testnet-rpc.cybermiles.ii:8545` with that of your RPC.
 ```bash
 #!/bin/bash
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+while true
+do
+  STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+  if [ $STATUS -eq 200 ]; then
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+    break
+  else
+    echo "Got $STATUS please wait"
+  fi
+  sleep 10
+done
 ``` 
 **Phase 1 - Step 2**
 Add the following command to cron using `crontab -e` command.
@@ -127,10 +138,18 @@ The system will take care of itself. Here is an example of how to run this once 
 Create a bash file, say, `~/startup2.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
 ```bash
 #!/bin/bash
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
-``` 
+while true
+do
+  STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+  if [ $STATUS -eq 200 ]; then
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+    break
+  else
+    echo "Got $STATUS please wait"
+  fi
+```
 **Phase 2 - Step 2**
 Add the following command to cron using `crontab -e` command.
 ```bash
