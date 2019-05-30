@@ -136,7 +136,7 @@ The system will take care of itself. Here is an example of how to run this once 
 ![diagram](images/harvest_py_full_and_topup_diagram.png)
 
 **Phase 2 - Step 1**
-Create a bash file, say, `~/startup2.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+Create a bash file, say, `~/startup2.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file. Please be sure to replace `https://testnet-rpc.cybermiles.ii:8545` with that of your RPC.
 ```bash
 #!/bin/bash
 while true
