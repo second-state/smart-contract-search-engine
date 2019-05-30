@@ -24,7 +24,7 @@ aws_region = ap-southeast-2
 ```
 ## Initial harvest - Phase 1 (must commence before phase 2)
 
-**UPDATE** 
+**UPDATE - now 100x faster than before** 
 This harvest_all.py script has been upgraded to perform the `-m full` mode of harvesting 100x faster than it used to. Here is the logic of the code. This code logic is just for your interest; the code will just work 100x faster now if you just run the same command.
 ```
 # -m full code gets the latest block number
@@ -35,6 +35,8 @@ threadsToUse = 100
 blocksPerThread = int(latestBlockNumber / threadsToUse)
 # the harvestAllContracts function is then called 100 separate times simultaneously using these unique block number parameters
 ```
+The good thing about this method is that each of the threads starts at even spacings in the blockchain so there is an evenly spread amount of block harvesting going on simultaneously. The harvest_all.py can be raised above 100x by adjusting the `threadsToUse` variable. We are just using this here because the m5.large instance from AWS is comfortable at about 60% CPU. Please check your servers capacity under load using `top` and increase this number to what you see fit.
+
 **Command line usage**
 ```
 python3.6 harvest_all.py -h
