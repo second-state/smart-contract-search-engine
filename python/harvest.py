@@ -233,7 +233,7 @@ class Harvest:
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
 
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                    theStatus = functionData['status']
+                                    theStatus = functionData['info'][0]
                                     outerData['status'] = theStatus
                                     if theStatus == 0:
                                         outerData['requiresUpdating'] = "yes"
