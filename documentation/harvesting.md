@@ -172,7 +172,7 @@ if [ $STATUS -eq 200 ]; then
 else
   HARVEST_COUNT=$(ps ax | grep harvest.py | wc -l)
   if [ $HARVEST_COUNT -le 2 ]; then 
-    echo "waiting"
+    echo "Obviously the system just rebooted so we are still waiting for the startup1.sh & startup2.sh scripts to activate (this will only happen when the RPC endpoint is back in service)"
   else
     sudo shutdown -r now
   fi 
