@@ -22,6 +22,25 @@ rpc = https://testnet-rpc.cybermiles.io:8545
 endpoint = search-smart-contract-search-engine-12345.ap-southeast-2.es.amazonaws.com
 aws_region = ap-southeast-2
 ```
+
+## Keep alive
+The following script ensures that the system will wait out any time periods where the RPC endpoint is not available. The system will essentially perform a quick reboot if the RPC goes down. After this it will wait untill the RPC is alive, before starting any harvesting.
+
+Please create the following bash script and make it executable using `chmod`. Please be sure to use your own RPC endpoint as apposed to the `https://testnet-rpc.cybermiles.io:8545` here.
+```
+i#!/bin/bash
+STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+if [ $STATUS -eq 200 ]; then
+echo "Got 200! All done!"
+else
+sudo shutdown -r now
+fi
+```
+
+Please add the following to your crontab -e
+```
+* * * * * nohup ~/rpcCheck.sh >/dev/null 2>&1 &
+```
 ## Initial harvest - Phase 1 (must commence before phase 2)
 
 **UPDATE - now 100x faster than before** 
