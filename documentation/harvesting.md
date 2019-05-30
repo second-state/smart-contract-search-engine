@@ -149,6 +149,8 @@ do
   else
     echo "Got $STATUS please wait"
   fi
+  sleep 10
+done
 ```
 **Phase 2 - Step 2**
 Add the following command to cron using `crontab -e` command.
