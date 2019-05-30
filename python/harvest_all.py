@@ -100,8 +100,8 @@ class Harvest:
                     continue
             if _topup == True and len(_argList) == 0:
                 self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
-                    if self.upcomingCallTimeHarvest > time.time():
-                        time.sleep(self.upcomingCallTimeHarvest - time.time())
+                if self.upcomingCallTimeHarvest > time.time():
+                    time.sleep(self.upcomingCallTimeHarvest - time.time())
             else:
                 if _topup == False and len(_argList) == 2:
                     break
