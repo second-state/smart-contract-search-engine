@@ -109,5 +109,10 @@ status: 0
 title: "Test SSL"
 ```
 
-The above examples demonstrate how to query the `api/es_search` endpoint. The great thing about the `api/es_search` endpoint is that it is 100% Elasticsearch (DSL Query) compatible. Please see the official Elasticsearch documentation on [Match all Queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html), [Full text queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html), [Exists query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html), [Wildcard query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html) and many more [query examples](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html).
+The above examples demonstrate how to query the `api/es_search` endpoint. The great thing about the `api/es_search` endpoint is that it is 100% Elasticsearch (DSL Query) compatible. Please see the official Elasticsearch documentation for more information about:
+- [Match all Queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-match-all-query.html), 
+- [Full text queries](https://www.elastic.co/guide/en/elasticsearch/reference/current/full-text-queries.html), 
+- [Exists query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-exists-query.html), 
+- [Wildcard query](https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html) 
+- and many more [query examples](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-request-body.html).
 
