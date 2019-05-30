@@ -70,6 +70,7 @@ class Harvest:
             if _topup == False and len(_argList) == 2:
                 latestBlockNumber = _argList[0]
                 stopAtBlock = latestBlockNumber - _argList[1]
+                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
