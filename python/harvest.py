@@ -303,7 +303,7 @@ class Harvest:
                 outerData = {}
                 outerData["functionData"] = freshFunctionData
                 outerData["functionDataId"] = functionDataId
-                theStatus = freshFunctionData['status']
+                theStatus = freshFunctionData['info'][0]
                 if theStatus == 0:
                     outerData['requiresUpdating'] = "yes"
                 elif theStatus == 1:
