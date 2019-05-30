@@ -84,22 +84,22 @@ class Harvest:
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
-                            #try:
-                            outerData = {}
-                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                            outerData['blockNumber'] = transactionReceipt.blockNumber
-                            outerData['contractAddress'] = transactionReceipt.contractAddress
-                            outerData['from'] = transactionReceipt['from']
-                            outerData['abi'] = "false"
-                            outerData['bytecode'] = "false"
-                            outerData['inProgress'] = "false"
-                            outerdata['epochOfLastUpdate'] = block.timestamp
-                            itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                            dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
-                            if dataStatus == False:
-                                indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
-                            #except:
-                            #    print("Error indexing contract")
+                            try:
+                                outerData = {}
+                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                outerData['blockNumber'] = transactionReceipt.blockNumber
+                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                outerData['from'] = transactionReceipt['from']
+                                outerData['abi'] = "false"
+                                outerData['bytecode'] = "false"
+                                outerData['inProgress'] = "false"
+                                outerData['epochOfLastUpdate'] = block.timestamp
+                                itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
+                                dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                if dataStatus == False:
+                                    indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
+                            except:
+                                print("Error indexing contract")
                         else:
                             print("This transaction does not involve a contract, so we will ignore it")
                             continue
