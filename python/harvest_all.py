@@ -90,9 +90,9 @@ class Harvest:
                             outerData['blockNumber'] = transactionReceipt.blockNumber
                             outerData['contractAddress'] = transactionReceipt.contractAddress
                             outerData['from'] = transactionReceipt['from']
-                            outerData['abi'] = 'false'
-                            outerData['bytecode'] = 'false'
-                            outerData['inProgress'] = 'false'
+                            outerData['abi'] = "false"
+                            outerData['bytecode'] = "false"
+                            outerData['inProgress'] = "false"
                             outerdata['epochOfLastUpdate'] = block.timestamp
                             itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
                             dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
