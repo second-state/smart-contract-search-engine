@@ -23,6 +23,10 @@ class Harvest:
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
+        # Master index
+        self.masterIndex = self.config['masterindex']['all']
+        print("Master index: %s" % self.masterIndex)
+
         # Elasticsearch endpoint
         self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
         print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
@@ -134,18 +138,17 @@ if __name__ == "__main__":
             argList = []
             argList.append(startingBlock)
             argList.append(blocksPerThread)
-            tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=["all", argList, False])
+            tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=[harvester.masterIndex, argList, False])
             tFullDriver.daemon = True
             tFullDriver.start()
             harvester.fastThreads.append(tFullDriver)
         for tt in harvester.fastThreads:
             tt.join()
 
-        harvester.harvestAllContracts("all")
     elif args.mode == "topup":
         print("Performing topup")
         argsList = []
-        harvester.harvestAllContracts("all", argsList, True)
+        harvester.harvestAllContracts(harvester.masterIndex, argsList, True)
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
