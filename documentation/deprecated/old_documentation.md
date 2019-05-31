@@ -39,8 +39,7 @@ blockchainRpc = "https://testnet-rpc.cybermiles.io:8545"
 web3 = Web3(HTTPProvider(blockchainRpc))
 transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
 
-
-# ES
+#blockchainRpc = "http://35.161.237.144:8545"
 
 
 
@@ -54,4 +53,3 @@ es = Elasticsearch(
     connection_class=RequestsHttpConnection
 )
 ```
-
