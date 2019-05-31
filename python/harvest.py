@@ -235,6 +235,7 @@ class Harvest:
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
                                     theStatus = functionData['info'][0]
                                     outerData['status'] = theStatus
+                                    # This needs to be moved to a separate process - no customisation here please (separate python script instead)
                                     if theStatus == 0:
                                         outerData['requiresUpdating'] = "yes"
                                     elif theStatus == 1:

@@ -17,7 +17,7 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 class Harvest:
     def __init__(self):
 
-        # Add list for unique queueing
+        # Add list for unique queue
         self.qList = []
 
         # CWD
@@ -295,6 +295,7 @@ class Harvest:
         self.uniqueContractList = self.fetchContractAddresses(_esIndex)
 
     def fetchContractInstances(self, _contractAbiJSONData):
+        #TODO this assumes that there is only one contract abi we need to pass in both the abi and the address for this to work
         self.contractInstanceList = []
         for uniqueContractAddress in self.uniqueContractList:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
@@ -450,3 +451,4 @@ if __name__ == "__main__":
 #cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
 
 # watch -n 2 -d "ps -eL THE_PID | wc -l"
+f
