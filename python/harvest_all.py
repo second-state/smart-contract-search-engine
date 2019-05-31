@@ -93,14 +93,22 @@ class Harvest:
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                 outerData['blockNumber'] = transactionReceipt.blockNumber
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
+                                # from is the contract's creator
                                 outerData['from'] = transactionReceipt['from']
                                 outerData['abi'] = "false"
                                 outerData['bytecode'] = "false"
                                 outerData['abiSha3'] = "false"
                                 outerData['bytecodeSha3'] = "false"
                                 outerData['abiSha3bytecodeSha3'] = "false"
-                                outerData['inProgress'] = "false"
-                                outerData['epochOfLastUpdate'] = block.timestamp
+                                # indexingInProgress is a placeholder/lock for sharded harvesting in the future
+                                outerData['indexingInProgress'] = "false"
+                                # contractDestructed will be set by external web3 script
+                                outerData['contractDestructed'] = "false"
+                                # epochOfLastUpdate will be updated by each sharded harvester/indexer and used to detect if a sharded harvester/indexer has gone off line with the indexingInProgress flag set to true
+                                # epochOfLastUpdate will be monitored by external script (the purpose to set the indexingInProgress to false in cases where no recent activity is detected)
+                                # i.e. if contractDestructed == "false" and indexingInProgress == "true" and (time.now - epochOfLastUpdate > 24 hours)
+                                outerData['epochOfLastUpdate'] = block.timestamp 
+                                
                                 itemId = transactionReceipt.contractAddress
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
