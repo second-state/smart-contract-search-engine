@@ -17,7 +17,8 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 class Harvest:
     def __init__(self):
 
-        # Add list for unique queue
+        # Add list for unique queueing
+        
         self.qList = []
 
         # CWD
