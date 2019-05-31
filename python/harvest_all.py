@@ -92,9 +92,12 @@ class Harvest:
                                 outerData['from'] = transactionReceipt['from']
                                 outerData['abi'] = "false"
                                 outerData['bytecode'] = "false"
+                                outerData['abiSha3'] = "false"
+                                outerData['bytecodeSha3'] = "false"
+                                outerData['abiSha3bytecodeSha3'] = "false"
                                 outerData['inProgress'] = "false"
                                 outerData['epochOfLastUpdate'] = block.timestamp
-                                itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
+                                itemId = transactionReceipt.contractAddress
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
                                     indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
