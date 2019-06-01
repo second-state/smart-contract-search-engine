@@ -64,7 +64,7 @@ abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).co
 abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
 data = {}
 data['abi'] = abiData
-es.index(index="abi", id=abiSha, body=abiData)
+es.index(index="abi", id=abiSha, body=data)
 ```
 
 This is now we create the bytecode record in the bytecode index
