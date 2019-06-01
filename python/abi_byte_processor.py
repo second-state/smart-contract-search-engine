@@ -194,12 +194,13 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _queueIndex,  _stop=False):
+    def harvest(self, _esAbiSingle,  _stop=False):
         self.upcomingCallTimeHarvest = time.time()
+        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
 
-        binObject = requests.get(self.config['bytecode'][itemConf[0]]).content
-        binJSONObject = json.loads(binObject)
-        byteCode = "0x" + binJSONObject['object']
+        # binObject = requests.get(self.config['bytecode'][itemConf[0]]).content
+        # binJSONObject = json.loads(binObject)
+        # byteCode = "0x" + binJSONObject['object']
 
         while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
@@ -237,31 +238,38 @@ class Harvest:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
                                     # get a masterList of all of the unique byte code which we own
-
-                                    outerData['abiURL'] = itemConf[1]['url']
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+                                    print('Contract version of ABI SHA')
+                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi)))))
+                                    # JUST FYI a comparison of the two SHAs
+                                    print("Uploaded version of the ABI SHA")
+                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractAbiJSONData)))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber
-                                    if byteCode in transactionData.input:
+                                    #TODO
+                                    #if byteCode in transactionData.input:
                                         # if the bytecode is in the Index of Unique Bytecode (IUB)
-                                        outerData['byteCodeURL'] = str(self.config['bytecode'][itemConf[0]])
+                                        # hash the bytecode and store this on its own
+                                        # outerData['byteSha'] = 
                                         # Then take the abiSha3 from above 
                                         # hash the bytecode also
-                                    outerData['dappVersion'] = version
+                                        # the pair of those become abiShaByteSha which is the most precise DApp version
+                                        #outerData['abiShaByteSha'] = 
+
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
 
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                    theStatus = functionData['info'][0]
-                                    outerData['status'] = theStatus
-                                    if theStatus == 0:
-                                        outerData['requiresUpdating'] = "yes"
-                                    elif theStatus == 1:
-                                        outerData['requiresUpdating'] = "no"
+                                    #theStatus = functionData['info'][0]
+                                    #outerData['status'] = theStatus
+                                    #if theStatus == 0:
+                                    #    outerData['requiresUpdating'] = "yes"
+                                    #elif theStatus == 1:
+                                    #    outerData['requiresUpdating'] = "no"
                                     functionDataId = self.getFunctionDataId(functionData)
                                     outerData['functionDataId'] = functionDataId
                                     outerData['functionData'] = functionData
                                     print(outerData)
-                                    itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
+                                    itemId = transactionReceipt.contractAddress
                                     dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                     if dataStatus == False:
                                         indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
@@ -286,7 +294,7 @@ class Harvest:
         harvestDriverThreads = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbis:
-            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle])
+            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
             tFullDriver.daemon = True
             tFullDriver.start()
             harvestDriverThreads.append(tFullDriver)
