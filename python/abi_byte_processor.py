@@ -18,7 +18,7 @@ class Harvest:
     def __init__(self):
 
         # Add list for unique queueing
-        
+
         self.qList = []
 
         # CWD
@@ -29,15 +29,22 @@ class Harvest:
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
 
-        # ABI[s] Allow for multiple ABIs in the config.ini
-        #self.abis = {}
-        # for key in self.config['abis']:
-        #     stringKey = str(key)
-        #     tempData = {}
-        #     tempData["url"] = self.config['abis'][key]
-        #     tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
-        #    self.abis[stringKey] = tempData
+        # Master index
+        self.masterIndex = self.config['masterindex']['all']
+        print("Master index: %s" % self.masterIndex)
+
+        # Common index
+        self.commonIndex = self.config['commonindex']['network']
+        print("Common index: %s" % self.commonIndex)
             
+        # Abi index
+        self.abiIndex = self.config['abiindex']['abi']
+        print("Abi index: %s" % self.abiIndex)
+
+        # Bytecode index
+        self.bytecodeIndex = self.config['bytecodeindex']['bytecode']
+        print("Bytecode index: %s" % self.bytecodeIndex)
+
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
@@ -158,6 +165,9 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
+        # dQuery
+        # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
+
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -277,18 +287,13 @@ class Harvest:
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
 
     def harvestDriver(self, _stop=False):
-        qHarvestDriver = queue.Queue()
-        queueIndex = len(self.qList)
-        self.qList.append(qHarvestDriver)
-        self.threadsFullDriver = []
+
         for i in range(len(self.abis)):
             tFullDriver = threading.Thread(target=self.harvest, args=[queueIndex, _stop])
             tFullDriver.daemon = True
             tFullDriver.start()
             self.threadsFullDriver.append(tFullDriver)
-        for abiConfig in self.abis.items():
-            self.qList[queueIndex].put(abiConfig)
-        self.qList[queueIndex].join()
+
 
     # State related
     def fetchUniqueContractList(self, _esIndex):
@@ -362,13 +367,6 @@ class Harvest:
                 time.sleep(self.upcomingCallTimeState - time.time())
 
     def updateStateDriver(self, _queueIndex):
-        if self.qList[_queueIndex].empty():
-            time.sleep(3)
-        else:
-            self.qList[_queueIndex].empty()
-        itemConf = self.qList[_queueIndex].get()
-        if itemConf is None:
-            sys.exit("No ABIs left to process")
         esIndex = itemConf[0].split('_')[0]
         version = itemConf[0].split('_')[1]
         contractAbiJSONData = json.loads(itemConf[1]['json'])
@@ -382,16 +380,14 @@ class Harvest:
         qUpdateStateDriverPre = queue.Queue()
         queueIndex = len(self.qList)
         self.qList.append(qUpdateStateDriverPre)
-
+        queryForAbiIndex = json.loads({"query":{"match":{"indexInProgress": "false"}}})
+        esAbis = elasticsearch.helpers.scan(client=self.es, index="abi", query=queryForAbiIndex, preserve_order=True)
         self.threadsupdateStateDriverPre = []
-        for i in range(len(self.abis)):
-            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[queueIndex])
+        for esAbiSingle in esAbis:
+            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-        for abiConfig in self.abis.items():
-            self.qList[queueIndex].put(abiConfig)
-        self.qList[queueIndex].join()
 
     def loadConfigIniToES(self):
         for key in self.config['abis']:
