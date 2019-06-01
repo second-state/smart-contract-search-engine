@@ -63,6 +63,8 @@ abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/Fa
 abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
 abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
 data = {}
+data['indexInProgress'] = "false"
+data['epochOfLastUpdate'] = int(time.time())
 data['abi'] = abiData
 es.index(index="abi", id=abiSha, body=data)
 ```
@@ -75,6 +77,8 @@ binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
 data = {}
+data['indexInProgress'] = "false"
+data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
 es.index(index="bytecode", id=byteCodeSha, body=data)
 ```
