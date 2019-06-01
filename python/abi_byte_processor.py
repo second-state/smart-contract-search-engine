@@ -167,7 +167,7 @@ class Harvest:
         dQuery["_source"] = lContractAddress
         # dQuery
         # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
-
+        # {"query":{"match":{"indexingInProgress": "false"}}}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -175,6 +175,38 @@ class Harvest:
             if source['contractAddress'] not in uniqueList:
                 uniqueList.append(source['contractAddress'])
         return uniqueList
+
+    def fetchContractAddressesWithAbis(self):
+        dQuery = {}
+        dWildCard = {}
+        dabiSha3 = {}
+        labiSha3 = []
+        dabiSha3["abiSha3"] = "0x*"
+        dWildCard["wildcard"] = dabiSha3 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["indexingInProgress"] = "false"
+        dMatch["match"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
+        labiSha3.append("abiSha3")
+        dQuery["_source"] = labiSha3
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=json.dumps(dQuery), preserve_order=True)
+        uniqueList = []
+        for i, doc in enumerate(esReponseAddresses):
+            source = doc.get('_source')
+            if source['abiSha3'] not in uniqueList:
+                uniqueList.append(source['abiSha3'])
+        return uniqueList
+
 
     def fetchFunctionDataIds(self, _theIndex):
         dQuery = {}
@@ -382,11 +414,11 @@ class Harvest:
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
-        queryForAbiIndex = json.loads({"query":{"match":{"indexingInProgress": "false"}}})
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForAbiIndex, preserve_order=True)
+        esAbiHashes = fetchContractAddressesWithAbis()
         self.threadsupdateStateDriverPre = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
-        for esAbiSingle in esAbis:
+        for esAbiSingle in esAbiHashes:
+            
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()

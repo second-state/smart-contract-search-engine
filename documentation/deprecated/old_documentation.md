@@ -59,7 +59,10 @@ es = Elasticsearch(
 This is how we create the abi record in the abi index
 
 ```python
-abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+#v1
+#abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+#v2
+abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
 abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
 abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
 data = {}
@@ -82,3 +85,58 @@ data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
 es.index(index="bytecode", id=byteCodeSha, body=data)
 ```
+
+
+Remove unwanted index results
+POST
+
+https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/cmtmainnet/_delete_by_query
+
+Using the following
+
+{
+  "query": { 
+    "match": {
+      "functionData.owner": "0x86eEB4105814b1A590939670eBDF3b72ba078025"
+    }
+  }
+}
+
+{
+  "query": { 
+    "match": {
+      "functionData.owner": "0x38B1BdA00f103C30547E5D31dbF1c1Dfc356F9F0"
+    }
+  }
+}
+
+{
+  "query": { 
+    "match": {
+      "functionData.owner": "0x779CBe4355268df897927B671C9c65673DeD0Fee"
+    }
+  }
+}
+
+
+{
+  "query": { 
+    "match": {
+      "functionData.owner": "0xAD0aec5FCa1E1FB5Ac84aB06aA813DE6B6105a27"
+    }
+  }
+}
+
+{
+  "query": { 
+    "match": {
+      "functionData.owner": "0xEBfC71f4ef3Eda82B65dE04B1cf1994f28C3B9CC"
+    }
+  }
+}
+
+
+
+
+
+
