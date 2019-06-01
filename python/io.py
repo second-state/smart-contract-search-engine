@@ -46,6 +46,27 @@ app = Flask(__name__)
 #         num = num+1
 #     return jsonify(obj)
 
+
+
+
+
+@app.route("/api/submit_abi", methods=['GET', 'POST'])
+def submit_abi():
+    jsonRequestData = json.loads(request.data)
+    ## Instantiate a web3 contract instance using the abi and the address provided from the submit_api page
+    ## If this passes then create an ES update query like this
+    ## The ABI
+    ## abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+    ## abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+
+    ## Once we have cleaned the ABI we create the hash of it 
+    ## abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
+    ## Use Elasticsearch to update the record 
+    ## data = {}
+    ## data['abi'] = abiData
+    ## es.index(index="abi", id=abiSha, body=abiData)
+
+
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
     jsonRequestData = json.loads(request.data)

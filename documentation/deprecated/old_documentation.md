@@ -21,6 +21,7 @@ Creating a web3 contract instance in the command line for testing
 
 ```python
 import os
+import re
 import sys
 import time
 import json
@@ -37,19 +38,25 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 # Testnet
 blockchainRpc = "https://testnet-rpc.cybermiles.io:8545"
 web3 = Web3(HTTPProvider(blockchainRpc))
-transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
+#transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
 
 #blockchainRpc = "http://35.161.237.144:8545"
 
 
 
-auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
+auth = BotoAWSRequestsAuth(aws_host="search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com", aws_region="ap-southeast-2", aws_service='es')
 es = Elasticsearch(
-    hosts=[{'host': host, 'port': 443}],
-    region=elasticSearchAwsRegion,
+    hosts=[{'host': "search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com", 'port': 443}],
+    region="ap-southeast-2",
     use_ssl=True,
     verify_certs=True,
     http_auth=auth,
     connection_class=RequestsHttpConnection
 )
 ```
+
+
+This is how we create the abi record in the abi index
+
+abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
