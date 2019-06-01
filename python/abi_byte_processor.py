@@ -234,47 +234,47 @@ class Harvest:
                                     break
                             # If all hashes match then the abi in the master list belongs to this contract
                             if count == len(listOfKeccakHashes):
-                                #try:
-                                outerData = {}
-                                contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                # get a masterList of all of the unique byte code which we own
-                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                                print('Contract version of ABI SHA')
-                                print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi)))))
-                                # JUST FYI a comparison of the two SHAs
-                                print("Uploaded version of the ABI SHA")
-                                print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractAbiJSONData)))))
-                                outerData['blockNumber'] = transactionReceipt.blockNumber
-                                #TODO
-                                #if byteCode in transactionData.input:
-                                    # if the bytecode is in the Index of Unique Bytecode (IUB)
-                                    # hash the bytecode and store this on its own
-                                    # outerData['byteSha'] = 
-                                    # Then take the abiSha3 from above 
-                                    # hash the bytecode also
-                                    # the pair of those become abiShaByteSha which is the most precise DApp version
-                                    #outerData['abiShaByteSha'] = 
+                                try:
+                                    outerData = {}
+                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+                                    # get a masterList of all of the unique byte code which we own
+                                    outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                    outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+                                    print('Contract version of ABI SHA')
+                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi)))))
+                                    # JUST FYI a comparison of the two SHAs
+                                    print("Uploaded version of the ABI SHA")
+                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractAbiJSONData)))))
+                                    outerData['blockNumber'] = transactionReceipt.blockNumber
+                                    #TODO
+                                    #if byteCode in transactionData.input:
+                                        # if the bytecode is in the Index of Unique Bytecode (IUB)
+                                        # hash the bytecode and store this on its own
+                                        # outerData['byteSha'] = 
+                                        # Then take the abiSha3 from above 
+                                        # hash the bytecode also
+                                        # the pair of those become abiShaByteSha which is the most precise DApp version
+                                        #outerData['abiShaByteSha'] = 
 
-                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                    outerData['contractAddress'] = transactionReceipt.contractAddress
 
-                                functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                #theStatus = functionData['info'][0]
-                                #outerData['status'] = theStatus
-                                #if theStatus == 0:
-                                #    outerData['requiresUpdating'] = "yes"
-                                #elif theStatus == 1:
-                                #    outerData['requiresUpdating'] = "no"
-                                functionDataId = self.getFunctionDataId(functionData)
-                                outerData['functionDataId'] = functionDataId
-                                outerData['functionData'] = functionData
-                                print(outerData)
-                                itemId = transactionReceipt.contractAddress
-                                dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
-                                if dataStatus == False:
-                                    indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                                #except:
-                                #    print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
+                                    functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
+                                    #theStatus = functionData['info'][0]
+                                    #outerData['status'] = theStatus
+                                    #if theStatus == 0:
+                                    #    outerData['requiresUpdating'] = "yes"
+                                    #elif theStatus == 1:
+                                    #    outerData['requiresUpdating'] = "no"
+                                    functionDataId = self.getFunctionDataId(functionData)
+                                    outerData['functionDataId'] = functionDataId
+                                    outerData['functionData'] = functionData
+                                    print(outerData)
+                                    itemId = transactionReceipt.contractAddress
+                                    dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+                                    if dataStatus == False:
+                                        indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+                                except:
+                                    print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                         else:
                             print("This transaction does not involve a contract, so we will ignore it")
                             continue
@@ -382,8 +382,8 @@ class Harvest:
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
-        queryForAbiIndex = json.loads({"query":{"match":{"indexInProgress": "false"}}})
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        queryForAbiIndex = json.loads({"query":{"match":{"indexingInProgress": "false"}}})
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForAbiIndex, preserve_order=True)
         self.threadsupdateStateDriverPre = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbis:
