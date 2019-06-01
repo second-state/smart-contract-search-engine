@@ -453,4 +453,3 @@ if __name__ == "__main__":
 #cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
 
 # watch -n 2 -d "ps -eL THE_PID | wc -l"
-f
