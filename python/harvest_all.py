@@ -95,8 +95,8 @@ class Harvest:
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 # from is the contract's creator
                                 outerData['from'] = transactionReceipt['from']
-                                outerData['abi'] = "false"
-                                outerData['bytecode'] = "false"
+                                #outerData['abi'] = "false"
+                                #outerData['bytecode'] = "false"
                                 outerData['abiSha3'] = "false"
                                 outerData['bytecodeSha3'] = "false"
                                 outerData['abiSha3bytecodeSha3'] = "false"
@@ -108,7 +108,7 @@ class Harvest:
                                 # epochOfLastUpdate will be monitored by external script (the purpose to set the indexingInProgress to false in cases where no recent activity is detected)
                                 # i.e. if contractDestructed == "false" and indexingInProgress == "true" and (time.now - epochOfLastUpdate > 24 hours)
                                 outerData['epochOfLastUpdate'] = block.timestamp 
-                                
+
                                 itemId = transactionReceipt.contractAddress
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
