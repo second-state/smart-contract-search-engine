@@ -270,9 +270,9 @@ class Harvest:
                                 outerData['functionData'] = functionData
                                 print(outerData)
                                 itemId = transactionReceipt.contractAddress
-                                dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
                                 if dataStatus == False:
-                                    indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
+                                    indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                                 #except:
                                 #    print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                         else:
