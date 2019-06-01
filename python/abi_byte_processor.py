@@ -289,7 +289,7 @@ class Harvest:
 
     def harvestDriver(self, _stop=False):
         print("harvestDriver")
-        queryForAbiIndex = json.loads({"query":{"match":{"indexInProgress": "false"}}})
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         harvestDriverThreads = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
