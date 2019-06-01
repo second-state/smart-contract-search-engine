@@ -196,13 +196,6 @@ class Harvest:
 
     def harvest(self, _queueIndex,  _stop=False):
         self.upcomingCallTimeHarvest = time.time()
-        itemConf = self.qList[_queueIndex].get()
-        if itemConf is None:
-            print("itemConf is None")
-
-        esIndex = itemConf[0].split('_')[0]
-        version = itemConf[0].split('_')[1]
-        contractAbiJSONData = json.loads(itemConf[1]['json'])
 
         binObject = requests.get(self.config['bytecode'][itemConf[0]]).content
         binJSONObject = json.loads(binObject)
@@ -287,12 +280,18 @@ class Harvest:
                 time.sleep(self.upcomingCallTimeHarvest - time.time())
 
     def harvestDriver(self, _stop=False):
-
-        for i in range(len(self.abis)):
-            tFullDriver = threading.Thread(target=self.harvest, args=[queueIndex, _stop])
+        print("harvestDriver")
+        queryForAbiIndex = json.loads({"query":{"match":{"indexInProgress": "false"}}})
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        harvestDriverThreads = []
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        for esAbiSingle in esAbis:
+            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle])
             tFullDriver.daemon = True
             tFullDriver.start()
-            self.threadsFullDriver.append(tFullDriver)
+            harvestDriverThreads.append(tFullDriver)
+        for harvestDriverThread in harvestDriverThreads:
+            harvestDriverThread.join()
 
 
     # State related
@@ -366,10 +365,8 @@ class Harvest:
             if self.upcomingCallTimeState > time.time():
                 time.sleep(self.upcomingCallTimeState - time.time())
 
-    def updateStateDriver(self, _queueIndex):
-        esIndex = itemConf[0].split('_')[0]
-        version = itemConf[0].split('_')[1]
-        contractAbiJSONData = json.loads(itemConf[1]['json'])
+    def updateStateDriver(self, _esAbiSingle):
+        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
         self.fetchUniqueContractList(esIndex)
         self.fetchContractInstances(contractAbiJSONData)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
@@ -377,17 +374,17 @@ class Harvest:
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
-        qUpdateStateDriverPre = queue.Queue()
-        queueIndex = len(self.qList)
-        self.qList.append(qUpdateStateDriverPre)
         queryForAbiIndex = json.loads({"query":{"match":{"indexInProgress": "false"}}})
-        esAbis = elasticsearch.helpers.scan(client=self.es, index="abi", query=queryForAbiIndex, preserve_order=True)
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         self.threadsupdateStateDriverPre = []
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbis:
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
+        for updateStateThreads1 in self.threadsupdateStateDriverPre:
+            updateStateThreads1.join()
 
     def loadConfigIniToES(self):
         for key in self.config['abis']:
