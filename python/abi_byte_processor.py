@@ -480,7 +480,7 @@ class Harvest:
                 outerData["bytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=bytecodeSha3))
                 outerData["abiSha3BytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=abiSha3BytecodeSha3))
                 doc["doc"] = outerData
-                updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
+                self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
 
     def updateBytecode(self):
         self.threadsUpdateBytecode = []
@@ -495,25 +495,6 @@ class Harvest:
         for individualVersionlessThread in self.threadsUpdateBytecode:
             individualVersionlessThread.join()
 
-
-def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
-    esReponseD = self.es.index(index=_theIndex, id=_theId, body=_thePayLoad)
-    return esReponseD
-
-def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
-    esReponseD = self.es.update(index=_theIndex, id=_theId, body=_thePayLoad)
-    return esReponseD
-
-def hasDataBeenIndexed(self, _theIndex, _esId):
-    returnVal = False
-    try:
-        esReponse2 = self.es.get(index=_theIndex, id=_esId, _source="false")
-        if esReponse2['found'] == True:
-            returnVal = True
-            print("Item is already indexed.")
-    except:
-        print("Item does not exist yet.")
-    return returnVal
 
 
 if __name__ == "__main__":
