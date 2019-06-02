@@ -433,10 +433,10 @@ class Harvest:
         #    print("Unable to fetch ABI from the ABI index")
         
 
-    def updateBytecodeAndVersion(self, _contractAddress, _abiSha3):
-        jsonAbi = self.fetchAbiUsingHash(_abiSha3)
-        contractInstance = self.web3.eth.contract(abi=jsonAbi, address=_contractAddress)
-        print("UPDATING BYTECODE WITH A NEW CONTRACT INSTANCE")
+    def updateBytecodeAndVersion(self, _txHash):
+        transactionInstance = self.web3.eth.getTransaction(str(_txHash))
+        print(transactionInstance)
+        
 
 
     def updateBytecode(self):
@@ -444,7 +444,7 @@ class Harvest:
         versionless = self.fetchContractAddressesWithAbis()
         for i, doc in enumerate(versionless):
             source = doc.get('_source')
-            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["contractAddress"], source["abiSha3"]])
+            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"]])
             tVersionless.daemon = True
             tVersionless.start()
             self.threadsUpdateBytecode.append(tVersionless)
