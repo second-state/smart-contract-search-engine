@@ -440,7 +440,7 @@ class Harvest:
 
     def updateBytecode(self):
         self.threadsUpdateBytecode = []
-        versionless = this.fetchContractAddressesWithAbis()
+        versionless = self.fetchContractAddressesWithAbis()
         for i, doc in enumerate(versionless):
             source = doc.get('_source')
             tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["contractAddress"], source["abiSha3"]])
