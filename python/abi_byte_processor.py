@@ -385,6 +385,7 @@ class Harvest:
             doc["doc"] = outerData
             print("********")
             print(doc)
+            print(itemId)
             indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
 
