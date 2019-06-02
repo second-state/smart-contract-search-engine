@@ -474,11 +474,11 @@ class Harvest:
             if source["bytecode"] in transactionInstance.input:
                 print("Found bytecode")
                 outerData = {}
-                bytecodeSha3 = web3.toHex(web3.sha3(text=source["bytecode"]))
+                bytecodeSha3 = self.web3.toHex(self.web3.sha3(text=source["bytecode"]))
                 abiBytecode = _abiSha3 + bytecodeSha3
-                abiSha3BytecodeSha3 = web3.toHex(web3.sha3(text=abiBytecode))
-                outerData["bytecodeSha3"] = web3.toHex(web3.sha3(text=bytecodeSha3))
-                outerData["abiSha3BytecodeSha3"] = web3.toHex(web3.sha3(text=abiSha3BytecodeSha3))
+                abiSha3BytecodeSha3 = self.web3.toHex(self.web3.sha3(text=abiBytecode))
+                outerData["bytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=bytecodeSha3))
+                outerData["abiSha3BytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=abiSha3BytecodeSha3))
                 doc["doc"] = outerData
                 updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
 
