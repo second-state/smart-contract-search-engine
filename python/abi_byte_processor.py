@@ -203,7 +203,31 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
-
+    def fetchTxHashWithAbis():
+        dQuery = {}
+        dWildCard = {}
+        dContractAddress = {}
+        lContractAddress = []
+        dContractAddress["abiSha3"] = "0x*"
+        dWildCard["wildcard"] = dContractAddress 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["field"] = "byteSha3"
+        dMatch["exists"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must_not"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
+        lContractAddress.append("TxHash")
+        dQuery["_source"] = lContractAddress
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
+        return esReponseAddresses
 
     def fetchFunctionDataIds(self, _theIndex):
         dQuery = {}
@@ -441,7 +465,7 @@ class Harvest:
 
     def updateBytecode(self):
         self.threadsUpdateBytecode = []
-        versionless = self.fetchContractAddressesWithAbis()
+        versionless = self.fetchTxHashWithAbis()
         for i, doc in enumerate(versionless):
             source = doc.get('_source')
             print(source)
