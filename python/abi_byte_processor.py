@@ -145,19 +145,28 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddresses(self, _theIndex):
+    def fetchContractAddresses(self, _theIndex, _abiSha3):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
         lContractAddress = []
         dContractAddress["contractAddress"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
+
         dMatch = {}
         dReauiresUpdating = {}
         dReauiresUpdating["requiresUpdating"] = "yes"
         dMatch["match"] = dReauiresUpdating
+
+        dMatch2 = {}
+        dabiSha3 = {}
+        dabiSha3["abiSha3"] = _abiSha3
+        dMatch2["match"] = dabiSha3
+
         lMust = []
         lMust.append(dMatch)
+        lMust.append(dMatch2)
+        
         dBool = {}
         dBool["must"] = lMust
         lShould = []
@@ -168,6 +177,7 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
+        print(dQuery)
         # dQuery
         # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
         # {"query":{"match":{"indexingInProgress": "false"}}}
@@ -352,9 +362,9 @@ class Harvest:
 
 
     # State related
-    def fetchUniqueContractList(self, _esIndex):
+    def fetchUniqueContractList(self, _esIndex, _abiSha3):
         self.uniqueContractList = []
-        self.uniqueContractList = self.fetchContractAddresses(_esIndex)
+        self.uniqueContractList = self.fetchContractAddresses(_esIndex, _abiSha3)
 
     def fetchContractInstances(self, _contractAbiJSONData):
         #TODO this assumes that there is only one contract abi we need to pass in both the abi and the address for this to work
@@ -429,7 +439,7 @@ class Harvest:
         
         esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
         contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
-        self.fetchUniqueContractList(self.commonIndex)
+        contractsToProcess = fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
         self.fetchContractInstances(contractAbiJSONData)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
         self.performStateUpdate(self.commonIndex, contractAbiJSONData)
