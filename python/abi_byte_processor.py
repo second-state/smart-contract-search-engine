@@ -177,18 +177,29 @@ class Harvest:
         return uniqueList
 
     def fetchContractAddressesWithAbis(self):
-        dValue = {}
-        dValue["value"] = "0x*"
-        dAbiSha3 = {}
-        dAbiSha3["abiSha3"] = dValue
-        dWildcard = {}
-        dWildcard["wildcard"] = dAbiSha3
         dQuery = {}
-        dQuery["query"] = dWildcard
-        lReturn = []
-        lReturn.append("contractAddress")
-        lReturn.append("abiSha3")
-        dQuery["_source"] = lReturn
+        dWildCard = {}
+        dContractAddress = {}
+        lContractAddress = []
+        dContractAddress["abiSha3"] = "0x*"
+        dWildCard["wildcard"] = dContractAddress 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["field"] = "byteSha3"
+        dMatch["exists"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must_not"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
+        lContractAddress.append("contractAddress")
+        lContractAddress.append("abiSha3")
+        dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -274,9 +285,9 @@ class Harvest:
                                         # hash the bytecode and store this on its own
                                         # outerData['byteSha'] = 
                                         # Then take the abiSha3 from above 
-                                        # hash the bytecode also
-                                        # the pair of those become abiShaByteSha which is the most precise DApp version
-                                        #outerData['abiShaByteSha'] = 
+                                        # hash the bytecode also to make byteSha3
+                                        # the pair of those become abiSha3ByteSha3 which is the most precise DApp version
+                                        #outerData['abiSha3ByteSha3'] = 
 
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
 
