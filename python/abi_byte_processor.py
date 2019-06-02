@@ -73,6 +73,9 @@ class Harvest:
             http_auth=self.auth,
             connection_class=RequestsHttpConnection
         )
+        # These will store ABI and Bytecode so that we are not having to go off and ask Elasticsearch repeatedly
+        self.bytecodeBuffer = {}
+        self.abiBuffer = {}
 
     # This will become a function used to create the index of unique comparisons IUC
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
@@ -447,19 +450,27 @@ class Harvest:
             tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
 
     def fetchAbiUsingHash(self, _esId):
-        #try:
-        print("ID=" + _esId)
-        esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
-        stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
-        jsonAbi = json.loads(stringAbi)
-        return jsonAbi
-        #except:
-        #    print("Unable to fetch ABI from the ABI index")
+        try:
+            print("ID=" + _esId)
+            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
+            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
+            jsonAbi = json.loads(stringAbi)
+            return jsonAbi
+        except:
+            print("Unable to fetch ABI from the ABI index")
         
 
     def updateBytecodeAndVersion(self, _txHash):
         transactionInstance = self.web3.eth.getTransaction(str(_txHash))
-        print(transactionInstance)
+        dMatchAllInner = {}
+        dMatchAll = {}
+        dMatchAll["match_all"] = dMatchAllInner
+        dQuery = {}
+        dQuery["query"] = dMatchAll
+        esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
+        for i, doc in enumerate(esReponseByte):
+            source = doc.get('_source')
+            print(source["bytecode"])
         
 
 
