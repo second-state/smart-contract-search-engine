@@ -432,7 +432,7 @@ class Harvest:
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
-        esAbiHashes = fetchContractAddressesWithAbis()
+        esAbiHashes = self.fetchContractAddressesWithAbis()
         self.threadsupdateStateDriverPre = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbiHashes:
