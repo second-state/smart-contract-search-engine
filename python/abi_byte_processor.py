@@ -166,7 +166,7 @@ class Harvest:
         lMust = []
         lMust.append(dMatch)
         lMust.append(dMatch2)
-        
+
         dBool = {}
         dBool["must"] = lMust
         lShould = []
@@ -361,88 +361,44 @@ class Harvest:
             harvestDriverThread.join()
 
 
-    # State related
-    def fetchUniqueContractList(self, _esIndex, _abiSha3):
-        self.uniqueContractList = []
-        self.uniqueContractList = self.fetchContractAddresses(_esIndex, _abiSha3)
-
-    def fetchContractInstances(self, _contractAbiJSONData):
+    def fetchContractInstances(self, _contractAbiJSONData, _uniqueContractList):
         #TODO this assumes that there is only one contract abi we need to pass in both the abi and the address for this to work
-        self.contractInstanceList = []
-        for uniqueContractAddress in self.uniqueContractList:
+        contractInstanceList = []
+        for uniqueContractAddress in _uniqueContractList:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
-            self.contractInstanceList.append(contractInstance)
+            contractInstanceList.append(contractInstance)
+        return contractInstanceList
 
-    def worker(self, _esIndex, _contractAbiJSONData, _queueIndex):
-        while True:
-            item = self.qList[_queueIndex].get()
-            if item is None:
-                break
-            uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
-            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, item)
+    def worker(self, _esIndex, _contractAbiJSONData, _instance):
+            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, _instance)
             functionDataId = self.getFunctionDataId(freshFunctionData)
-            if functionDataId in uniqueFunctionIds:
-                print("No change to %s " % functionDataId)
-            else:
-                print("Hash not found, we must now update this contract instance state")
-                itemId = str(self.web3.toHex(self.web3.sha3(text=item.address)))
-                doc = {}
-                outerData = {}
-                outerData["functionData"] = freshFunctionData
-                outerData["functionDataId"] = functionDataId
-                theStatus = freshFunctionData['info'][0]
-                if theStatus == 0:
-                    outerData['requiresUpdating'] = "yes"
-                elif theStatus == 1:
-                    outerData['requiresUpdating'] = "no"
-                doc["doc"] = outerData
-                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
-            self.qList[_queueIndex].task_done()
+            itemId = str(self.web3.toHex(self.web3.sha3(text=item.address)))
+            doc = {}
+            outerData = {}
+            outerData["functionData"] = freshFunctionData
+            outerData["functionDataId"] = functionDataId
+            theStatus = freshFunctionData['info'][0]
+            if theStatus == 0:
+                outerData['requiresUpdating'] = "yes"
+            elif theStatus == 1:
+                outerData['requiresUpdating'] = "no"
+            doc["doc"] = outerData
+            indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
-    def performStateUpdate(self, _esIndex, _contractAbiJSONData):
-        self.upcomingCallTimeState = time.time()
-        while True:
-            print("Starting ...")
-            self.fetchUniqueContractList(_esIndex)
-            self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
-            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
-                self.fetchContractInstances(_contractAbiJSONData)
-            q = queue.Queue()
-            queueIndex = len(self.qList)
-            self.qList.append(q)
-            self.threads = []
-            # Set the number of threads
-            threadCount = len(self.uniqueContractList)
-            for i in range(threadCount):
-                t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData, queueIndex])
-                t.start()
-                self.threads.append(t)
-            for uniqueContractInstance in self.contractInstanceList:
-                # Put a web3 contract object instance in the queue
-                self.qList[queueIndex].put(uniqueContractInstance)
-            # block untill all tasks are done
-            self.qList[queueIndex].join()
-            for i in range(threadCount):
-                self.qList[queueIndex].put(None)
-            for t in self.threads:
-                t.join()
-            print("Finished")
-            # set the time interval for when this task will be repeated
-            self.upcomingCallTimeState = self.upcomingCallTimeState + 10
-            # If this takes longer than the break time, then just continue straight away
-            if self.upcomingCallTimeState > time.time():
-                time.sleep(self.upcomingCallTimeState - time.time())
 
     def updateStateDriver(self, _esAbiSingle):
-        #TODO Fetch ABI from the abi index using the abiSha3 as the id
-        
         esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
         contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
-        contractsToProcess = fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
-        self.fetchContractInstances(contractAbiJSONData)
-        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-        self.performStateUpdate(self.commonIndex, contractAbiJSONData)
+        contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
+        contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
+        instanceThreads = []
+        for instance in contractInstances:
+            instanceThread = threading.Thread((target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance]))
+            instanceThread.daemon = True
+            instanceThread.start()
+            instanceThreads.append(instanceThread)
+        for oneThread in instanceThreads:
+            oneThread.join()
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
