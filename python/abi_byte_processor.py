@@ -177,29 +177,19 @@ class Harvest:
         return uniqueList
 
     def fetchContractAddressesWithAbis(self):
+        dValue = {}
+        dValue["value"] = "0x*"
+        dAbiSha3 = {}
+        dAbiSha3["abiSha3"] = dValue
+        dWildcard = {}
+        dWildcard["wildcard"] = dAbiSha3
         dQuery = {}
-        dWildCard = {}
-        dabiSha3 = {}
-        labiSha3 = []
-        dabiSha3["abiSha3"] = "0x*"
-        dWildCard["wildcard"] = dabiSha3 
-        dMatch = {}
-        dReauiresUpdating = {}
-        dReauiresUpdating["indexingInProgress"] = "false"
-        dMatch["match"] = dReauiresUpdating
-        lMust = []
-        lMust.append(dMatch)
-        dBool = {}
-        dBool["must"] = lMust
-        lShould = []
-        lShould.append(dWildCard)
-        dBool["should"] = lShould
-        dOb = {}
-        dOb["bool"] = dBool
-        dQuery["query"] = dOb
-        labiSha3.append("abiSha3")
-        dQuery["_source"] = labiSha3
-        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=json.dumps(dQuery), preserve_order=True)
+        dQuery["query"] = dWildcard
+        lReturn = []
+        lReturn.append("contractAddress")
+        lReturn.append("abiSha3")
+        dQuery["_source"] = lReturn
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
             source = doc.get('_source')
@@ -325,6 +315,22 @@ class Harvest:
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         harvestDriverThreads = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        for esAbiSingle in esAbis:
+            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
+            tFullDriver.daemon = True
+            tFullDriver.start()
+            harvestDriverThreads.append(tFullDriver)
+        for harvestDriverThread in harvestDriverThreads:
+            harvestDriverThread.join()
+
+    def bytecodeDriver(self, _stop=False):
+        print("harvestDriver")
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        harvestDriverThreads = []
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
         for esAbiSingle in esAbis:
             tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
             tFullDriver.daemon = True
@@ -418,7 +424,7 @@ class Harvest:
         self.threadsupdateStateDriverPre = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbiHashes:
-            
+
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
@@ -470,11 +476,15 @@ if __name__ == "__main__":
     elif args.mode == "state":
         print("Performing state update")
         harvester.updateStateDriverPre()
+    elif args.mode == "bytecode":
+        print("Performing bytecode update")
+        harvester.updateBytecode()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
+        print("harvest.py --mode bytecode")
         
 # Monitor the total number of threads on the operating system
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
