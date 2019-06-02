@@ -423,13 +423,13 @@ class Harvest:
             tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
 
     def fetchAbiUsingHash(self, _esId):
-        try:
-            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
-            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
-            jsonAbi = json.loads(stringAbi)
-            return jsonAbi
-        except:
-            print("Unable to fetch ABI from the ABI index")
+        #try:
+        esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
+        stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
+        jsonAbi = json.loads(stringAbi)
+        return jsonAbi
+        #except:
+        #    print("Unable to fetch ABI from the ABI index")
         
 
     def updateBytecodeAndVersion(self, _abiSha3, _contractAddress):
