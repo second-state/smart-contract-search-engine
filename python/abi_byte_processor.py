@@ -391,6 +391,7 @@ class Harvest:
     def performStateUpdate(self, _esIndex, _contractAbiJSONData):
         self.upcomingCallTimeState = time.time()
         while True:
+            print("Starting ...")
             self.fetchUniqueContractList(_esIndex)
             self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
             self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
@@ -415,6 +416,7 @@ class Harvest:
                 self.qList[queueIndex].put(None)
             for t in self.threads:
                 t.join()
+            print("Finished")
             # set the time interval for when this task will be repeated
             self.upcomingCallTimeState = self.upcomingCallTimeState + 10
             # If this takes longer than the break time, then just continue straight away
