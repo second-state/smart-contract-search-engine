@@ -215,7 +215,7 @@ class Harvest:
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
         dReauiresUpdating = {}
-        dReauiresUpdating["field"] = "byteSha3"
+        dReauiresUpdating["field"] = "bytecodeSha3"
         dMatch["exists"] = dReauiresUpdating
         lMust = []
         lMust.append(dMatch)
