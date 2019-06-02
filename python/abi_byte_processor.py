@@ -488,6 +488,7 @@ class Harvest:
         self.tupdateBytecode = time.time()
         # Run this once every 5 minutes
         while True:
+            print("Starting ...")
             self.threadsUpdateBytecode = []
             versionless = self.fetchTxHashWithAbis()
             for i, doc in enumerate(versionless):
@@ -499,6 +500,7 @@ class Harvest:
                 self.threadsUpdateBytecode.append(tVersionless)
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
+            print("Finished")
             self.tupdateBytecode = self.tupdateBytecode + 300
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
