@@ -393,7 +393,7 @@ class Harvest:
         contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
         instanceThreads = []
         for instance in contractInstances:
-            instanceThread = threading.Thread((target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance]))
+            instanceThread = threading.Thread(target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance])
             instanceThread.daemon = True
             instanceThread.start()
             instanceThreads.append(instanceThread)
