@@ -444,6 +444,7 @@ class Harvest:
         versionless = self.fetchContractAddressesWithAbis()
         for i, doc in enumerate(versionless):
             source = doc.get('_source')
+            print(source)
             tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"]])
             tVersionless.daemon = True
             tVersionless.start()
