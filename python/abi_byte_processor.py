@@ -433,7 +433,7 @@ class Harvest:
         #    print("Unable to fetch ABI from the ABI index")
         
 
-    def updateBytecodeAndVersion(self, _abiSha3, _contractAddress):
+    def updateBytecodeAndVersion(self, _contractAddress, _abiSha3):
         jsonAbi = self.fetchAbiUsingHash(_abiSha3)
         contractInstance = self.web3.eth.contract(abi=jsonAbi, address=_contractAddress)
         print("UPDATING BYTECODE WITH A NEW CONTRACT INSTANCE")
