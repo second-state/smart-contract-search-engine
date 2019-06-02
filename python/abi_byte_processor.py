@@ -470,7 +470,9 @@ class Harvest:
         esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
         for i, doc in enumerate(esReponseByte):
             source = doc.get('_source')
-            print(source["bytecode"])
+            #print(source["bytecode"])
+            if source["bytecode"] in transactionInstance.input:
+                print("Found bytecode")
         
 
 
