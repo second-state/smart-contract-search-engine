@@ -210,7 +210,7 @@ class Harvest:
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
-        lContractAddress = []
+        #lContractAddress = []
         dContractAddress["abiSha3"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
@@ -227,8 +227,8 @@ class Harvest:
         dOb = {}
         dOb["bool"] = dBool
         dQuery["query"] = dOb
-        lContractAddress.append("TxHash")
-        dQuery["_source"] = lContractAddress
+        #lContractAddress.append("TxHash")
+        #dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
