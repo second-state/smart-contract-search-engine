@@ -203,7 +203,7 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
-    def fetchTxHashWithAbis():
+    def fetchTxHashWithAbis(self):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
