@@ -372,7 +372,7 @@ class Harvest:
     def worker(self, _esIndex, _contractAbiJSONData, _instance):
             freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, _instance)
             functionDataId = self.getFunctionDataId(freshFunctionData)
-            itemId = str(self.web3.toHex(self.web3.sha3(text=_instance.address)))
+            itemId = self.web3.toHex(self.web3.sha3(text=_instance.address))
             doc = {}
             outerData = {}
             outerData["functionData"] = freshFunctionData
