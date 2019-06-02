@@ -424,7 +424,10 @@ class Harvest:
                 time.sleep(self.upcomingCallTimeState - time.time())
 
     def updateStateDriver(self, _esAbiSingle):
-        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
+        #TODO Fetch ABI from the abi index using the abiSha3 as the id
+        
+        esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
+        contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
         self.fetchUniqueContractList(esIndex)
         self.fetchContractInstances(contractAbiJSONData)
         self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
