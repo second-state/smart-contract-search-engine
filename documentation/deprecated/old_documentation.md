@@ -65,7 +65,7 @@ This is how we create the abi record in the abi index
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
 abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
 abiData = re.sub(r"[\s]+", " ", abiData)
-abiSha = str(web3.toHex(web3.sha3(text=json.dumps(abiData))))
+abiSha = web3.toHex(web3.sha3(text=abiData))
 print(abiSha)
 print(abiData)
 data = {}
@@ -78,7 +78,9 @@ es.index(index="abi", id=abiSha, body=data)
 This is now we create the bytecode record in the bytecode index
 ```python
 # This must be the raw URL (raw.githubusercontent.com...) not just the GitHub URL
-binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
+#binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
+binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
+
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))

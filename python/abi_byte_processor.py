@@ -460,21 +460,27 @@ class Harvest:
             print("Unable to fetch ABI from the ABI index")
         
 
-    def updateBytecodeAndVersion(self, _txHash):
+    def updateBytecodeAndVersion(self, _txHash, _abiSha3, _esId):
         transactionInstance = self.web3.eth.getTransaction(str(_txHash))
         dMatchAllInner = {}
         dMatchAll = {}
         dMatchAll["match_all"] = dMatchAllInner
         dQuery = {}
         dQuery["query"] = dMatchAll
+        doc = {}
         esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
         for i, doc in enumerate(esReponseByte):
             source = doc.get('_source')
-            #print(source["bytecode"])
             if source["bytecode"] in transactionInstance.input:
                 print("Found bytecode")
-        
-
+                outerData = {}
+                bytecodeSha3 = web3.toHex(web3.sha3(text=source["bytecode"]))
+                abiBytecode = _abiSha3 + bytecodeSha3
+                abiSha3BytecodeSha3 = web3.toHex(web3.sha3(text=abiBytecode))
+                outerData["bytecodeSha3"] = web3.toHex(web3.sha3(text=bytecodeSha3))
+                outerData["abiSha3BytecodeSha3"] = web3.toHex(web3.sha3(text=abiSha3BytecodeSha3))
+                doc["doc"] = outerData
+                updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
 
     def updateBytecode(self):
         self.threadsUpdateBytecode = []
@@ -482,7 +488,7 @@ class Harvest:
         for i, doc in enumerate(versionless):
             source = doc.get('_source')
             print(source)
-            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"]])
+            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
             tVersionless.daemon = True
             tVersionless.start()
             self.threadsUpdateBytecode.append(tVersionless)
