@@ -435,6 +435,7 @@ class Harvest:
     def updateBytecodeAndVersion(self, _abiSha3, _contractAddress):
         jsonAbi = fetchAbiUsingHash(_abiSha3)
         contractInstance = self.web3.eth.contract(abi=jsonAbi, address=_contractAddress)
+        print("UPDATING BYTECODE WITH A NEW CONTRACT INSTANCE")
 
 
     def updateBytecode(self):
