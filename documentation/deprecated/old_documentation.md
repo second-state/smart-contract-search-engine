@@ -63,8 +63,11 @@ This is how we create the abi record in the abi index
 #abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
 #v2
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
-abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
-abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
+abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+abiData = re.sub(r"[\s]+", " ", abiData)
+abiSha = str(web3.toHex(web3.sha3(text=json.dumps(abiData))))
+print(abiSha)
+print(abiData)
 data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
@@ -86,6 +89,7 @@ data['bytecode'] = byteCode
 es.index(index="bytecode", id=byteCodeSha, body=data)
 ```
 
+str(web3.toHex(web3.sha3(text=json.dumps(abiData))))
 
 Remove unwanted index results
 POST
