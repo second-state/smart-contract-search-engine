@@ -383,6 +383,8 @@ class Harvest:
             elif theStatus == 1:
                 outerData['requiresUpdating'] = "no"
             doc["doc"] = outerData
+            print("********")
+            print(doc)
             indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
 
 
