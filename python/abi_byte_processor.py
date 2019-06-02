@@ -424,6 +424,7 @@ class Harvest:
 
     def fetchAbiUsingHash(self, _esId):
         #try:
+        print("ID=" + _esId)
         esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
         stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
         jsonAbi = json.loads(stringAbi)
