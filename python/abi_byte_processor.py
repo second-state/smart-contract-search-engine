@@ -201,12 +201,8 @@ class Harvest:
         lContractAddress.append("abiSha3")
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
-        uniqueList = []
-        for i, doc in enumerate(esReponseAddresses):
-            source = doc.get('_source')
-            if source['abiSha3'] not in uniqueList:
-                uniqueList.append(source['abiSha3'])
-        return uniqueList
+        return esReponseAddresses
+
 
 
     def fetchFunctionDataIds(self, _theIndex):
@@ -270,38 +266,14 @@ class Harvest:
                                 try:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    # get a masterList of all of the unique byte code which we own
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                                    print('Contract version of ABI SHA')
-                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi)))))
-                                    # JUST FYI a comparison of the two SHAs
-                                    print("Uploaded version of the ABI SHA")
-                                    print(str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractAbiJSONData)))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber
-                                    #TODO
-                                    #if byteCode in transactionData.input:
-                                        # if the bytecode is in the Index of Unique Bytecode (IUB)
-                                        # hash the bytecode and store this on its own
-                                        # outerData['byteSha'] = 
-                                        # Then take the abiSha3 from above 
-                                        # hash the bytecode also to make byteSha3
-                                        # the pair of those become abiSha3ByteSha3 which is the most precise DApp version
-                                        #outerData['abiSha3ByteSha3'] = 
-
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
-
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                    #theStatus = functionData['info'][0]
-                                    #outerData['status'] = theStatus
-                                    #if theStatus == 0:
-                                    #    outerData['requiresUpdating'] = "yes"
-                                    #elif theStatus == 1:
-                                    #    outerData['requiresUpdating'] = "no"
                                     functionDataId = self.getFunctionDataId(functionData)
                                     outerData['functionDataId'] = functionDataId
                                     outerData['functionData'] = functionData
-                                    print(outerData)
                                     itemId = transactionReceipt.contractAddress
                                     dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
                                     if dataStatus == False:
@@ -449,6 +421,33 @@ class Harvest:
             tempData = {}
             tempData["url"] = self.config['abis'][key]
             tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
+
+    def fetchAbiUsingHash(self, _esId):
+        try:
+            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
+            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
+            jsonAbi = json.loads(stringAbi)
+            return jsonAbi
+        except:
+            print("Unable to fetch ABI from the ABI index")
+        
+
+    def updateBytecodeAndVersion(self, _abiSha3, _contractAddress):
+        jsonAbi = fetchAbiUsingHash(_abiSha3)
+        contractInstance = self.web3.eth.contract(abi=jsonAbi, address=_contractAddress)
+
+
+    def updateBytecode(self):
+        self.threadsUpdateBytecode = []
+        versionless = this.fetchContractAddressesWithAbis()
+        for i, doc in enumerate(versionless):
+            source = doc.get('_source')
+            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["contractAddress"], source["abiSha3"]])
+            tVersionless.daemon = True
+            tVersionless.start()
+            self.threadsUpdateBytecode.append(tVersionless)
+        for individualVersionlessThread in self.threadsUpdateBytecode:
+            individualVersionlessThread.join()
 
 
 def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
