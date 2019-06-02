@@ -483,18 +483,23 @@ class Harvest:
                 self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
 
     def updateBytecode(self):
-        self.threadsUpdateBytecode = []
-        versionless = self.fetchTxHashWithAbis()
-        for i, doc in enumerate(versionless):
-            source = doc.get('_source')
-            print(source)
-            tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
-            tVersionless.daemon = True
-            tVersionless.start()
-            self.threadsUpdateBytecode.append(tVersionless)
-        for individualVersionlessThread in self.threadsUpdateBytecode:
-            individualVersionlessThread.join()
-
+        self.tupdateBytecode = time.time()
+        # Run this once every 5 minutes
+        while True:
+            self.threadsUpdateBytecode = []
+            versionless = self.fetchTxHashWithAbis()
+            for i, doc in enumerate(versionless):
+                source = doc.get('_source')
+                print(source)
+                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
+                tVersionless.daemon = True
+                tVersionless.start()
+                self.threadsUpdateBytecode.append(tVersionless)
+            for individualVersionlessThread in self.threadsUpdateBytecode:
+                individualVersionlessThread.join()
+            self.tupdateBytecode = self.tupdateBytecode + 300
+            if self.tupdateBytecode > time.time():
+                time.sleep(self.tupdateBytecode - time.time())
 
 
 if __name__ == "__main__":
