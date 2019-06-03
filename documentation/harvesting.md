@@ -263,6 +263,17 @@ The arn:aws:iam above can be found in [your AWS IAM console](https://console.aws
 
 ![Demonstration image](images/iam.png)
 
+
+# ABI and Bytecode
+
+At present the system reads ABIs and Bytecode from the abi and bytecode indexes respectively. At present these are both populted by static code which is below. There will be a user interface for users to upload both ABIs and bytecode in the very near future.
+
+Please use this code for now. It will upload the FairPlay V1 and FairPlay V2 ABI and Bytecode. The user interface will eventually allow anyone to upload ABIs and Bytecode and then the search engine will go ahead and harvest them automatically.
+
+```
+https://github.com/second-state/smart-contract-search-engine/blob/master/python/load_v1_v2_abi_byecode.py
+```
+
 # Known system errors
 
 ## Error 1
