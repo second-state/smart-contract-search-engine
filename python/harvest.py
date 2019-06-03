@@ -398,16 +398,19 @@ class Harvest:
         self.contractInstanceList.append(contractInstance)
 
     def worker(self, _instance):
+        print(self.addressAndFunctionDataHashes)
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
-        print("Fresh function data")
-        print(freshFunctionData)
         functionDataId = self.getFunctionDataId(freshFunctionData)
+        print("functionDataId")
+        print(functionDataId)
         if _instance.address not in self.addressAndFunctionDataHashes.keys():
+            print("Instance " +  _instance.address + "not in the list yet")
             self.addressAndFunctionDataHashes[_instance.address] = ""
         if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
             print("The data is different so we will update " + _instance.address + " record now")
             #try:
             self.addressAndFunctionDataHashes[_instance.address] = functionDataId
+            print(self.addressAndFunctionDataHashes)
             itemId = _instance.address
             doc = {}
             outerData = {}
@@ -434,7 +437,7 @@ class Harvest:
             self.fetchContractAddressesWithAbis()
             self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
-            print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
+            #print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
             if tempAbiAddressHash != self.esAbiAddressesHash:
                 self.addressAndFunctionDataHashes = {}
                 
