@@ -192,7 +192,7 @@ Add the following line inside crontab
 ```
 
 ## Activate the harvesting
-Please make sure that you have followed [the harvesting documentation](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.mdautomated cron/bash harvesting procedures.) which shows you how to set up the automatic cron tasks for the harvesting/indexing scripts.
+Please make sure that you have followed [the harvesting documentation](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md) which shows you how to set up the automatic cron tasks for the harvesting/indexing scripts.
 
 Also once all of this is done, please just give the server a quick reboot; during this time all of the processes will fire off as per the cron etc.
 ```
