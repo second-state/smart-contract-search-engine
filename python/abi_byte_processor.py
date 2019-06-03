@@ -177,7 +177,7 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
-        print(dQuery)
+        #print(dQuery)
         # dQuery
         # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
         # {"query":{"match":{"indexingInProgress": "false"}}}
@@ -491,7 +491,7 @@ class Harvest:
             versionless = self.fetchTxHashWithAbis()
             for i, doc in enumerate(versionless):
                 source = doc.get('_source')
-                print(source)
+                #print(source)
                 tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
                 tVersionless.daemon = True
                 tVersionless.start()
