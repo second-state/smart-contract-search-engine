@@ -442,12 +442,16 @@ class Harvest:
         
         while True:
             print("updateStateDriverPre")           
-            origDict = {}
+            originalListOfAddressesAndAbi = self.esAbiAddresses
             origListOfAddresses = []
-            #for o in 
-
-            #    self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
-            # Create new thread list
+            for originalItem in originalListOfAddressesAndAbi:
+                if originalItem['contractAddress'] not in origListOfAddresses:
+                    origListOfAddresses.append(originalItem['contractAddress'])
+            self.fetchContractAddressesWithAbis()
+            for newItem in self.esAbiAddresses:
+                if newItem['contractAddress'] not in origListOfAddresses:
+                    print("Found a new contract " + newItem['contractAddress'] + ", creating a new web3 instance")
+                    self.fetchContractInstances(newItem['abiSha3'], newItem['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
