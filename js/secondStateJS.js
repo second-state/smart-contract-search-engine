@@ -208,7 +208,7 @@ $(document).ready(function() {
             var dQueryInner = {};
             var dMultiMatch = {};
             var dQueryOuter = {};
-            var lFields = ["functionData.title", "functionData.desc"];
+            var lFields = ["functionData.info.1", "functionData.info.2"];
             dTemp = {};
             dTemp["fields"] = lFields;
             dTemp["query"] = theText;
