@@ -260,20 +260,21 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _esAbiSingle,  _stop=False):
+    def harvest(self, _esAbiSingle, _argList=[],  _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
-
-        # binObject = requests.get(self.config['bytecode'][itemConf[0]]).content
-        # binJSONObject = json.loads(binObject)
-        # byteCode = "0x" + binJSONObject['object']
-
         while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
-            if _stop == True:
+            if _topup == True and len(_argList) == 0:
                 stopAtBlock = latestBlockNumber - 24
+            if _topup == False and len(_argList) == 2:
+                latestBlockNumber = _argList[0]
+                stopAtBlock = latestBlockNumber - _argList[1]
+                if stopAtBlock < 0:
+                    stopAtBlock = 0
+                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
@@ -324,21 +325,30 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
-            if _stop == False:
-                self.qList[_queueIndex].task_done()
-            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
-            if self.upcomingCallTimeHarvest > time.time():
-                time.sleep(self.upcomingCallTimeHarvest - time.time())
+            if _topup == True and len(_argList) == 0:
+                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+                if self.upcomingCallTimeHarvest > time.time():
+                    time.sleep(self.upcomingCallTimeHarvest - time.time())
+            else:
+                if _topup == False and len(_argList) == 2:
+                    break
 
-    def harvestDriver(self, _stop=False):
+    def harvestDriver(self, _argList=[], _stop=False):
         print("harvestDriver")
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         harvestDriverThreads = []
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        latestBlockNumber = self.web3.eth.getBlock('latest').number
+        threadsToUse = 100
+        blocksPerThread = int(latestBlockNumber / threadsToUse)
         for esAbiSingle in esAbis:
-            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
+            for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+            argList = []
+            argList.append(startingBlock)
+            argList.append(blocksPerThread)
+            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
             tFullDriver.daemon = True
             tFullDriver.start()
             harvestDriverThreads.append(tFullDriver)
