@@ -409,7 +409,7 @@ class Harvest:
             outerData["functionData"] = freshFunctionData
             outerData["functionDataId"] = functionDataId
             doc["doc"] = outerData
-            indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+            indexResult = self.updateDataInElastic(self.commonIndex, itemId, json.dumps(doc))
             #except:
             #    print("Unable to update the state data in the worker function")
         else:
