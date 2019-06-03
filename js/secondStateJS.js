@@ -21,7 +21,7 @@ var blockExplorer = "";
 
 if (searchEngineNetwork == "19") {
     blockExplorer = "https://testnet.cmttracking.io/";
-    esIndexName = "cmttestnetmultiabi";
+    esIndexName = "testnet";
 }
 
 if (searchEngineNetwork == "18") {
