@@ -120,9 +120,9 @@ class Harvest:
             print("Item does not exist yet.")
         return returnVal
 
-    def fetchPureViewFunctionData(self, _contractAbiJSONData, _theContractInstance):
+    def fetchPureViewFunctionData(self, _theContractInstance):
         callableFunctions = []
-        for item in _contractAbiJSONData:
+        for item in _theContractInstance.abi:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
                     if len(item['outputs']) > 0:
@@ -379,68 +379,59 @@ class Harvest:
             harvestDriverThread.join()
 
 
-    def fetchContractInstances(self, _contractAbiJSONData, _uniqueContractList):
-        #TODO this assumes that there is only one contract abi we need to pass in both the abi and the address for this to work
-        contractInstanceList = []
-        for uniqueContractAddress in _uniqueContractList:
-            contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
-            contractInstanceList.append(contractInstance)
-        return contractInstanceList
+    def fetchContractInstances(self, _contractAbiJSONData, _contractAddress):
+        self.contractInstanceList = []
+        contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=_contractAddress)
+        self.contractInstanceList.append(contractInstance)
 
-    def worker(self, _esIndex, _contractAbiJSONData, _instance):
-            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, _instance)
-            functionDataId = self.getFunctionDataId(freshFunctionData)
-            if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
-                print("The data is different so we will update this record now")
-                #try:
-                self.addressAndFunctionDataHashes[_instance.address] = functionDataId
-                itemId = _instance.address
-                doc = {}
-                outerData = {}
-                outerData["functionData"] = freshFunctionData
-                outerData["functionDataId"] = functionDataId
-                doc["doc"] = outerData
-                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
-                #except:
-                #    print("Unable to update the state data in the worker function")
-            else:
-                print("The data is still the same so we will move on ...")
-
-
-    def updateStateDriver(self, _esAbiSingle):
-        #while True:
-        esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
-        contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
-        contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
-        # We create a key value pair for every contract instance address so that we can cache the hash of the function data later
-        for singleAddress in contractsToProcess:
-            if singleAddress not in self.addressAndFunctionDataHashes:
-                self.addressAndFunctionDataHashes[singleAddress] = "placeholder"
-        contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
-        instanceThreads = []
-        for instance in contractInstances:
-            instanceThread = threading.Thread(target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance])
-            instanceThread.daemon = True
-            instanceThread.start()
-            instanceThreads.append(instanceThread)
-        for oneThread in instanceThreads:
-            oneThread.join()
+    def worker(self, _instance):
+        freshFunctionData = self.fetchPureViewFunctionData(_instance)
+        functionDataId = self.getFunctionDataId(freshFunctionData)
+        if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
+            print("The data is different so we will update this record now")
+            #try:
+            self.addressAndFunctionDataHashes[_instance.address] = functionDataId
+            itemId = _instance.address
+            doc = {}
+            outerData = {}
+            outerData["functionData"] = freshFunctionData
+            outerData["functionDataId"] = functionDataId
+            doc["doc"] = outerData
+            indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+            #except:
+            #    print("Unable to update the state data in the worker function")
+        else:
+            print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
-        print("updateStateDriverPre")
-        esAbiHashes = self.fetchContractAddressesWithAbis()
-        threadsupdateStateDriverPre = []
-        # We store the address as the key and the hash of the function data as the value
-        # We can test to see if the data from web3 is different to what we have (essentially caching so that we don't waste valuable ES IO resources)
         self.addressAndFunctionDataHashes = {}
-        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
-        for esAbiSingle in esAbiHashes:
-            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
+        self.updateStateDriverPreTimer = time.time()
+        self.esAbiAddresses = self.fetchContractAddressesWithAbis()
+        self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
+        while True:
+            print("updateStateDriverPre")
+            tempAbiAddressHash = self.esAbiAddressesHash
+            self.esAbiAddresses = self.fetchContractAddressesWithAbis()
+            self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
+            # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
+            if tempAbiAddressHash != self.esAbiAddressesHash:
+                for esAbiSingle in self.esAbiAddresses:
+                    self.addressAndFunctionDataHashes = {}
+                    self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
+            tupdateStateDriverPre = threading.Thread(target=self.worker, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-        for updateStateThreads1 in threadsupdateStateDriverPre:
-            updateStateThreads1.join()
+            for updateStateThreads1 in threadsupdateStateDriverPre:
+                updateStateThreads1.join()
+            print("Finished updateStateDriverPreTimer...")
+            self.updateStateDriverPreTimer = self.updateStateDriverPreTimer + 10
+            if self.updateStateDriverPreTimer > time.time():
+                print("Finished before time limit, will sleep now ...")
+                time.sleep(self.updateStateDriverPreTimer - time.time())
+                print("Back awake and ready to go ...")
+            else:
+                print("It has been longer than 10 seconds, need to re-update the state immediately ...")
 
     def loadConfigIniToES(self):
         for key in self.config['abis']:
