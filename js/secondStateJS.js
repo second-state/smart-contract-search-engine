@@ -1,8 +1,9 @@
 // CONFIG START
 // STATIC
+//
 // Local single user vs global multiuser
-var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
-//var publicIp = "http://54.66.215.89"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
+//var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
+var publicIp = "http://52.65.144.128/"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 
 // Check blockchain network and accounts
 // This is used to confirm that the user"s chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
@@ -20,12 +21,12 @@ var blockExplorer = "";
 
 if (searchEngineNetwork == "19") {
     blockExplorer = "https://testnet.cmttracking.io/";
-    esIndexName = "fairplay";
+    esIndexName = "cmttestnetmultiabi";
 }
 
 if (searchEngineNetwork == "18") {
     blockExplorer = "https://www.cmttracking.io/";
-    esIndexName = "mainnetfairplay";
+    esIndexName = "cmtmainnetmultiabi";
 }
 
 var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
