@@ -441,10 +441,16 @@ class Harvest:
         
         while True:
             print("updateStateDriverPre")
+            print("ORIGAddress Hash")
+            print(str(self.esAbiAddresses))
+            print("With hash of " + self.esAbiAddressesHash)
             # Set the original address has to temp so that we can get a new one and see if the available contracts with ABI is now different to the last time
             tempAbiAddressHash = self.esAbiAddressesHash
             self.fetchContractAddressesWithAbis()
             self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
+            print("NEWAddress Hash")
+            print(str(self.esAbiAddresses))
+            print("With hash of " + self.esAbiAddressesHash)
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
             
             print("Address <-> ABI ")
