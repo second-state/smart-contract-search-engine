@@ -408,38 +408,38 @@ class Harvest:
 
 
     def updateStateDriver(self, _esAbiSingle):
-        while True:
-            esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
-            contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
-            contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
-            # We create a key value pair for every contract instance address so that we can cache the hash of the function data later
-            for singleAddress in contractsToProcess:
-                if singleAddress not in self.addressAndFunctionDataHashes:
-                    self.addressAndFunctionDataHashes[singleAddress] = "placeholder"
-            contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
-            instanceThreads = []
-            for instance in contractInstances:
-                instanceThread = threading.Thread(target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance])
-                instanceThread.daemon = True
-                instanceThread.start()
-                instanceThreads.append(instanceThread)
-            for oneThread in instanceThreads:
-                oneThread.join()
+        #while True:
+        esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
+        contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
+        contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
+        # We create a key value pair for every contract instance address so that we can cache the hash of the function data later
+        for singleAddress in contractsToProcess:
+            if singleAddress not in self.addressAndFunctionDataHashes:
+                self.addressAndFunctionDataHashes[singleAddress] = "placeholder"
+        contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
+        instanceThreads = []
+        for instance in contractInstances:
+            instanceThread = threading.Thread(target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance])
+            instanceThread.daemon = True
+            instanceThread.start()
+            instanceThreads.append(instanceThread)
+        for oneThread in instanceThreads:
+            oneThread.join()
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
         esAbiHashes = self.fetchContractAddressesWithAbis()
-        self.threadsupdateStateDriverPre = []
+        threadsupdateStateDriverPre = []
         # We store the address as the key and the hash of the function data as the value
         # We can test to see if the data from web3 is different to what we have (essentially caching so that we don't waste valuable ES IO resources)
-        self.addressAndFunctionDataHashes = {}
+        addressAndFunctionDataHashes = {}
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbiHashes:
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
-            self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-        for updateStateThreads1 in self.threadsupdateStateDriverPre:
+            threadsupdateStateDriverPre.append(tupdateStateDriverPre)
+        for updateStateThreads1 in threadsupdateStateDriverPre:
             updateStateThreads1.join()
 
     def loadConfigIniToES(self):
