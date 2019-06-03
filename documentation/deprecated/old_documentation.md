@@ -233,4 +233,3 @@ optional arguments:
   -m MODE, --mode MODE  [full|topup|state]
 ```
 
-
