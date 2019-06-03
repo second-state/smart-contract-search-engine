@@ -226,7 +226,7 @@ class Harvest:
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
-            self.esAbiAddresses.append(item["_source"]["contractAddress"])
+            self.esAbiAddresses.append(item["_source"])
         print("esAbiAddresses")
         print(self.esAbiAddresses)
 
@@ -426,7 +426,7 @@ class Harvest:
         
         self.fetchContractAddressesWithAbis()
         for esAbiSingle in self.esAbiAddresses:                    
-            self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
+            self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
         while True:
             print("updateStateDriverPre")
@@ -439,7 +439,7 @@ class Harvest:
                 self.addressAndFunctionDataHashes = {}
                 
                 for esAbiSingle in self.esAbiAddresses:                    
-                    self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
+                    self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
