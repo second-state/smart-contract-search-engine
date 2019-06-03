@@ -499,6 +499,14 @@ function renderItems(_hits) {
             var endDate = new Date(epochRepresentation);
         }
 
+        // Setting Dapp Version
+        if (abiSha3BytecodeSha3 = "0x0afaf8e4843da5ea7a78bb01088fde7ad5bcfabc1cffc9851adb9fa41389d44e"){
+                dappVersion = "v1";
+            }
+            else if (abiSha3BytecodeSha3 = "0xa1c025708a54ed04595d075658a563e454ac4595eff966113b81447dce3c4340") {
+                dappVersion = "v2";
+            }
+
         // Current time
         var currentDate = new Date();
 
@@ -512,7 +520,8 @@ function renderItems(_hits) {
             var view = jQuery("<dd/>", {
 
             });
-            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            
+            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
             var viewButton = jQuery("<a/>", {
                 href: viewUrl,
                 class: "btn btn-info",
@@ -532,7 +541,7 @@ function renderItems(_hits) {
             var play = jQuery("<dd/>", {
 
             });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + value._source.dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
             var playButton = jQuery("<a/>", {
                 href: playUrl,
                 class: "btn btn-success",
@@ -546,7 +555,7 @@ function renderItems(_hits) {
         }
 
         var version = jQuery("<dd/>", {
-            text: "DApp version: " + value._source.dappVersion
+            text: "DApp version: " + dappVersion
         });
         version.appendTo(dl);
 
