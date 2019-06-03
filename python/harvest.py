@@ -432,10 +432,11 @@ class Harvest:
                 for esAbiSingle in self.esAbiAddresses:
                     self.addressAndFunctionDataHashes = {}
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
-            tupdateStateDriverPre = threading.Thread(target=self.worker, args=[esAbiSingle])
-            tupdateStateDriverPre.daemon = True
-            tupdateStateDriverPre.start()
-            threadsupdateStateDriverPre.append(tupdateStateDriverPre)
+            for contractInstanceItem in self.contractInstanceList:
+                tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
+                tupdateStateDriverPre.daemon = True
+                tupdateStateDriverPre.start()
+                threadsupdateStateDriverPre.append(tupdateStateDriverPre)
             for updateStateThreads1 in threadsupdateStateDriverPre:
                 updateStateThreads1.join()
             print("Finished updateStateDriverPreTimer...")
