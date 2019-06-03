@@ -397,6 +397,12 @@ class Harvest:
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
+        print("Instance address")
+        print(_instance.address)
+        print("Position in list")
+        print(self.addressAndFunctionDataHashes[_instance.address])
+        print("FunctionDataId comparison")
+        print(functionDataId)
         if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
             print("The data is different so we will update this record now")
             #try:
