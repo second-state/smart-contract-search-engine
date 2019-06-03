@@ -103,7 +103,7 @@ class Harvest:
 
     def fetchAbiUsingHash(self, _esId):
         try:
-            print("ID=" + _esId)
+            #print("ID=" + _esId)
             esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
             stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
             jsonAbi = json.loads(stringAbi)
@@ -227,6 +227,8 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
             self.esAbiAddresses.append(item)
+        print("esAbiAddresses")
+        print(self.esAbiAddresses)
 
     def fetchTxHashWithAbis(self):
         dQuery = {}
@@ -392,6 +394,7 @@ class Harvest:
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
+        self.contractInstanceList = []
         jsonAbiDataForInstance = json.loads(self.fetchAbiUsingHash(_contractAbiId))
         contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
@@ -420,7 +423,7 @@ class Harvest:
     def updateStateDriverPre(self):
         self.updateStateDriverPreTimer = time.time()
         self.addressAndFunctionDataHashes = {}
-        self.contractInstanceList = []
+        
         self.fetchContractAddressesWithAbis()
         for esAbiSingle in self.esAbiAddresses:                    
             self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
@@ -434,7 +437,7 @@ class Harvest:
             print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
             if tempAbiAddressHash != self.esAbiAddressesHash:
                 self.addressAndFunctionDataHashes = {}
-                self.contractInstanceList = []
+                
                 for esAbiSingle in self.esAbiAddresses:                    
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
             threadsupdateStateDriverPre = []
