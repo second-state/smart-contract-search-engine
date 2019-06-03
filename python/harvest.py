@@ -132,6 +132,8 @@ class Harvest:
 
     def fetchPureViewFunctionData(self, _theContractInstance):
         callableFunctions = []
+        for item in _theContractInstance:
+            print(item)
         for item in _theContractInstance["abi"]:
             if item['type'] == 'function':
                 if len(item['inputs']) == 0:
