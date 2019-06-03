@@ -101,6 +101,16 @@ class Harvest:
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
+    def fetchAbiUsingHash(self, _esId):
+        try:
+            print("ID=" + _esId)
+            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
+            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
+            jsonAbi = json.loads(stringAbi)
+            return jsonAbi
+        except:
+            print("Unable to fetch ABI from the ABI index")
+
     def loadDataIntoElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.index(index=_theIndex, id=_theId, body=_thePayLoad)
         return esReponseD
@@ -379,9 +389,9 @@ class Harvest:
             harvestDriverThread.join()
 
 
-    def fetchContractInstances(self, _contractAbiJSONData, _contractAddress):
-        self.contractInstanceList = []
-        contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=_contractAddress)
+    def fetchContractInstances(self, _contractAbiId, _contractAddress):
+        jsonAbiDataForInstance = json.loads(fetchAbiUsingHash(_contractAbiId))
+        contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
 
     def worker(self, _instance):
@@ -405,6 +415,7 @@ class Harvest:
 
     def updateStateDriverPre(self):
         self.addressAndFunctionDataHashes = {}
+        #self.contractInstanceList = []
         self.updateStateDriverPreTimer = time.time()
         self.esAbiAddresses = self.fetchContractAddressesWithAbis()
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
@@ -415,6 +426,7 @@ class Harvest:
             self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
             if tempAbiAddressHash != self.esAbiAddressesHash:
+                self.contractInstanceList = []
                 for esAbiSingle in self.esAbiAddresses:
                     self.addressAndFunctionDataHashes = {}
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
@@ -439,16 +451,6 @@ class Harvest:
             tempData = {}
             tempData["url"] = self.config['abis'][key]
             tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
-
-    def fetchAbiUsingHash(self, _esId):
-        try:
-            print("ID=" + _esId)
-            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
-            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
-            jsonAbi = json.loads(stringAbi)
-            return jsonAbi
-        except:
-            print("Unable to fetch ABI from the ABI index")
         
 
     def updateBytecodeAndVersion(self, _txHash, _abiSha3, _esId):
