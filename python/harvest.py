@@ -390,7 +390,7 @@ class Harvest:
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
-        jsonAbiDataForInstance = json.loads(fetchAbiUsingHash(_contractAbiId))
+        jsonAbiDataForInstance = json.loads(self.fetchAbiUsingHash(_contractAbiId))
         contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
 
