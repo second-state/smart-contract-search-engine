@@ -374,17 +374,17 @@ class Harvest:
             functionDataId = self.getFunctionDataId(freshFunctionData)
             if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
                 print("The data is different so we will update this record now")
-                try:
-                    self.addressAndFunctionDataHashes[_instance.address] = functionDataId
-                    itemId = self.web3.toHex(self.web3.sha3(text=_instance.address))
-                    doc = {}
-                    outerData = {}
-                    outerData["functionData"] = freshFunctionData
-                    outerData["functionDataId"] = functionDataId
-                    doc["doc"] = outerData
-                    indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
-                except:
-                    print("Unable to update the state data in the worker function")
+                #try:
+                self.addressAndFunctionDataHashes[_instance.address] = functionDataId
+                itemId = _instance.address
+                doc = {}
+                outerData = {}
+                outerData["functionData"] = freshFunctionData
+                outerData["functionDataId"] = functionDataId
+                doc["doc"] = outerData
+                indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+                #except:
+                #    print("Unable to update the state data in the worker function")
             else:
                 print("The data is still the same so we will move on ...")
 
