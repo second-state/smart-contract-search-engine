@@ -397,12 +397,8 @@ class Harvest:
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
-        print("Instance address")
-        print(_instance.address)
-        print("Position in list")
-        print(self.addressAndFunctionDataHashes[_instance.address])
-        print("FunctionDataId comparison")
-        print(functionDataId)
+        if _instance.address not in self.addressAndFunctionDataHashes.keys():
+            self.addressAndFunctionDataHashes[_instance.address] = ""
         if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
             print("The data is different so we will update this record now")
             #try:
@@ -420,7 +416,7 @@ class Harvest:
             print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
-        self.addressAndFunctionDataHashes = []
+        self.addressAndFunctionDataHashes = {}
         #self.contractInstanceList = []
         self.updateStateDriverPreTimer = time.time()
         self.esAbiAddresses = self.fetchContractAddressesWithAbis()
@@ -434,7 +430,7 @@ class Harvest:
             if tempAbiAddressHash != self.esAbiAddressesHash:
                 self.contractInstanceList = []
                 for esAbiSingle in self.esAbiAddresses:
-                    self.addressAndFunctionDataHashes = []
+                    self.addressAndFunctionDataHashes = {}
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
