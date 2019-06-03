@@ -226,7 +226,7 @@ class Harvest:
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
-            self.esAbiAddresses.append(item)
+            self.esAbiAddresses.append(item["_source"]["contractAddress"])
         print("esAbiAddresses")
         print(self.esAbiAddresses)
 
