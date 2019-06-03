@@ -116,14 +116,41 @@ Please ensure that the correct network id is set in the "searchEngineNetwork" va
 var searchEngineNetwork = "18"; // CyberMiles MainNet
 ```
 
-**index variable in io.py** 
-You will need to ensure that the `index="fairplay",` values in the io.py file are set to the correct Elasticsearch index. This will become part of the new config.ini format but for now, just this value has to be typed. At present CMT TestNet is `index="fairplay"` and CMT MainNet is `index="mainnetfairplay"`
-
 **Blockchain -> rpc variable in config.ini**
 It is important that the search engine is pointing to the correct RPC endpoint i.e. CMT TestNet vs MainNet
 ```
 [blockchain]
 rpc = https://testnet-rpc.cybermiles.io:8545
+```
+
+**Elasticsearch**
+Please also put in your Elasticsearch URL and region.
+
+```
+[blockchain]
+rpc = https://testnet-rpc.cybermiles.io:8545
+
+[elasticSearch]
+endpoint = search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com
+aws_region = ap-southeast-2
+
+```
+
+**Index names**
+The masterindex, abiindex and bytecode index can all stay as they are below. You might just want to change the commonindex to be more descriptive i.e. mainnet, testnet etc.
+
+```
+[masterindex]
+all = all
+
+[abiindex]
+abi = abi
+
+[bytecodeindex]
+bytecode = bytecode
+
+[commonindex]
+network = cmttestnetmultiabi
 ```
 
 ## SSL (HTTPS) using "lets encrypt"
