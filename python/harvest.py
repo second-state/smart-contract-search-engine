@@ -444,9 +444,9 @@ class Harvest:
             print("updateStateDriverPre")           
             origDict = {}
             origListOfAddresses = []
-            for o in 
+            #for o in 
 
-                self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
+            #    self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             # Create new thread list
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
