@@ -418,10 +418,12 @@ class Harvest:
             print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
+        self.updateStateDriverPreTimer = time.time()
         self.addressAndFunctionDataHashes = {}
         self.contractInstanceList = []
-        self.updateStateDriverPreTimer = time.time()
         self.fetchContractAddressesWithAbis()
+        for esAbiSingle in self.esAbiAddresses:                    
+            self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
         while True:
             print("updateStateDriverPre")
@@ -431,9 +433,9 @@ class Harvest:
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
             print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
             if tempAbiAddressHash != self.esAbiAddressesHash:
+                self.addressAndFunctionDataHashes = {}
                 self.contractInstanceList = []
-                for esAbiSingle in self.esAbiAddresses:
-                    self.addressAndFunctionDataHashes = {}
+                for esAbiSingle in self.esAbiAddresses:                    
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
