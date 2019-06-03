@@ -434,7 +434,7 @@ class Harvest:
             if tempAbiAddressHash != self.esAbiAddressesHash:
                 self.contractInstanceList = []
                 for esAbiSingle in self.esAbiAddresses:
-                    self.addressAndFunctionDataHashes = {}
+                    self.addressAndFunctionDataHashes = []
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
