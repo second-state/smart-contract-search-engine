@@ -260,7 +260,7 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _esAbiSingle, _argList=[],  _topup=False):
+    def harvest(self, _esAbiSingle, _argList,  _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
         while True:
@@ -333,7 +333,7 @@ class Harvest:
                 if _topup == False and len(_argList) == 2:
                     break
 
-    def harvestDriver(self, _argList=[], _stop=False):
+    def harvestDriver(self, _stop=False):
         print("harvestDriver")
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
@@ -355,6 +355,7 @@ class Harvest:
                     harvestDriverThreads.append(tFullDriver)
             else:
                 if _stop == True:
+                    argList = []
                     tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
                     tFullDriver.daemon = True
                     tFullDriver.start()
