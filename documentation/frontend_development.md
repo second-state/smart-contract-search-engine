@@ -33,6 +33,13 @@ The above hashes enable anyone who knows the ABI and Bytecode, to search for the
 
 We then go a step further and combine the two values `abiSha3` and `bytecodeSha3` and the create a sha3 hash of them. This provides us with a third (the most unique and useful identifier in terms of contract instance version) value called `abiSha3BytecodeSha3`
 
+```
+"_source": 
+...
+"abiSha3BytecodeSha3": "0xa1c025708a54ed04595d075658a563e454ac4595eff966113b81447dce3c4340"
+...
+```
+
 It makes sense to store these hashes because this is a really robust way to deterministically understand the data. The frontend (a search results page or DApp) just needs to convert this data to whatever format it needs it in. For example, the following Javascript displays version 1 ("v1") or version 2 ("v2") depending on the unique ABI/Bytecode combination which is their unique smart contract instance.
 
 
