@@ -200,6 +200,7 @@ class Harvest:
         return uniqueList
 
     def fetchContractAddressesWithAbis(self):
+        self.esAbiAddresses = []
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
@@ -224,7 +225,8 @@ class Harvest:
         lContractAddress.append("abiSha3")
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
-        return esReponseAddresses
+        for item in esReponseAddresses:
+            self.esAbiAddresses.append(item)
 
     def fetchTxHashWithAbis(self):
         dQuery = {}
@@ -419,16 +421,12 @@ class Harvest:
         self.addressAndFunctionDataHashes = {}
         #self.contractInstanceList = []
         self.updateStateDriverPreTimer = time.time()
-        self.esAbiAddresses = self.fetchContractAddressesWithAbis()
+        self.fetchContractAddressesWithAbis()
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
         while True:
             print("updateStateDriverPre")
             tempAbiAddressHash = self.esAbiAddressesHash
-            self.esAbiAddresses = self.fetchContractAddressesWithAbis()
-            print("temp")
-            print(tempAbiAddressHash)
-            print("new")
-            print(self.esAbiAddresses)
+            self.fetchContractAddressesWithAbis()
             self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
             print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
