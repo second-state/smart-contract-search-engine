@@ -22,45 +22,58 @@ Creating a web3 contract instance in the command line for testing
 ```python
 import os
 import re
-import sys
 import time
 import json
-import boto3
-import queue
 import argparse
 import requests
-import threading
 import configparser
-import elasticsearch.helpers
-from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
-# Testnet
-blockchainRpc = "https://testnet-rpc.cybermiles.io:8545"
-web3 = Web3(HTTPProvider(blockchainRpc))
-#transactionData = web3.eth.getTransaction("0x3c1bfa6806800adee8b8e9e60421e54cc3b7a9cf0f41aaabcdb21636efb27f29")
 
-#blockchainRpc = "http://35.161.237.144:8545"
+# CWD
+scriptExecutionLocation = os.getcwd()
 
+# Config
+print("Reading configuration file")
+config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
+config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
 
+abiIndex = config['abiindex']['abi']
+print("Abi index: %s" % abiIndex)
 
-auth = BotoAWSRequestsAuth(aws_host="search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com", aws_region="ap-southeast-2", aws_service='es')
+# Bytecode index
+bytecodeIndex = config['bytecodeindex']['bytecode']
+print("Bytecode index: %s" % bytecodeIndex)
+
+# Elasticsearch endpoint
+elasticSearchEndpoint = config['elasticSearch']['endpoint']
+print("ElasticSearch Endpoint: %s" % elasticSearchEndpoint)
+
+# Elasticsearch AWS region
+elasticSearchAwsRegion = config['elasticSearch']['aws_region']
+
+auth = BotoAWSRequestsAuth(aws_host=elasticSearchEndpoint, aws_region=elasticSearchAwsRegion, aws_service='es')
 es = Elasticsearch(
-    hosts=[{'host': "search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com", 'port': 443}],
-    region="ap-southeast-2",
+    hosts=[{'host': elasticSearchEndpoint, 'port': 443}],
+    region=elasticSearchAwsRegion,
     use_ssl=True,
     verify_certs=True,
     http_auth=auth,
     connection_class=RequestsHttpConnection
 )
-```
 
-
-This is how we create the abi record in the abi index
-
-```python
 #v1
-#abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+abiData = re.sub(r"[\s]+", " ", abiData)
+abiSha = web3.toHex(web3.sha3(text=abiData))
+print(abiSha)
+print(abiData)
+data = {}
+data['indexInProgress'] = "false"
+data['epochOfLastUpdate'] = int(time.time())
+data['abi'] = abiData
+es.index(index=abiIndex, id=abiSha, body=data)
 #v2
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
 abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
@@ -72,15 +85,10 @@ data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['abi'] = abiData
-es.index(index="abi", id=abiSha, body=data)
-```
+es.index(index=abiIndex, id=abiSha, body=data)
 
-This is now we create the bytecode record in the bytecode index
-```python
-# This must be the raw URL (raw.githubusercontent.com...) not just the GitHub URL
-#binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
-binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
-
+#v1
+binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
@@ -88,7 +96,17 @@ data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
-es.index(index="bytecode", id=byteCodeSha, body=data)
+es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
+#v2
+binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
+binJSONObject = json.loads(binObject)
+byteCode = "0x" + binJSONObject['object']
+byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
+data = {}
+data['indexInProgress'] = "false"
+data['epochOfLastUpdate'] = int(time.time())
+data['bytecode'] = byteCode
+es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
 ```
 
 str(web3.toHex(web3.sha3(text=json.dumps(abiData))))
@@ -214,9 +232,5 @@ optional arguments:
   -h, --help            show this help message and exit
   -m MODE, --mode MODE  [full|topup|state]
 ```
-
-
-
-
 
 

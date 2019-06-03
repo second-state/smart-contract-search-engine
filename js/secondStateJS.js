@@ -29,7 +29,7 @@ if (searchEngineNetwork == "18") {
     esIndexName = "cmtmainnetmultiabi";
 }
 
-var elasticSearchUrl = "https://search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
 // CONFIG END
 
 // CODE START
