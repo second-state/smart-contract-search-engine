@@ -5,6 +5,7 @@ import json
 import argparse
 import requests
 import configparser
+from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
 
