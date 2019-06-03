@@ -403,7 +403,7 @@ class Harvest:
         if _instance.address not in self.addressAndFunctionDataHashes.keys():
             self.addressAndFunctionDataHashes[_instance.address] = ""
         if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
-            print("The data is different so we will update this record now")
+            print("The data is different so we will update " + _instance.address + " record now")
             #try:
             self.addressAndFunctionDataHashes[_instance.address] = functionDataId
             itemId = _instance.address
