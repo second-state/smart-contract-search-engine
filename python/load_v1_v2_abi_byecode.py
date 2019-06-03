@@ -41,6 +41,10 @@ es = Elasticsearch(
     connection_class=RequestsHttpConnection
 )
 
+self.blockchainRpc = self.config['blockchain']['rpc']
+
+self.web3 = Web3(HTTPProvider(str(self.blockchainRpc)))
+
 #v1
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
 abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
