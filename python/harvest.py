@@ -432,7 +432,7 @@ class Harvest:
         threadsupdateStateDriverPre = []
         # We store the address as the key and the hash of the function data as the value
         # We can test to see if the data from web3 is different to what we have (essentially caching so that we don't waste valuable ES IO resources)
-        addressAndFunctionDataHashes = {}
+        self.addressAndFunctionDataHashes = {}
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbiHashes:
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
