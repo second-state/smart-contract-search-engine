@@ -18,6 +18,7 @@ class Harvest:
     def __init__(self):
 
         # Add list for unique queueing
+
         self.qList = []
 
         # CWD
@@ -28,15 +29,22 @@ class Harvest:
         self.config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
         self.config.read(os.path.join(self.scriptExecutionLocation, 'config.ini'))
 
-        # ABI[s] Allow for multiple ABIs in the config.ini
-        self.abis = {}
-        for key in self.config['abis']:
-            stringKey = str(key)
-            tempData = {}
-            tempData["url"] = self.config['abis'][key]
-            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
-            self.abis[stringKey] = tempData
+        # Master index
+        self.masterIndex = self.config['masterindex']['all']
+        print("Master index: %s" % self.masterIndex)
+
+        # Common index
+        self.commonIndex = self.config['commonindex']['network']
+        print("Common index: %s" % self.commonIndex)
             
+        # Abi index
+        self.abiIndex = self.config['abiindex']['abi']
+        print("Abi index: %s" % self.abiIndex)
+
+        # Bytecode index
+        self.bytecodeIndex = self.config['bytecodeindex']['bytecode']
+        print("Bytecode index: %s" % self.bytecodeIndex)
+
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
@@ -65,8 +73,11 @@ class Harvest:
             http_auth=self.auth,
             connection_class=RequestsHttpConnection
         )
+        # These will store ABI and Bytecode so that we are not having to go off and ask Elasticsearch repeatedly
+        self.bytecodeBuffer = {}
+        self.abiBuffer = {}
 
-
+    # This will become a function used to create the index of unique comparisons IUC
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
         keccakHashes = []
         for item in _contractAbiJSONData:
@@ -134,19 +145,28 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddresses(self, _theIndex):
+    def fetchContractAddresses(self, _theIndex, _abiSha3):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
         lContractAddress = []
         dContractAddress["contractAddress"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
+
         dMatch = {}
         dReauiresUpdating = {}
         dReauiresUpdating["requiresUpdating"] = "yes"
         dMatch["match"] = dReauiresUpdating
+
+        dMatch2 = {}
+        dabiSha3 = {}
+        dabiSha3["abiSha3"] = _abiSha3
+        dMatch2["match"] = dabiSha3
+
         lMust = []
         lMust.append(dMatch)
+        lMust.append(dMatch2)
+
         dBool = {}
         dBool["must"] = lMust
         lShould = []
@@ -157,6 +177,10 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
+        #print(dQuery)
+        # dQuery
+        # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
+        # {"query":{"match":{"indexingInProgress": "false"}}}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
@@ -164,6 +188,59 @@ class Harvest:
             if source['contractAddress'] not in uniqueList:
                 uniqueList.append(source['contractAddress'])
         return uniqueList
+
+    def fetchContractAddressesWithAbis(self):
+        dQuery = {}
+        dWildCard = {}
+        dContractAddress = {}
+        lContractAddress = []
+        dContractAddress["abiSha3"] = "0x*"
+        dWildCard["wildcard"] = dContractAddress 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["field"] = "byteSha3"
+        dMatch["exists"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must_not"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
+        lContractAddress.append("contractAddress")
+        lContractAddress.append("abiSha3")
+        dQuery["_source"] = lContractAddress
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
+        return esReponseAddresses
+
+    def fetchTxHashWithAbis(self):
+        dQuery = {}
+        dWildCard = {}
+        dContractAddress = {}
+        #lContractAddress = []
+        dContractAddress["abiSha3"] = "0x*"
+        dWildCard["wildcard"] = dContractAddress 
+        dMatch = {}
+        dReauiresUpdating = {}
+        dReauiresUpdating["field"] = "bytecodeSha3"
+        dMatch["exists"] = dReauiresUpdating
+        lMust = []
+        lMust.append(dMatch)
+        dBool = {}
+        dBool["must_not"] = lMust
+        lShould = []
+        lShould.append(dWildCard)
+        dBool["should"] = lShould
+        dOb = {}
+        dOb["bool"] = dBool
+        dQuery["query"] = dOb
+        #lContractAddress.append("TxHash")
+        #dQuery["_source"] = lContractAddress
+        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
+        return esReponseAddresses
 
     def fetchFunctionDataIds(self, _theIndex):
         dQuery = {}
@@ -183,26 +260,21 @@ class Harvest:
                 uniqueList.append(source['functionDataId'])
         return uniqueList
 
-    def harvest(self, _queueIndex,  _stop=False):
+    def harvest(self, _esAbiSingle, _argList,  _topup=False):
         self.upcomingCallTimeHarvest = time.time()
-        itemConf = self.qList[_queueIndex].get()
-        if itemConf is None:
-            print("itemConf is None")
-
-        esIndex = itemConf[0].split('_')[0]
-        version = itemConf[0].split('_')[1]
-        contractAbiJSONData = json.loads(itemConf[1]['json'])
-
-        binObject = requests.get(self.config['bytecode'][itemConf[0]]).content
-        binJSONObject = json.loads(binObject)
-        byteCode = "0x" + binJSONObject['object']
-
+        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
         while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
-            if _stop == True:
+            if _topup == True and len(_argList) == 0:
                 stopAtBlock = latestBlockNumber - 24
+            if _topup == False and len(_argList) == 2:
+                latestBlockNumber = _argList[0]
+                stopAtBlock = latestBlockNumber - _argList[1]
+                if stopAtBlock < 0:
+                    stopAtBlock = 0
+                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
@@ -214,40 +286,37 @@ class Harvest:
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
+                            # This will be a list of a list of unique ABI comparisons which we get from the IUAC index
+                            # the IUAC index will already have been populated using the createUniqueAbiComparisons functions before hand by another process
                             listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
+                            
+                            # for listOfKeccakHashes in theMasterList
                             count = 0
                             for individualHash in listOfKeccakHashes:
                                 if individualHash in transactionData.input:
                                     count += 1
+                                else:
+                                    print("Hash not found, so move on quickly")
+                                    # break out of this inner loop and keep trying the theMasterList
+                                    break
+                            # If all hashes match then the abi in the master list belongs to this contract
                             if count == len(listOfKeccakHashes):
                                 try:
                                     outerData = {}
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    if byteCode in transactionData.input:
-                                        outerData['byteCodeURL'] = str(self.config['bytecode'][itemConf[0]])
-                                    outerData['abiURL'] = itemConf[1]['url']
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber
-                                    outerData['dappVersion'] = version
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
-
                                     functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
-                                    theStatus = functionData['info'][0]
-                                    outerData['status'] = theStatus
-                                    # This needs to be moved to a separate process - no customisation here please (separate python script instead)
-                                    if theStatus == 0:
-                                        outerData['requiresUpdating'] = "yes"
-                                    elif theStatus == 1:
-                                        outerData['requiresUpdating'] = "no"
                                     functionDataId = self.getFunctionDataId(functionData)
                                     outerData['functionDataId'] = functionDataId
                                     outerData['functionData'] = functionData
-                                    print(outerData)
-                                    itemId = str(self.web3.toHex(self.web3.sha3(text=transactionReceipt.contractAddress)))
-                                    dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                    outerData["requiresUpdating"] = "yes"
+                                    itemId = transactionReceipt.contractAddress
+                                    dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
                                     if dataStatus == False:
-                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
+                                        indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                                 except:
                                     print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
                         else:
@@ -256,127 +325,183 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
-            if _stop == False:
-                self.qList[_queueIndex].task_done()
-            self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
-            if self.upcomingCallTimeHarvest > time.time():
-                time.sleep(self.upcomingCallTimeHarvest - time.time())
+            if _topup == True and len(_argList) == 0:
+                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+                if self.upcomingCallTimeHarvest > time.time():
+                    time.sleep(self.upcomingCallTimeHarvest - time.time())
+            else:
+                if _topup == False and len(_argList) == 2:
+                    break
 
     def harvestDriver(self, _stop=False):
-        qHarvestDriver = queue.Queue()
-        queueIndex = len(self.qList)
-        self.qList.append(qHarvestDriver)
-        self.threadsFullDriver = []
-        for i in range(len(self.abis)):
-            tFullDriver = threading.Thread(target=self.harvest, args=[queueIndex, _stop])
+        print("harvestDriver")
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        harvestDriverThreads = []
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        latestBlockNumber = self.web3.eth.getBlock('latest').number
+        threadsToUse = 100
+        blocksPerThread = int(latestBlockNumber / threadsToUse)
+        for esAbiSingle in esAbis:
+            if _stop == False:
+                for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+                    argList = []
+                    argList.append(startingBlock)
+                    argList.append(blocksPerThread)
+                    tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
+                    tFullDriver.daemon = True
+                    tFullDriver.start()
+                    harvestDriverThreads.append(tFullDriver)
+            else:
+                if _stop == True:
+                    argList = []
+                    tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
+                    tFullDriver.daemon = True
+                    tFullDriver.start()
+                    harvestDriverThreads.append(tFullDriver)
+        for harvestDriverThread in harvestDriverThreads:
+            harvestDriverThread.join()
+
+    def bytecodeDriver(self, _stop=False):
+        print("harvestDriver")
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        harvestDriverThreads = []
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        for esAbiSingle in esAbis:
+            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
             tFullDriver.daemon = True
             tFullDriver.start()
-            self.threadsFullDriver.append(tFullDriver)
-        for abiConfig in self.abis.items():
-            self.qList[queueIndex].put(abiConfig)
-        self.qList[queueIndex].join()
+            harvestDriverThreads.append(tFullDriver)
+        for harvestDriverThread in harvestDriverThreads:
+            harvestDriverThread.join()
 
-    # State related
-    def fetchUniqueContractList(self, _esIndex):
-        self.uniqueContractList = []
-        self.uniqueContractList = self.fetchContractAddresses(_esIndex)
 
-    def fetchContractInstances(self, _contractAbiJSONData):
-        self.contractInstanceList = []
-        for uniqueContractAddress in self.uniqueContractList:
+    def fetchContractInstances(self, _contractAbiJSONData, _uniqueContractList):
+        #TODO this assumes that there is only one contract abi we need to pass in both the abi and the address for this to work
+        contractInstanceList = []
+        for uniqueContractAddress in _uniqueContractList:
             contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=uniqueContractAddress)
-            self.contractInstanceList.append(contractInstance)
+            contractInstanceList.append(contractInstance)
+        return contractInstanceList
 
-    def worker(self, _esIndex, _contractAbiJSONData, _queueIndex):
-        while True:
-            item = self.qList[_queueIndex].get()
-            if item is None:
-                break
-            uniqueFunctionIds = self.fetchFunctionDataIds(_esIndex)
-            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, item)
+    def worker(self, _esIndex, _contractAbiJSONData, _instance):
+            freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, _instance)
             functionDataId = self.getFunctionDataId(freshFunctionData)
-            if functionDataId in uniqueFunctionIds:
-                print("No change to %s " % functionDataId)
-            else:
-                print("Hash not found, we must now update this contract instance state")
-                itemId = str(self.web3.toHex(self.web3.sha3(text=item.address)))
+            if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
+                print("The data is different so we will update this record now")
+                #try:
+                self.addressAndFunctionDataHashes[_instance.address] = functionDataId
+                itemId = _instance.address
                 doc = {}
                 outerData = {}
                 outerData["functionData"] = freshFunctionData
                 outerData["functionDataId"] = functionDataId
-                theStatus = freshFunctionData['info'][0]
-                if theStatus == 0:
-                    outerData['requiresUpdating'] = "yes"
-                elif theStatus == 1:
-                    outerData['requiresUpdating'] = "no"
                 doc["doc"] = outerData
                 indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
-            self.qList[_queueIndex].task_done()
+                #except:
+                #    print("Unable to update the state data in the worker function")
+            else:
+                print("The data is still the same so we will move on ...")
 
-    def performStateUpdate(self, _esIndex, _contractAbiJSONData):
-        self.upcomingCallTimeState = time.time()
+
+    def updateStateDriver(self, _esAbiSingle):
         while True:
-            self.fetchUniqueContractList(_esIndex)
-            self.uniqueContractListHashOrig = self.uniqueContractListHashFresh
-            self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-            if self.uniqueContractListHashFresh != self.uniqueContractListHashOrig:
-                self.fetchContractInstances(_contractAbiJSONData)
-            q = queue.Queue()
-            queueIndex = len(self.qList)
-            self.qList.append(q)
-            self.threads = []
-            # Set the number of threads
-            threadCount = len(self.uniqueContractList)
-            for i in range(threadCount):
-                t = threading.Thread(target=self.worker, args=[_esIndex, _contractAbiJSONData, queueIndex])
-                t.start()
-                self.threads.append(t)
-            for uniqueContractInstance in self.contractInstanceList:
-                # Put a web3 contract object instance in the queue
-                self.qList[queueIndex].put(uniqueContractInstance)
-            # block untill all tasks are done
-            self.qList[queueIndex].join()
-            for i in range(threadCount):
-                self.qList[queueIndex].put(None)
-            for t in self.threads:
-                t.join()
-            # set the time interval for when this task will be repeated
-            self.upcomingCallTimeState = self.upcomingCallTimeState + 10
-            # If this takes longer than the break time, then just continue straight away
-            if self.upcomingCallTimeState > time.time():
-                time.sleep(self.upcomingCallTimeState - time.time())
-
-    def updateStateDriver(self, _queueIndex):
-        if self.qList[_queueIndex].empty():
-            time.sleep(3)
-        else:
-            self.qList[_queueIndex].empty()
-        itemConf = self.qList[_queueIndex].get()
-        if itemConf is None:
-            sys.exit("No ABIs left to process")
-        esIndex = itemConf[0].split('_')[0]
-        version = itemConf[0].split('_')[1]
-        contractAbiJSONData = json.loads(itemConf[1]['json'])
-        self.fetchUniqueContractList(esIndex)
-        self.fetchContractInstances(contractAbiJSONData)
-        self.uniqueContractListHashFresh = str(self.web3.toHex(self.web3.sha3(text=str(self.uniqueContractList))))
-        self.performStateUpdate(esIndex, contractAbiJSONData)
+            esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
+            contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
+            contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
+            # We create a key value pair for every contract instance address so that we can cache the hash of the function data later
+            for singleAddress in contractsToProcess:
+                if singleAddress not in self.addressAndFunctionDataHashes:
+                    self.addressAndFunctionDataHashes[singleAddress] = "placeholder"
+            contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
+            instanceThreads = []
+            for instance in contractInstances:
+                instanceThread = threading.Thread(target=self.worker, args=[self.commonIndex, contractAbiJSONData, instance])
+                instanceThread.daemon = True
+                instanceThread.start()
+                instanceThreads.append(instanceThread)
+            for oneThread in instanceThreads:
+                oneThread.join()
 
     def updateStateDriverPre(self):
         print("updateStateDriverPre")
-        qUpdateStateDriverPre = queue.Queue()
-        queueIndex = len(self.qList)
-        self.qList.append(qUpdateStateDriverPre)
-
+        esAbiHashes = self.fetchContractAddressesWithAbis()
         self.threadsupdateStateDriverPre = []
-        for i in range(len(self.abis)):
-            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[queueIndex])
+        # We store the address as the key and the hash of the function data as the value
+        # We can test to see if the data from web3 is different to what we have (essentially caching so that we don't waste valuable ES IO resources)
+        self.addressAndFunctionDataHashes = {}
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        for esAbiSingle in esAbiHashes:
+            tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
             self.threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-        for abiConfig in self.abis.items():
-            self.qList[queueIndex].put(abiConfig)
-        self.qList[queueIndex].join()
+        for updateStateThreads1 in self.threadsupdateStateDriverPre:
+            updateStateThreads1.join()
+
+    def loadConfigIniToES(self):
+        for key in self.config['abis']:
+            stringKey = str(key)
+            tempData = {}
+            tempData["url"] = self.config['abis'][key]
+            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
+
+    def fetchAbiUsingHash(self, _esId):
+        try:
+            print("ID=" + _esId)
+            esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
+            stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
+            jsonAbi = json.loads(stringAbi)
+            return jsonAbi
+        except:
+            print("Unable to fetch ABI from the ABI index")
+        
+
+    def updateBytecodeAndVersion(self, _txHash, _abiSha3, _esId):
+        transactionInstance = self.web3.eth.getTransaction(str(_txHash))
+        dMatchAllInner = {}
+        dMatchAll = {}
+        dMatchAll["match_all"] = dMatchAllInner
+        dQuery = {}
+        dQuery["query"] = dMatchAll
+        esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
+        for i, doc in enumerate(esReponseByte):
+            source = doc.get('_source')
+            if source["bytecode"] in transactionInstance.input:
+                print("Found bytecode")
+                doc = {}
+                outerData = {}
+                bytecodeSha3 = self.web3.toHex(self.web3.sha3(text=source["bytecode"]))
+                abiBytecode = _abiSha3 + bytecodeSha3
+                abiSha3BytecodeSha3 = self.web3.toHex(self.web3.sha3(text=abiBytecode))
+                outerData["bytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=bytecodeSha3))
+                outerData["abiSha3BytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=abiSha3BytecodeSha3))
+                doc["doc"] = outerData
+                self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
+
+    def updateBytecode(self):
+        self.tupdateBytecode = time.time()
+        # Run this once every 5 minutes
+        while True:
+            print("Starting ...")
+            self.threadsUpdateBytecode = []
+            versionless = self.fetchTxHashWithAbis()
+            for i, doc in enumerate(versionless):
+                source = doc.get('_source')
+                #print(source)
+                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
+                tVersionless.daemon = True
+                tVersionless.start()
+                self.threadsUpdateBytecode.append(tVersionless)
+            for individualVersionlessThread in self.threadsUpdateBytecode:
+                individualVersionlessThread.join()
+            print("Finished")
+            self.tupdateBytecode = self.tupdateBytecode + 300
+            if self.tupdateBytecode > time.time():
+                time.sleep(self.tupdateBytecode - time.time())
 
 
 if __name__ == "__main__":
@@ -395,12 +520,16 @@ if __name__ == "__main__":
     elif args.mode == "state":
         print("Performing state update")
         harvester.updateStateDriverPre()
+    elif args.mode == "bytecode":
+        print("Performing bytecode update")
+        harvester.updateBytecode()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
-        
+        print("harvest.py --mode bytecode")
+
 # Monitor the total number of threads on the operating system
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
 
