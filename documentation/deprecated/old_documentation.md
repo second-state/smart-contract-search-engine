@@ -142,6 +142,80 @@ Using the following
 }
 
 
+# Reference this for shell scripts and cron
+
+## Initial harvest - Phase 1 (must commence before phase 2)
+
+**UPDATE - now 100x faster than before** 
+This harvest_all.py script has been upgraded to perform the `-m full` mode of harvesting 100x faster than it used to. Here is the logic of the code. This code logic is just for your interest; the code will just work 100x faster now if you just run the same command.
+```
+# -m full code gets the latest block number
+latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+# then facilitates one hundred separate IO threads
+threadsToUse = 100
+# then it will work out how many blocks will be harvested per thread
+blocksPerThread = int(latestBlockNumber / threadsToUse)
+# the harvestAllContracts function is then called 100 separate times simultaneously using these unique block number parameters
+```
+The good thing about this method is that each of the threads starts at even spacings in the blockchain so there is an evenly spread amount of block harvesting going on simultaneously. The harvest_all.py can be raised above 100x by adjusting the `threadsToUse` variable. We are just using this here because the m5.large instance from AWS is comfortable at about 60% CPU. Please check your servers capacity under load using `top` and increase this number to what you see fit.
+
+**Command line usage**
+```
+python3.6 harvest_all.py -h
+usage: harvest_all.py [-h] [-m MODE]
+
+Harvester < https://github.com/second-state/smart-contract-search-engine >
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MODE, --mode MODE  [full|topup]
+```
+
+### Recommended usage - Run once at startup!
+**Run at startup**
+
+Technically speaking (in the long term) once the project is well underway, you will just want to run all of these commands the **one** time, at startup! i.e. ensure that they are always running.
+
+The system will take care of itself. Here is an example of how to run this once at startup.
+
+**Phase 1 - Step 1**
+Create a bash file, say, `~/startup1.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.
+Please be sure to replace `https://testnet-rpc.cybermiles.ii:8545` with that of your RPC.
+```bash
+#!/bin/bash
+while true
+do
+  STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+  if [ $STATUS -eq 200 ]; then
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+    break
+  else
+    echo "Got $STATUS please wait"
+  fi
+  sleep 10
+done
+``` 
+**Phase 1 - Step 2**
+Add the following command to cron using `crontab -e` command.
+```bash
+@reboot ~/startup1.sh
+```
+
+## Subsequent harvest - Phase 2 (must only commence once phase 1 is well underway)
+```
+cd ~/smart-contract-search-engine/python
+
+python3.6 harvest.py -h
+
+usage: harvest.py [-h] [-m MODE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -m MODE, --mode MODE  [full|topup|state]
+```
+
+
 
 
 
