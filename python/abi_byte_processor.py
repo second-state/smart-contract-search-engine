@@ -345,13 +345,13 @@ class Harvest:
         blocksPerThread = int(latestBlockNumber / threadsToUse)
         for esAbiSingle in esAbis:
             for startingBlock in range(1, latestBlockNumber, blocksPerThread):
-            argList = []
-            argList.append(startingBlock)
-            argList.append(blocksPerThread)
-            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
-            tFullDriver.daemon = True
-            tFullDriver.start()
-            harvestDriverThreads.append(tFullDriver)
+                argList = []
+                argList.append(startingBlock)
+                argList.append(blocksPerThread)
+                tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
+                tFullDriver.daemon = True
+                tFullDriver.start()
+                harvestDriverThreads.append(tFullDriver)
         for harvestDriverThread in harvestDriverThreads:
             harvestDriverThread.join()
 
