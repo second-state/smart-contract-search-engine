@@ -21,6 +21,18 @@ config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
 host = config['elasticSearch']['endpoint']
 print("ElasticSearch Endpoint: %s" % host)
 
+masterIndex = config['masterindex']['all']
+print("masterIndex: %s" % masterIndex)
+
+commonIndex = config['commonindex']['network']
+print("commonIndex: %s" % commonIndex)
+
+abiIndex = config['abiindex']['abi']
+print("abiIndex: %s" % abiIndex)
+
+bytecodeIndex = config['bytecodeindex']['bytecode']
+print("bytecodeIndex: %s" % bytecodeIndex)
+
 elasticSearchAwsRegion = config['elasticSearch']['aws_region']
 
 auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
@@ -35,24 +47,12 @@ es = Elasticsearch(
 
 app = Flask(__name__)
 
-# @app.route("/api/data1", methods=['GET', 'POST'])
-# def data1():
-#     jsonRequestData = json.loads(request.data)
-#     results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
-#     obj = {}
-#     num = 1
-#     for item in results:
-#         obj[str(num)] = item
-#         num = num+1
-#     return jsonify(obj)
-
-
-
-
 
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
+    ## The users would have visited the upload_abi page which would have displayed all of the contracts without ABIShA3 field. 
+    ## The "all" index is the one which has all of the contract addresses we refer to it as the masterIndex
     ## Instantiate a web3 contract instance using the abi and the address provided from the submit_api page
     ## If this passes then create an ES update query like this
     ## The ABI
@@ -70,7 +70,7 @@ def submit_abi():
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     obj = {}
     num = 1
     for item in results:
@@ -85,7 +85,7 @@ def getAll():
     query = {}
     query["query"] = matchAll
     allQuery = json.loads(json.dumps(query))
-    results = elasticsearch.helpers.scan(client=es, index="fairplay", query=allQuery)
+    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=allQuery)
     obj = {}
     num = 1
     for item in results:
