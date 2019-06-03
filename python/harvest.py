@@ -227,8 +227,6 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
             self.esAbiAddresses.append(item["_source"])
-        print("esAbiAddresses")
-        print(self.esAbiAddresses)
 
     def fetchTxHashWithAbis(self):
         dQuery = {}
