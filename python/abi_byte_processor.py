@@ -372,27 +372,31 @@ class Harvest:
     def worker(self, _esIndex, _contractAbiJSONData, _instance):
             freshFunctionData = self.fetchPureViewFunctionData(_contractAbiJSONData, _instance)
             functionDataId = self.getFunctionDataId(freshFunctionData)
-            itemId = self.web3.toHex(self.web3.sha3(text=_instance.address))
-            doc = {}
-            outerData = {}
-            outerData["functionData"] = freshFunctionData
-            outerData["functionDataId"] = functionDataId
-            theStatus = freshFunctionData['info'][0]
-            if theStatus == 0:
-                outerData['requiresUpdating'] = "yes"
-            elif theStatus == 1:
-                outerData['requiresUpdating'] = "no"
-            doc["doc"] = outerData
-            print("********")
-            print(doc)
-            print(itemId)
-            indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+            if self.addressAndFunctionDataHashes[_instance.address] != functionDataId:
+                print("The data is different so we will update this record now")
+                try:
+                    self.addressAndFunctionDataHashes[_instance.address] = functionDataId
+                    itemId = self.web3.toHex(self.web3.sha3(text=_instance.address))
+                    doc = {}
+                    outerData = {}
+                    outerData["functionData"] = freshFunctionData
+                    outerData["functionDataId"] = functionDataId
+                    doc["doc"] = outerData
+                    indexResult = self.updateDataInElastic(_esIndex, itemId, json.dumps(doc))
+                except:
+                    print("Unable to update the state data in the worker function")
+            else:
+                print("The data is still the same so we will move on ...")
 
 
     def updateStateDriver(self, _esAbiSingle):
         esReponseAbi = self.es.get(index=self.abiIndex , id=_esAbiSingle['_source']['abiSha3'])
         contractAbiJSONData = json.loads(esReponseAbi['_source']['abi'])
         contractsToProcess = self.fetchContractAddresses(self.commonIndex, _esAbiSingle['_source']['abiSha3'])
+        # We create a key value pair for every contract instance address so that we can cache the hash of the function data later
+        for singleAddress in contractsToProcess:
+            self.addressAndFunctionDataHashes[singleAddress] = "placeholder"
+            print("Added address ...")
         contractInstances = self.fetchContractInstances(contractAbiJSONData, contractsToProcess)
         instanceThreads = []
         for instance in contractInstances:
@@ -407,9 +411,12 @@ class Harvest:
         print("updateStateDriverPre")
         esAbiHashes = self.fetchContractAddressesWithAbis()
         self.threadsupdateStateDriverPre = []
+        # We store the address as the key and the hash of the function data as the value
+        # We can test to see if the data from web3 is different to what we have (essentially caching so that we don't waste valuable ES IO resources)
+        self.addressAndFunctionDataHashes = {}
+        print("Created the address and function data hash storage")
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         for esAbiSingle in esAbiHashes:
-
             tupdateStateDriverPre = threading.Thread(target=self.updateStateDriver, args=[esAbiSingle])
             tupdateStateDriverPre.daemon = True
             tupdateStateDriverPre.start()
@@ -504,7 +511,7 @@ if __name__ == "__main__":
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
         print("harvest.py --mode bytecode")
-        
+
 # Monitor the total number of threads on the operating system
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
 
