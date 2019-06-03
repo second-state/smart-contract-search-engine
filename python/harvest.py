@@ -399,6 +399,8 @@ class Harvest:
 
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
+        print("Fresh function data")
+        print(freshFunctionData)
         functionDataId = self.getFunctionDataId(freshFunctionData)
         if _instance.address not in self.addressAndFunctionDataHashes.keys():
             self.addressAndFunctionDataHashes[_instance.address] = ""
