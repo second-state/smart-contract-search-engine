@@ -430,6 +430,7 @@ class Harvest:
                 for esAbiSingle in self.esAbiAddresses:
                     self.addressAndFunctionDataHashes = {}
                     self.fetchContractInstances(esAbiSingle['_source']['abiSha3'], esAbiSingle['_source']['contractAddress'])
+            threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
                 tupdateStateDriverPre.daemon = True
