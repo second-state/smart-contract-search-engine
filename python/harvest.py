@@ -308,7 +308,7 @@ class Harvest:
                                     outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
                                     outerData['blockNumber'] = transactionReceipt.blockNumber
                                     outerData['contractAddress'] = transactionReceipt.contractAddress
-                                    functionData = self.fetchPureViewFunctionData(contractAbiJSONData, contractInstance)
+                                    functionData = self.fetchPureViewFunctionData(contractInstance)
                                     functionDataId = self.getFunctionDataId(functionData)
                                     outerData['functionDataId'] = functionDataId
                                     outerData['functionData'] = functionData
