@@ -420,7 +420,7 @@ class Harvest:
             print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
-        self.addressAndFunctionDataHashes = {}
+        self.addressAndFunctionDataHashes = []
         #self.contractInstanceList = []
         self.updateStateDriverPreTimer = time.time()
         self.esAbiAddresses = self.fetchContractAddressesWithAbis()
