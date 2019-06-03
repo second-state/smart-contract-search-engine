@@ -392,17 +392,16 @@ class Harvest:
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
-        self.contractInstanceList = []
         jsonAbiDataForInstance = json.loads(self.fetchAbiUsingHash(_contractAbiId))
         contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
 
     def worker(self, _instance):
-        print(self.addressAndFunctionDataHashes)
+        #print(self.addressAndFunctionDataHashes)
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
-        print("functionDataId")
-        print(functionDataId)
+        #print("functionDataId")
+        #print(functionDataId)
         if _instance.address not in self.addressAndFunctionDataHashes.keys():
             print("Instance " +  _instance.address + "not in the list yet")
             self.addressAndFunctionDataHashes[_instance.address] = ""
@@ -410,7 +409,7 @@ class Harvest:
             print("The data is different so we will update " + _instance.address + " record now")
             #try:
             self.addressAndFunctionDataHashes[_instance.address] = functionDataId
-            print(self.addressAndFunctionDataHashes)
+            #print(self.addressAndFunctionDataHashes)
             itemId = _instance.address
             doc = {}
             outerData = {}
@@ -424,34 +423,55 @@ class Harvest:
             print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
+        self.firstRun = True
         self.updateStateDriverPreTimer = time.time()
         self.addressAndFunctionDataHashes = {}
-        
+        # Fetch the addresses and ABI hash of records that have an ABI Hash stored (abiSha3)
         self.fetchContractAddressesWithAbis()
+        # Create a hash of the list which holds both the address and the ABI hash
+        self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
+        # Purge the contract instance list as we are about to freshly populate it
+        self.contractInstanceList = []
+        # Populate the global cache of web3 contract instances by instantiating the using the ABI and address from the previously fetched list
         for esAbiSingle in self.esAbiAddresses:                    
             self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
-        self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
+            print("Instantiated address " + esAbiSingle['contractAddress'])
+        print("The following contract instances now exist")
+        print(self.contractInstanceList)
+        
         while True:
             print("updateStateDriverPre")
+            # Set the original address has to temp so that we can get a new one and see if the available contracts with ABI is now different to the last time
             tempAbiAddressHash = self.esAbiAddressesHash
             self.fetchContractAddressesWithAbis()
             self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
             # We can also possible make a function which analyses which addresses are different and only fetches those instances, for now we refetch all over again if the address list changes
-            #print("********Comparing " + tempAbiAddressHash + " with " + self.esAbiAddressesHash)
+            
+            print("Address <-> ABI ")
+            print(tempAbiAddressHash)
+            print(self.esAbiAddressesHash)
+
             if tempAbiAddressHash != self.esAbiAddressesHash:
-                self.addressAndFunctionDataHashes = {}
-                
+                print("There must be new records with ABIs because the list is different")
+                # Refresh this dict because we will load in new addresses and functionDataHashes
+                #self.addressAndFunctionDataHashes = {}
+                # Purge the contract instance list as we are about to freshly populate it
+                self.contractInstanceList = []
+                # Go ahead and instantiate a new set of web3 contract instances using the newly updated addresses (with ABI) list
                 for esAbiSingle in self.esAbiAddresses:                    
                     self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
+            # Create new thread list
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
                 tupdateStateDriverPre.daemon = True
                 tupdateStateDriverPre.start()
                 threadsupdateStateDriverPre.append(tupdateStateDriverPre)
+            # Join all of the instances in the list to end this round
             for updateStateThreads1 in threadsupdateStateDriverPre:
                 updateStateThreads1.join()
             print("Finished updateStateDriverPreTimer...")
+            # Sleep if you have to
             self.updateStateDriverPreTimer = self.updateStateDriverPreTimer + 10
             if self.updateStateDriverPreTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
