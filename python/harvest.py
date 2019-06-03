@@ -419,7 +419,7 @@ class Harvest:
 
     def updateStateDriverPre(self):
         self.addressAndFunctionDataHashes = {}
-        #self.contractInstanceList = []
+        self.contractInstanceList = []
         self.updateStateDriverPreTimer = time.time()
         self.fetchContractAddressesWithAbis()
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
