@@ -49,10 +49,6 @@ class Harvest:
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
-        # Elasticsearch index - This is now derived from the ABI key name in the config.ini
-        #self.elasticSearchIndex = self.config['elasticSearch']['index']
-        #print("ElasticSearch Index: %s" % self.elasticSearchIndex)
-
         # Elasticsearch endpoint
         self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
         print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
@@ -227,6 +223,7 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
             self.esAbiAddresses.append(item["_source"])
+        #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiSha3': '0x*'}}]}}, '_source': ['contractAddress', 'abiSha3']}
 
     def fetchTxHashWithAbis(self):
         dQuery = {}
@@ -301,7 +298,6 @@ class Harvest:
                             # This will be a list of a list of unique ABI comparisons which we get from the IUAC index
                             # the IUAC index will already have been populated using the createUniqueAbiComparisons functions before hand by another process
                             listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
-                            
                             # for listOfKeccakHashes in theMasterList
                             count = 0
                             for individualHash in listOfKeccakHashes:
@@ -518,7 +514,7 @@ class Harvest:
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
             print("Finished")
-            self.tupdateBytecode = self.tupdateBytecode + 300
+            self.tupdateBytecode = self.tupdateBytecode + 30
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
 
