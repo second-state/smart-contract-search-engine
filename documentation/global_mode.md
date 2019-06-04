@@ -226,6 +226,67 @@ Add the following line inside crontab
 @reboot cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 io.py >/dev/null 2>&1 &
 ```
 
+## CORS (Allowing Javascript, from anywhere, to access the API)
+
+Whilst the API can be accessed from anywhere using REST clients like Postman etc. DApps and websites will also want to access the data in the search engine API by visiting the domain (where the search engine is being hosted) via port 80 i.e.
+
+```
+_data = {"query":{"multi_match":{"fields":["functionData.title","functionData.desc"],"query":"Win"}}}
+var _dataString = JSON.stringify(_data);
+```
+
+```
+response1 = $.ajax({
+    url: "https://search-engine.com/api/es_search",
+    type: "POST",
+    data: _dataString,
+    dataType: "json",
+    contentType: "application/json",
+    success: function(response) {
+        console.log(response);
+    },
+    error: function(xhr) {
+        console.log("Get items failed");
+    }
+});
+```
+Without CORS enabled (on Apache) the above Javascript query will cause the following error.
+
+```
+Access to XMLHttpRequest at 'https://search-engine.com/api/es_search' from origin 'https://theDapp.com' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+```
+To enable CORS please following these instructions.
+
+Ensure that Apache2 has the headers library enabled by typing the following command.
+
+```
+sudo a2enmod headers
+```
+
+Open the `/etc/apache2/apache2.conf` file and add the following.
+```
+<Directory /var/www/search-engine>
+     Order Allow,Deny
+     Allow from all
+     AllowOverride all
+     Header set Access-Control-Allow-Origin "*"
+</Directory>
+```
+
+Then in addition to this, please open the `/etc/apache2/sites-enabled/search-engine-le-ssl.conf` file (which was created automatically by the above "lets encrypt" command) and add the following code inside the <VirtualHost *:443> section.
+
+```
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header always set Access-Control-Max-Age "1000"
+Header always set Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token"
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+```
+
+Restart the server and then test again using the above Javascript code.
+
 ## Activate the harvesting
 Please make sure that you have followed [the harvesting documentation](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md) which shows you how to set up the automatic cron tasks for the harvesting/indexing scripts.
 
