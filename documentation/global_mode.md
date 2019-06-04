@@ -116,6 +116,41 @@ Please ensure that the correct network id is set in the "searchEngineNetwork" va
 var searchEngineNetwork = "18"; // CyberMiles MainNet
 ```
 
+**esIndexName name in secondStateJS.js**
+Please ensure that the appropriate index name will be set (depending on which network you selected in the previous step)
+The logic is as follows.
+```
+if (searchEngineNetwork == "19") {
+    blockExplorer = "https://testnet.cmttracking.io/";
+    esIndexName = "testnet";
+}
+
+if (searchEngineNetwork == "18") {
+    blockExplorer = "https://www.cmttracking.io/";
+    esIndexName = "cmtmainnetmultiabi";
+}
+```
+Just please make sure that you set the esIndexName to the same value as the config.ini (i.e. note how the below config.ini common index and the above secondStateJS.js esIndexName are both set to testnet).
+
+**This Javascript configuration will be made part of the global configuration as per the GitHub Issue**
+```
+[commonindex]
+network = testnet
+```
+
+```
+if (searchEngineNetwork == "19") {
+    blockExplorer = "https://testnet.cmttracking.io/";
+    esIndexName = "testnet";
+}
+
+if (searchEngineNetwork == "18") {
+    blockExplorer = "https://www.cmttracking.io/";
+    esIndexName = "cmtmainnetmultiabi";
+}
+```
+
+
 **Blockchain -> rpc variable in config.ini**
 It is important that the search engine is pointing to the correct RPC endpoint i.e. CMT TestNet vs MainNet
 ```
