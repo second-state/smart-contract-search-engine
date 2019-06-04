@@ -424,7 +424,7 @@ class Harvest:
         self.addressAndFunctionDataHashes = {}
         # Fetch the addresses and ABI hash of records that have an ABI Hash stored (abiSha3)
         self.fetchContractAddressesWithAbis()
-        print(self.esAbiAddresses)
+        #print(self.esAbiAddresses)
         # Create a hash of the list which holds both the address and the ABI hash
         self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
         # Purge the contract instance list as we are about to freshly populate it
@@ -434,7 +434,7 @@ class Harvest:
             self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             print("Instantiated address " + esAbiSingle['contractAddress'])
         print("The following contract instances now exist")
-        print(self.contractInstanceList)
+        #print(self.contractInstanceList)
         
         while True:
             print("updateStateDriverPre")           
