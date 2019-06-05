@@ -233,3 +233,26 @@ optional arguments:
   -m MODE, --mode MODE  [full|topup|state]
 ```
 
+sudo a2enmod headers
+
+add 
+```
+Header always set Access-Control-Allow-Origin "*"
+Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header always set Access-Control-Max-Age "1000"
+Header always set Access-Control-Allow-Headers "x-requested-with, Content-Type, origin, authorization, accept, client-security-token"
+RewriteEngine On
+RewriteCond %{REQUEST_METHOD} OPTIONS
+RewriteRule ^(.*)$ $1 [R=200,L]
+```
+
+to the 
+/etc/apache2/sites-enabled/cmt-testnet.search.secondstate.io-le-ssl.conf 
+file
+inside the <VirtualHost *:443> section and then restart apache2
+
+
+/var/www/cmt.search.secondstate.io
+
+https://cmt.search.secondstate.io
+
