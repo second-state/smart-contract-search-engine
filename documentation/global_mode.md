@@ -104,7 +104,7 @@ sudo chown -R $USER:$USER /var/www/search-engine.com/*
 
 ## Global mode config
 
-Go to the appropriate directory (where the search engine will be served by Apache2) i.e. `cd /var/www/search-engine.com/html/`
+Go to the appropriate directory (where the search engine will be served by Apache2) i.e. `cd /var/www/search-engine.com/html/`. We will be staying in that area for all of the following work.
 
 **publicIp in secondStateJS.js**
 If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name of the server which is hosting the search engine (including the protocol) i.e. 
