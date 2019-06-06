@@ -372,7 +372,7 @@ class Harvest:
             harvestDriverThread.join()
 
     def bytecodeDriver(self, _stop=False):
-        print("harvestDriver")
+        print("bytecodeDriver")
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         harvestDriverThreads = []
