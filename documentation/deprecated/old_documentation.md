@@ -52,6 +52,9 @@ print("ElasticSearch Endpoint: %s" % elasticSearchEndpoint)
 # Elasticsearch AWS region
 elasticSearchAwsRegion = config['elasticSearch']['aws_region']
 
+        # Web 3 init
+web3 = Web3(HTTPProvider(config['blockchain']['rpc'])
+
 auth = BotoAWSRequestsAuth(aws_host=elasticSearchEndpoint, aws_region=elasticSearchAwsRegion, aws_service='es')
 es = Elasticsearch(
     hosts=[{'host': elasticSearchEndpoint, 'port': 443}],
