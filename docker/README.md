@@ -12,7 +12,8 @@ cd smart-contract-search-engine
 2. Edit configurations files
     - ServerName in apache config `config/site.conf`
     - rpc, elasticsearch configs in `python/config.ini`
-    - IP in `js/secondStateJS.js`
+    - IP in `js/secondStateJS.js` 
+    Please don't forget to add the Docker port `:8080` (**without** a trailing slash) to this IP, like this `var publicIp = "http://52.65.234.57:8080"; `
 
 ```
 vim config/site.conf
