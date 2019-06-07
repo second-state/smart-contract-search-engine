@@ -101,8 +101,30 @@ def es_increase_quality():
     outerData = {}
     outerData["quality"] = "100"
     doc["doc"] = outerData
-    #es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
-    return itemId
+    theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+    return jsonify(theResponse)
+
+@app.route("/api/es_decrease_quality", methods=['GET', 'POST'])
+def es_decrease_quality():
+    jsonRequestData = json.loads(request.data)
+    itemId = jsonRequestData["contractAddress"]
+    doc = {}
+    outerData = {}
+    outerData["quality"] = "0"
+    doc["doc"] = outerData
+    theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+    return jsonify(theResponse)
+
+@app.route("/api/es_reset_quality", methods=['GET', 'POST'])
+def es_reset_quality():
+    jsonRequestData = json.loads(request.data)
+    itemId = jsonRequestData["contractAddress"]
+    doc = {}
+    outerData = {}
+    outerData["quality"] = "50"
+    doc["doc"] = outerData
+    theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+    return jsonify(theResponse)
 
 
 if __name__ == "__main__":
