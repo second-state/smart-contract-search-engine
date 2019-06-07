@@ -321,6 +321,7 @@ class Harvest:
                                     outerData['functionDataId'] = functionDataId
                                     outerData['functionData'] = functionData
                                     outerData["requiresUpdating"] = "yes"
+                                    outerData['quality'] = "50"
                                     itemId = transactionReceipt.contractAddress
                                     dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
                                     if dataStatus == False:
