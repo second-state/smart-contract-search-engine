@@ -40,3 +40,16 @@ docker run -it --rm -p 8080:80 -v $HOME/.aws:/root/.aws search-engine
 ```
 
 Now you can visit `http://<your_host>:8080` to check your smart contract search engine.
+
+# Accessing the Docker command line
+
+Once the Docker instance is running you can get the ID of the container using the following command.
+```
+docker ps -q
+```
+
+Once you have this ID you can open a bash terminal inside the Docker container environment.
+
+```
+docker exec -it PasteTheID bash
+```
