@@ -81,8 +81,8 @@ dQuery["query"] = dMatchAll
 # Fetch the items
 esReponseByte = elasticsearch.helpers.scan(client=es, index=commonIndex , query=json.dumps(dQuery), preserve_order=True)
 # Access each of the item IDs
-for i, doc in enumerate(esReponseByte):
-	itemId = doc.get('_id')
+for i, data in enumerate(esReponseByte):
+	itemId = data.get('_id')
 	print("Updating ID: %s" % itemId)
 	# Write the new data from above into the index at the current ID
 	reponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
