@@ -93,5 +93,16 @@ def getAll():
         num = num+1
     return jsonify(obj)
 
+@app.route("/api/es_increase_quality", methods=['GET', 'POST'])
+def es_increase_quality():
+    jsonRequestData = json.loads(request.data)
+    itemId = jsonRequestData.contractAddress
+    doc = {}
+    outerData = {}
+    outerData["quality"] = "100"
+    doc["doc"] = outerData
+    es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+
+
 if __name__ == "__main__":
         app.run(host='0.0.0.0', port=8080, debug=True)
