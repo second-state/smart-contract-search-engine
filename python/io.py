@@ -101,7 +101,8 @@ def es_increase_quality():
     outerData = {}
     outerData["quality"] = "100"
     doc["doc"] = outerData
-    es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+    #es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+    return itemId
 
 
 if __name__ == "__main__":
