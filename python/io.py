@@ -98,12 +98,13 @@ def es_update_quality():
     jsonRequestData = json.loads(request.data)
     itemId = jsonRequestData["contractAddress"]
     qualityScore = jsonRequestData["qualityScore"]
-    doc = {}
-    outerData = {}
-    outerData["quality"] = qualityScore
-    doc["doc"] = outerData
-    theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
-    return jsonify(theResponse)
+    if int(qualityScore) >= 0 and int(qualityScore) <= 100:
+        doc = {}
+        outerData = {}
+        outerData["quality"] = qualityScore
+        doc["doc"] = outerData
+        theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+        return jsonify(theResponse)
 
 if __name__ == "__main__":
         app.run(host='0.0.0.0', port=8080, debug=True)
