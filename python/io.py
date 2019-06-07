@@ -96,7 +96,7 @@ def getAll():
 @app.route("/api/es_increase_quality", methods=['GET', 'POST'])
 def es_increase_quality():
     jsonRequestData = json.loads(request.data)
-    itemId = jsonRequestData.contractAddress
+    itemId = jsonRequestData["contractAddress"]
     doc = {}
     outerData = {}
     outerData["quality"] = "100"
