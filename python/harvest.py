@@ -204,6 +204,28 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
+    def abiCompatabilityUpdate(self, _esAbiSingle):
+        
+        listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
+        # for listOfKeccakHashes in theMasterList
+        count = 0
+        for individualHash in listOfKeccakHashes:
+            if individualHash in transactionData.input:
+                count += 1
+            else:
+                print("Hash not found, so move on quickly")
+                # break out of this inner loop and keep trying the theMasterList
+                break
+        # If all hashes match then the abi in the master list belongs to this contract
+        if count == len(listOfKeccakHashes):
+            try:
+
+            except:
+                print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
+
+
+#str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
@@ -230,39 +252,22 @@ class Harvest:
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
-                            # This will be a list of a list of unique ABI comparisons which we get from the IUAC index
-                            # the IUAC index will already have been populated using the createUniqueAbiComparisons functions before hand by another process
-                            listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
-                            # for listOfKeccakHashes in theMasterList
-                            count = 0
-                            for individualHash in listOfKeccakHashes:
-                                if individualHash in transactionData.input:
-                                    count += 1
-                                else:
-                                    print("Hash not found, so move on quickly")
-                                    # break out of this inner loop and keep trying the theMasterList
-                                    break
-                            # If all hashes match then the abi in the master list belongs to this contract
-                            if count == len(listOfKeccakHashes):
-                                try:
-                                    outerData = {}
-                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                    outerData['abiSha3'] = str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
-                                    outerData['blockNumber'] = transactionReceipt.blockNumber
-                                    outerData['contractAddress'] = transactionReceipt.contractAddress
-                                    functionData = self.fetchPureViewFunctionData(contractInstance)
-                                    functionDataId = self.getFunctionDataId(functionData)
-                                    outerData['functionDataId'] = functionDataId
-                                    outerData['functionData'] = functionData
-                                    outerData["requiresUpdating"] = "yes"
-                                    outerData['quality'] = "50"
-                                    itemId = transactionReceipt.contractAddress
-                                    dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
-                                    if dataStatus == False:
-                                        indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                                except:
-                                    print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
+                            outerData = {}
+                            contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                            outerData['abiShaList'] = []
+                            outerData['blockNumber'] = transactionReceipt.blockNumber
+                            outerData['contractAddress'] = transactionReceipt.contractAddress
+                            functionData = self.fetchPureViewFunctionData(contractInstance)
+                            functionDataId = self.getFunctionDataId(functionData)
+                            outerData['functionDataId'] = functionDataId
+                            outerData['functionData'] = functionData
+                            outerData["requiresUpdating"] = "yes"
+                            outerData['quality'] = "50"
+                            itemId = transactionReceipt.contractAddress
+                            dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+                            if dataStatus == False:
+                                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                         else:
                             print("This transaction does not involve a contract, so we will ignore it")
                             continue
