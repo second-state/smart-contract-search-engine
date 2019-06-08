@@ -500,10 +500,10 @@ function renderItems(_hits) {
         }
 
         // Setting Dapp Version
-        if (value._source.abiSha3BytecodeSha3 == "0x0afaf8e4843da5ea7a78bb01088fde7ad5bcfabc1cffc9851adb9fa41389d44e"){
+        if (value._source.abiSha3BytecodeSha3 == "0x39e76f559313a52e86c540b63ec64fbf1c88624855ad60cc0380c0d7d47aed4b"){
                 dappVersion = "v1";
             }
-            else if (value._source.abiSha3BytecodeSha3 == "0xa1c025708a54ed04595d075658a563e454ac4595eff966113b81447dce3c4340") {
+            else if (value._source.abiSha3BytecodeSha3 == "0x82069af99bd87d7c8271916cd33cff9f6176d1bb6da18a75379107df30da6fc5") {
                 dappVersion = "v2";
             }
 
