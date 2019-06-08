@@ -426,10 +426,13 @@ class Harvest:
             for i, doc in enumerate(versionless):
                 source = doc.get('_source')
                 #print(source)
-                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
-                tVersionless.daemon = True
-                tVersionless.start()
-                self.threadsUpdateBytecode.append(tVersionless)
+                i = 1
+                if i == 1:
+                    tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
+                    tVersionless.daemon = True
+                    tVersionless.start()
+                    self.threadsUpdateBytecode.append(tVersionless)
+                    i = i + 1
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
             print("Finished")
