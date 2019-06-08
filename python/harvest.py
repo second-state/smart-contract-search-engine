@@ -17,10 +17,6 @@ from elasticsearch import Elasticsearch, RequestsHttpConnection
 class Harvest:
     def __init__(self):
 
-        # Add list for unique queueing
-
-        self.qList = []
-
         # CWD
         self.scriptExecutionLocation = os.getcwd()
 
@@ -69,9 +65,6 @@ class Harvest:
             http_auth=self.auth,
             connection_class=RequestsHttpConnection
         )
-        # These will store ABI and Bytecode so that we are not having to go off and ask Elasticsearch repeatedly
-        self.bytecodeBuffer = {}
-        self.abiBuffer = {}
 
     # This will become a function used to create the index of unique comparisons IUC
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
@@ -151,50 +144,7 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddresses(self, _theIndex, _abiSha3):
-        dQuery = {}
-        dWildCard = {}
-        dContractAddress = {}
-        lContractAddress = []
-        dContractAddress["contractAddress"] = "0x*"
-        dWildCard["wildcard"] = dContractAddress 
-
-        dMatch = {}
-        dReauiresUpdating = {}
-        dReauiresUpdating["requiresUpdating"] = "yes"
-        dMatch["match"] = dReauiresUpdating
-
-        dMatch2 = {}
-        dabiSha3 = {}
-        dabiSha3["abiSha3"] = _abiSha3
-        dMatch2["match"] = dabiSha3
-
-        lMust = []
-        lMust.append(dMatch)
-        lMust.append(dMatch2)
-
-        dBool = {}
-        dBool["must"] = lMust
-        lShould = []
-        lShould.append(dWildCard)
-        dBool["should"] = lShould
-        dOb = {}
-        dOb["bool"] = dBool
-        dQuery["query"] = dOb
-        lContractAddress.append("contractAddress")
-        dQuery["_source"] = lContractAddress
-        #print(dQuery)
-        # dQuery
-        # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
-        # {"query":{"match":{"indexingInProgress": "false"}}}
-        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
-        uniqueList = []
-        for i, doc in enumerate(esReponseAddresses):
-            source = doc.get('_source')
-            if source['contractAddress'] not in uniqueList:
-                uniqueList.append(source['contractAddress'])
-        return uniqueList
-
+    # This is a specific function which restricts the amount of data being returned i.e. instead of getting the entire record it only asks for and then returns the contractAddress and the abiSha3
     def fetchContractAddressesWithAbis(self):
         self.esAbiAddresses = []
         dQuery = {}
@@ -225,11 +175,12 @@ class Harvest:
             self.esAbiAddresses.append(item["_source"])
         #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiSha3': '0x*'}}]}}, '_source': ['contractAddress', 'abiSha3']}
 
+    # This is a specific function which also restricts what is asked for and what is returned. More efficient on the ES instance.
     def fetchTxHashWithAbis(self):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
-        #lContractAddress = []
+        lContractAddress = []
         dContractAddress["abiSha3"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
@@ -246,28 +197,11 @@ class Harvest:
         dOb = {}
         dOb["bool"] = dBool
         dQuery["query"] = dOb
-        #lContractAddress.append("TxHash")
-        #dQuery["_source"] = lContractAddress
+        lContractAddress.append("TxHash")
+        lContractAddress.append("abiSha3")
+        dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
-
-    def fetchFunctionDataIds(self, _theIndex):
-        dQuery = {}
-        dWildCard = {}
-        dFunctionDataId = {}
-        lFunctionId = []
-        dFunctionDataId["functionDataId"] = "0x*"
-        dWildCard["wildcard"] = dFunctionDataId
-        lFunctionId.append("functionDataId")
-        dQuery["query"] = dWildCard
-        dQuery["_source"] = lFunctionId
-        esReponseIds = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
-        uniqueList = []
-        for i, doc in enumerate(esReponseIds):
-            source = doc.get('_source')
-            if source['functionDataId'] not in uniqueList:
-                uniqueList.append(source['functionDataId'])
-        return uniqueList
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
         self.upcomingCallTimeHarvest = time.time()
@@ -372,21 +306,6 @@ class Harvest:
         for harvestDriverThread in harvestDriverThreads:
             harvestDriverThread.join()
 
-    def bytecodeDriver(self, _stop=False):
-        print("bytecodeDriver")
-        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
-        harvestDriverThreads = []
-        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
-        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
-        for esAbiSingle in esAbis:
-            tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, _stop])
-            tFullDriver.daemon = True
-            tFullDriver.start()
-            harvestDriverThreads.append(tFullDriver)
-        for harvestDriverThread in harvestDriverThreads:
-            harvestDriverThread.join()
-
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
         jsonAbiDataForInstance = json.loads(self.fetchAbiUsingHash(_contractAbiId))
@@ -467,14 +386,6 @@ class Harvest:
                 print("Back awake and ready to go ...")
             else:
                 print("It has been longer than 10 seconds, need to re-update the state immediately ...")
-
-    def loadConfigIniToES(self):
-        for key in self.config['abis']:
-            stringKey = str(key)
-            tempData = {}
-            tempData["url"] = self.config['abis'][key]
-            tempData["json"] = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(self.config['abis'][key]).content)))
-        
 
     def updateBytecodeAndVersion(self, _txHash, _abiSha3, _esId):
         transactionInstance = self.web3.eth.getTransaction(str(_txHash))

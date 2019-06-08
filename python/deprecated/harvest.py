@@ -135,18 +135,29 @@ class Harvest:
         return theId
 
     def fetchContractAddresses(self, _theIndex):
+
+    def fetchContractAddresses(self, _theIndex, _abiSha3):
         dQuery = {}
         dWildCard = {}
         dContractAddress = {}
         lContractAddress = []
         dContractAddress["contractAddress"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
+
         dMatch = {}
         dReauiresUpdating = {}
         dReauiresUpdating["requiresUpdating"] = "yes"
         dMatch["match"] = dReauiresUpdating
+
+        dMatch2 = {}
+        dabiSha3 = {}
+        dabiSha3["abiSha3"] = _abiSha3
+        dMatch2["match"] = dabiSha3
+
         lMust = []
         lMust.append(dMatch)
+        lMust.append(dMatch2)
+
         dBool = {}
         dBool["must"] = lMust
         lShould = []
@@ -157,6 +168,8 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
+        # dQuery will look like this
+        # {'query': {'bool': {'must': [{'match': {'requiresUpdating': 'yes'}}], 'should': [{'wildcard': {'contractAddress': '0x*'}}]}}, '_source': ['contractAddress']}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=_theIndex, query=json.dumps(dQuery), preserve_order=True)
         uniqueList = []
         for i, doc in enumerate(esReponseAddresses):
