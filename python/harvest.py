@@ -235,14 +235,19 @@ class Harvest:
                             found = True
                             break
                         else:
-                            newList.append(item)
+                            newList.append(newAbiSha)
                             print("Keep comparing")
-                if found == False:
+                    if found == False:
                     newList.append(newAbiSha)
-                    doc = {}
-                    outerData = {}
-                    outerData["abiShaList"] = newList
-                    updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+                else:
+                    newList.append(newAbiSha)
+
+                
+                doc = {}
+                outerData = {}
+                outerData["abiShaList"] = newList
+                doc["doc"] = outerData
+                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             except:
                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
     
@@ -513,6 +518,9 @@ if __name__ == "__main__":
     elif args.mode == "bytecode":
         print("Performing bytecode update")
         harvester.updateBytecode()
+    elif args.mode == "abi":
+        print("Performing abi comparison update")
+        harvester.abiCompatabilityUpdateDriverPre1()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
