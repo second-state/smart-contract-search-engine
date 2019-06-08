@@ -242,10 +242,24 @@ class Harvest:
                 else:
                     newList.append(newAbiSha)
 
-                
+                # Update the ABI list in ES
                 doc = {}
                 outerData = {}
                 outerData["abiShaList"] = newList
+                doc["doc"] = outerData
+                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+
+                # Update the version in ES
+                stringToHash = ""
+                for abiItem in newList:
+                    print("Adding %s " % str(abiItem))
+                    stringToHash = stringToHash + str(abiItem)
+                stringToHash = stringToHash + str(_source["bytecodeSha3"])
+                newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
+                # Update the version list in ES
+                doc = {}
+                outerData = {}
+                outerData["abiSha3BytecodeSha3"] = newVersionHash
                 doc["doc"] = outerData
                 updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             except:
@@ -270,7 +284,7 @@ class Harvest:
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         # Get all of the contract instance addresses and their respective transaction hashes
-        queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress"]}
+        queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
         esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
         for i, doc in enumerate(esAbis):
             source = doc.get('_source')
