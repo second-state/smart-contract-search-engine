@@ -75,6 +75,8 @@ binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_con
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
+print(byteCode)
+print(byteCodeSha)
 data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
@@ -85,6 +87,8 @@ binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_con
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
+print(byteCode)
+print(byteCodeSha)
 data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())

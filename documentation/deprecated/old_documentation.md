@@ -22,13 +22,20 @@ Creating a web3 contract instance in the command line for testing
 ```python
 import os
 import re
+import sys
 import time
 import json
+import boto3
+import queue
 import argparse
 import requests
+import threading
 import configparser
+import elasticsearch.helpers
+from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
+
 
 # CWD
 scriptExecutionLocation = os.getcwd()
@@ -38,12 +45,25 @@ print("Reading configuration file")
 config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
 config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
 
+# Master index
+masterIndex = config['masterindex']['all']
+print("Master index: %s" % masterIndex)
+
+# Common index
+commonIndex = config['commonindex']['network']
+print("Common index: %s" % commonIndex)
+    
+# Abi index
 abiIndex = config['abiindex']['abi']
 print("Abi index: %s" % abiIndex)
 
 # Bytecode index
 bytecodeIndex = config['bytecodeindex']['bytecode']
 print("Bytecode index: %s" % bytecodeIndex)
+
+# Blockchain RPC
+blockchainRpc = config['blockchain']['rpc']
+print("Blockchain RPC: %s" % blockchainRpc)
 
 # Elasticsearch endpoint
 elasticSearchEndpoint = config['elasticSearch']['endpoint']
@@ -52,9 +72,10 @@ print("ElasticSearch Endpoint: %s" % elasticSearchEndpoint)
 # Elasticsearch AWS region
 elasticSearchAwsRegion = config['elasticSearch']['aws_region']
 
-        # Web 3 init
-web3 = Web3(HTTPProvider(config['blockchain']['rpc'])
+# Web 3 init
+web3 = Web3(HTTPProvider(str(blockchainRpc)))
 
+# AWS Boto
 auth = BotoAWSRequestsAuth(aws_host=elasticSearchEndpoint, aws_region=elasticSearchAwsRegion, aws_service='es')
 es = Elasticsearch(
     hosts=[{'host': elasticSearchEndpoint, 'port': 443}],
@@ -64,6 +85,8 @@ es = Elasticsearch(
     http_auth=auth,
     connection_class=RequestsHttpConnection
 )
+
+tx = web3.eth.getTransaction("0x8b7109b7d78b8fdf04ef0950e3fca2fe6833dc2bf69d4127794b898bdc168e1e")
 
 #v1
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
@@ -197,7 +220,7 @@ optional arguments:
 
 Technically speaking (in the long term) once the project is well underway, you will just want to run all of these commands the **one** time, at startup! i.e. ensure that they are always running.
 
-The system will take care of itself. Here is an example of how to run this once at startup.
+The system will take care of it Here is an example of how to run this once at startup.
 
 **Phase 1 - Step 1**
 Create a bash file, say, `~/startup1.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file.

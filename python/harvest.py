@@ -406,15 +406,15 @@ class Harvest:
                 bytecodeSha3 = self.web3.toHex(self.web3.sha3(text=source["bytecode"]))
                 abiBytecode = _abiSha3 + bytecodeSha3
                 abiSha3BytecodeSha3 = self.web3.toHex(self.web3.sha3(text=abiBytecode))
-                outerData["bytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=bytecodeSha3))
-                outerData["abiSha3BytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=abiSha3BytecodeSha3))
+                outerData["bytecodeSha3"] = bytecodeSha3
+                outerData["abiSha3BytecodeSha3"] = abiSha3BytecodeSha3
                 doc["doc"] = outerData
                 self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
-            else:
-                print("Did not find bytecode:")
-                print(str(source["bytecode"]))
-                print("inside the following transaction input")
-                print(str(transactionInstance.input))
+            # else:
+            #     print("Did not find bytecode:")
+            #     print(str(source["bytecode"]))
+            #     print("inside the following transaction input")
+            #     print(transactionInstance.input)
 
     def updateBytecode(self):
         self.tupdateBytecode = time.time()
@@ -426,13 +426,10 @@ class Harvest:
             for i, doc in enumerate(versionless):
                 source = doc.get('_source')
                 #print(source)
-                i = 1
-                if i == 1:
-                    tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
-                    tVersionless.daemon = True
-                    tVersionless.start()
-                    self.threadsUpdateBytecode.append(tVersionless)
-                    i = i + 1
+                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
+                tVersionless.daemon = True
+                tVersionless.start()
+                self.threadsUpdateBytecode.append(tVersionless)
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
             print("Finished")
