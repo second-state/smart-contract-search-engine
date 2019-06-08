@@ -398,6 +398,7 @@ class Harvest:
         esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
         for i, doc in enumerate(esReponseByte):
             source = doc.get('_source')
+            print("Processing " + source)
             if source["bytecode"] in transactionInstance.input:
                 print("Found bytecode")
                 doc = {}
@@ -409,6 +410,11 @@ class Harvest:
                 outerData["abiSha3BytecodeSha3"] = self.web3.toHex(self.web3.sha3(text=abiSha3BytecodeSha3))
                 doc["doc"] = outerData
                 self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
+            else:
+                print("Did not find bytecode:")
+                print(source["bytecode"])
+                print("inside the following transaction input")
+                print(transactionInstance.input)
 
     def updateBytecode(self):
         self.tupdateBytecode = time.time()
