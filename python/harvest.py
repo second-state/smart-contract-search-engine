@@ -204,9 +204,14 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
-    def abiCompatabilityUpdate(self, _esAbiSingle):
-        
-        listOfKeccakHashes = self.createUniqueAbiComparisons(contractAbiJSONData)
+
+    def shaAnAbiWithOrderedKeys(self, _theAbi):
+        theAbiHash = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theAbi, sort_keys=True))))
+        return theAbiHash
+
+    def abiCompatabilityUpdate(self, _esAbiSingle, _source):
+        transactionData = self.web3.eth.getTransaction(str(_source["TxHash"]))
+        listOfKeccakHashes = self.createUniqueAbiComparisons(_esAbiSingle)
         # for listOfKeccakHashes in theMasterList
         count = 0
         for individualHash in listOfKeccakHashes:
@@ -219,12 +224,58 @@ class Harvest:
         # If all hashes match then the abi in the master list belongs to this contract
         if count == len(listOfKeccakHashes):
             try:
-
+                newAbiSha = shaAnAbiWithOrderedKeys(_esAbiSingle)
+                newList = []
+                found = False
+                newData = es.get(index=commonIndex, id=_source["contractAddress"])
+                if len(newData["_source"]["abiShaList"]) > 0:
+                    for item in newData["_source"]["abiShaList"]:
+                        if item == newAbiSha:
+                            print("Already have hash of " + item)
+                            found = True
+                            break
+                        else:
+                            newList.append(item)
+                            print("Keep comparing")
+                if found == False:
+                    newList.append(newAbiSha)
+                    doc = {}
+                    outerData = {}
+                    outerData["abiShaList"] = newList
+                    updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             except:
                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
+    
+    def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
+        txThreadList = []
+        for i, doc in enumerate(_esTxs):
+            source = doc.get('_source')
+            tabiCompatabilityUpdateDriverPre2 = threading.Thread(target=self.abiCompatabilityUpdate, args=[_abi, source])
+            tabiCompatabilityUpdateDriverPre2.daemon = True
+            tabiCompatabilityUpdateDriverPre2.start()
+            txThreadList.append(tabiCompatabilityUpdateDriverPre2)
+        for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
+            abiCompatabilityUpdateDriverPre2Thread.join()
 
 
-#str(self.web3.toHex(self.web3.sha3(text=json.dumps(contractInstance.abi))))
+    def abiCompatabilityUpdateDriverPre1(self):
+        # Multithread lists
+        abiThreadList = []
+        # Get all of the ABIs
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        # Get all of the contract instance addresses and their respective transaction hashes
+        queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress"]}
+        esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
+        for i, doc in enumerate(esAbis):
+            source = doc.get('_source')
+            tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), esTxs])
+            tabiCompatabilityUpdateDriverPre1.daemon = True
+            tabiCompatabilityUpdateDriverPre1.start()
+            abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
+        for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
+            abiCompatabilityUpdateDriverPre1Thread.join()
+
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
         self.upcomingCallTimeHarvest = time.time()

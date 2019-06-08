@@ -47,7 +47,7 @@ web3 = Web3(HTTPProvider(str(blockchainRpc)))
 
 #v1
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
 abiData = re.sub(r"[\s]+", " ", abiData)
 abiSha = web3.toHex(web3.sha3(text=abiData))
 print(abiSha)
@@ -59,7 +59,7 @@ data['abi'] = abiData
 es.index(index=abiIndex, id=abiSha, body=data)
 #v2
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
-abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
 abiData = re.sub(r"[\s]+", " ", abiData)
 abiSha = web3.toHex(web3.sha3(text=abiData))
 print(abiSha)
