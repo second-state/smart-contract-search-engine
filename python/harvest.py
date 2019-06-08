@@ -200,6 +200,7 @@ class Harvest:
         lContractAddress.append("TxHash")
         lContractAddress.append("abiSha3")
         dQuery["_source"] = lContractAddress
+        # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiSha3": "0x*"}}]}}, "_source": ["TxHash", "abiSha3"]}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
