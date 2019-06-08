@@ -398,7 +398,7 @@ class Harvest:
         esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
         for i, doc in enumerate(esReponseByte):
             source = doc.get('_source')
-            print("Processing " + source)
+            print("Processing " + str(source))
             if source["bytecode"] in transactionInstance.input:
                 print("Found bytecode")
                 doc = {}
@@ -412,9 +412,9 @@ class Harvest:
                 self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
             else:
                 print("Did not find bytecode:")
-                print(source["bytecode"])
+                print(str(source["bytecode"]))
                 print("inside the following transaction input")
-                print(transactionInstance.input)
+                print(str(transactionInstance.input))
 
     def updateBytecode(self):
         self.tupdateBytecode = time.time()
