@@ -287,28 +287,39 @@ class Harvest:
 
 
     def abiCompatabilityUpdateDriverPre1(self):
-        # Multithread lists
-        abiThreadList = []
-        # Get all of the ABIs
-        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = self.es.search(index=self.abiIndex, body=queryForAbiIndex)
-        # Get all of the contract instance addresses and their respective transaction hashes
-        queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
-        esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
-        TxObj = {}
-        num = 1
-        for item in esTxs:
-            TxObj[str(num)] = item
-            num = num+1
-        print(TxObj)
-        for doc1 in esAbis["hits"]["hits"]:
-            source = doc1['_source']
-            tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), json.loads(json.dumps(TxObj))])
-            tabiCompatabilityUpdateDriverPre1.daemon = True
-            tabiCompatabilityUpdateDriverPre1.start()
-            abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
-        for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
-            abiCompatabilityUpdateDriverPre1Thread.join()
+        self.abiCompatabilityUpdateDriverPre1 = time.time()
+        while True:
+            # Multithread lists
+            abiThreadList = []
+            # Get all of the ABIs
+            queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+            esAbis = self.es.search(index=self.abiIndex, body=queryForAbiIndex)
+            # Get all of the contract instance addresses and their respective transaction hashes
+            queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
+            esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
+            TxObj = {}
+            num = 1
+            for item in esTxs:
+                TxObj[str(num)] = item
+                num = num+1
+            print(TxObj)
+            for doc1 in esAbis["hits"]["hits"]:
+                source = doc1['_source']
+                tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), json.loads(json.dumps(TxObj))])
+                tabiCompatabilityUpdateDriverPre1.daemon = True
+                tabiCompatabilityUpdateDriverPre1.start()
+                abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
+            for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
+                abiCompatabilityUpdateDriverPre1Thread.join()
+                        # Sleep if you have to
+            self.abiCompatabilityUpdateDriverPre1 = self.abiCompatabilityUpdateDriverPre1 + 5
+            if self.abiCompatabilityUpdateDriverPre1 > time.time():
+                print("Finished before time limit, will sleep now ...")
+                time.sleep(self.abiCompatabilityUpdateDriverPre1 - time.time())
+                print("Back awake and ready to go ...")
+            else:
+                print("It has been longer than the desired time, need to re-update the state immediately ...")
+
 
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
