@@ -222,6 +222,7 @@ class Harvest:
                 # break out of this inner loop and keep trying the theMasterList
                 break
         # If all hashes match then the abi in the master list belongs to this contract
+        print("COUNT " + str(count))
         if count == len(listOfKeccakHashes):
             #try:
             newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
