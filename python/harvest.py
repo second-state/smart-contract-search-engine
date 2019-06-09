@@ -222,23 +222,15 @@ class Harvest:
                 # break out of this inner loop and keep trying the theMasterList
                 break
         # If all hashes match then the abi in the master list belongs to this contract
-        print("COUNT " + str(count))
         if count == len(listOfKeccakHashes):
             #try:
             newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
-            print("Generated new SHA" + newAbiSha)
             newList = []
             found = False
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
-            print("Length" + str(len(newData["_source"]["abiShaList"])))
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
-                    print("Contract Address ...")
-                    print(_source["contractAddress"])
-                    print("*************************")
-                    print(item)
                     if item == newAbiSha:
-                        print("Already have hash of " + item)
                         found = True
                         break
                     else:
@@ -271,7 +263,7 @@ class Harvest:
 
 
     def abiCompatabilityUpdateDriverPre1(self):
-        self.abiCompatabilityUpdateDriverPre1 = time.time()
+        self.abiCompatabilityUpdateDriverPre1Timer = time.time()
         while True:
             # Multithread lists
             abiThreadList = []
@@ -296,10 +288,10 @@ class Harvest:
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
                         # Sleep if you have to
-            self.abiCompatabilityUpdateDriverPre1 = self.abiCompatabilityUpdateDriverPre1 + 60
-            if self.abiCompatabilityUpdateDriverPre1 > time.time():
+            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 60
+            if self.abiCompatabilityUpdateDriverPre1Timer > time.time():
                 print("Finished before time limit, will sleep now ...")
-                time.sleep(self.abiCompatabilityUpdateDriverPre1 - time.time())
+                time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
                 print("Back awake and ready to go ...")
             else:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")

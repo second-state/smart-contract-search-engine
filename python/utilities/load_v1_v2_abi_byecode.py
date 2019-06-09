@@ -74,6 +74,7 @@ es.index(index=abiIndex, id=abiSha, body=data)
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
+byteCode = re.sub(r"[\n\t\s]*", "", byteCode)
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
 print(byteCode)
 print(byteCodeSha)
@@ -86,6 +87,7 @@ es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
+byteCode = re.sub(r"[\n\t\s]*", "", byteCode)
 byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
 print(byteCode)
 print(byteCodeSha)
