@@ -224,10 +224,10 @@ class Harvest:
         # If all hashes match then the abi in the master list belongs to this contract
         if count == len(listOfKeccakHashes):
             #try:
-            newAbiSha = shaAnAbiWithOrderedKeys(_esAbiSingle)
+            newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
             newList = []
             found = False
-            newData = es.get(index=commonIndex, id=_source["contractAddress"])
+            newData = es.get(index=self.commonIndex, id=_source["contractAddress"])
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
                     if item == newAbiSha:
@@ -247,7 +247,7 @@ class Harvest:
             outerData = {}
             outerData["abiShaList"] = newList
             doc["doc"] = outerData
-            updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            self.updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
 
             # Update the version in ES
             stringToHash = ""
@@ -261,7 +261,7 @@ class Harvest:
             outerData = {}
             outerData["abiSha3BytecodeSha3"] = newVersionHash
             doc["doc"] = outerData
-            updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            self.updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             #except:
             #    print("An exception occured!")
     
