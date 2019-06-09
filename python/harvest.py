@@ -339,11 +339,11 @@ class Harvest:
                                 dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
                                 if dataStatus == False:
                                     indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                            else:
-                                print("This transaction does not involve a contract, so we will ignore it")
-                                continue
                             except:
                                 print("Unable to process this contract instance with the given ABI")
+                        else:
+                            print("This transaction does not involve a contract, so we will ignore it")
+                            continue
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
