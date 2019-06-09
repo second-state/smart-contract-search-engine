@@ -292,9 +292,10 @@ class Harvest:
         for item in esTxs:
             TxObj[str(num)] = item
             num = num+1
+        print(TxObj)
         for doc1 in esAbis["hits"]["hits"]:
             source = doc1['_source']
-            tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), json.loads(TxObj)])
+            tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), json.loads(json.dumps(TxObj))])
             tabiCompatabilityUpdateDriverPre1.daemon = True
             tabiCompatabilityUpdateDriverPre1.start()
             abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
