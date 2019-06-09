@@ -322,25 +322,28 @@ class Harvest:
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
-                            outerData = {}
-                            contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                            outerData['abiShaList'] = []
-                            outerData['blockNumber'] = transactionReceipt.blockNumber
-                            outerData['contractAddress'] = transactionReceipt.contractAddress
-                            functionData = self.fetchPureViewFunctionData(contractInstance)
-                            functionDataId = self.getFunctionDataId(functionData)
-                            outerData['functionDataId'] = functionDataId
-                            outerData['functionData'] = functionData
-                            outerData["requiresUpdating"] = "yes"
-                            outerData['quality'] = "50"
-                            itemId = transactionReceipt.contractAddress
-                            dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
-                            if dataStatus == False:
-                                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                        else:
-                            print("This transaction does not involve a contract, so we will ignore it")
-                            continue
+                            try:
+                                outerData = {}
+                                contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                outerData['abiShaList'] = []
+                                outerData['blockNumber'] = transactionReceipt.blockNumber
+                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                functionData = self.fetchPureViewFunctionData(contractInstance)
+                                functionDataId = self.getFunctionDataId(functionData)
+                                outerData['functionDataId'] = functionDataId
+                                outerData['functionData'] = functionData
+                                outerData["requiresUpdating"] = "yes"
+                                outerData['quality'] = "50"
+                                itemId = transactionReceipt.contractAddress
+                                dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+                                if dataStatus == False:
+                                    indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+                            else:
+                                print("This transaction does not involve a contract, so we will ignore it")
+                                continue
+                            except:
+                                print("Unable to process this contract instance with the given ABI")
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
