@@ -223,47 +223,47 @@ class Harvest:
                 break
         # If all hashes match then the abi in the master list belongs to this contract
         if count == len(listOfKeccakHashes):
-            try:
-                newAbiSha = shaAnAbiWithOrderedKeys(_esAbiSingle)
-                newList = []
-                found = False
-                newData = es.get(index=commonIndex, id=_source["contractAddress"])
-                if len(newData["_source"]["abiShaList"]) > 0:
-                    for item in newData["_source"]["abiShaList"]:
-                        if item == newAbiSha:
-                            print("Already have hash of " + item)
-                            found = True
-                            break
-                        else:
-                            newList.append(newAbiSha)
-                            print("Keep comparing")
-                    if found == False:
+            #try:
+            newAbiSha = shaAnAbiWithOrderedKeys(_esAbiSingle)
+            newList = []
+            found = False
+            newData = es.get(index=commonIndex, id=_source["contractAddress"])
+            if len(newData["_source"]["abiShaList"]) > 0:
+                for item in newData["_source"]["abiShaList"]:
+                    if item == newAbiSha:
+                        print("Already have hash of " + item)
+                        found = True
+                        break
+                    else:
                         newList.append(newAbiSha)
-                else:
+                        print("Keep comparing")
+                if found == False:
                     newList.append(newAbiSha)
+            else:
+                newList.append(newAbiSha)
 
-                # Update the ABI list in ES
-                doc = {}
-                outerData = {}
-                outerData["abiShaList"] = newList
-                doc["doc"] = outerData
-                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            # Update the ABI list in ES
+            doc = {}
+            outerData = {}
+            outerData["abiShaList"] = newList
+            doc["doc"] = outerData
+            updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
 
-                # Update the version in ES
-                stringToHash = ""
-                for abiItem in newList:
-                    print("Adding %s " % str(abiItem))
-                    stringToHash = stringToHash + str(abiItem)
-                stringToHash = stringToHash + str(_source["bytecodeSha3"])
-                newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
-                # Update the version list in ES
-                doc = {}
-                outerData = {}
-                outerData["abiSha3BytecodeSha3"] = newVersionHash
-                doc["doc"] = outerData
-                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
-            except:
-                print("An exception occured!")
+            # Update the version in ES
+            stringToHash = ""
+            for abiItem in newList:
+                print("Adding %s " % str(abiItem))
+                stringToHash = stringToHash + str(abiItem)
+            stringToHash = stringToHash + str(_source["bytecodeSha3"])
+            newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
+            # Update the version list in ES
+            doc = {}
+            outerData = {}
+            outerData["abiSha3BytecodeSha3"] = newVersionHash
+            doc["doc"] = outerData
+            updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            #except:
+            #    print("An exception occured!")
     
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
