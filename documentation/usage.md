@@ -124,16 +124,18 @@ The smart contract search engine provide a very flexible mechanism for smart con
 This is how it work. 
 The smart contract search engine:
 - creates a deterministic hash of the each known ABI (sorting the keys inside the ABI for absolute determinism) 
-- goes through every block, every transaction and every known ABI and maintains a list of the deteministic ABI hashes (as a list data field, inside every indexed smart contract instance)
+- goes through every block, every transaction and every known ABI and maintains a list of the deteministic ABI hashes (as a list data field containing one or more Sha3) inside every indexed smart contract instance)
 - creates a deterministic hash of each known Bytecode 
-- goees through every block every transaction and every known Bytecode and maintains a field inside every smart contract instance
+- goes through every block, every transaction and every known Bytecode and maintains a field (a single Sha3) inside every smart contract instance
 
-At any given time, each smart contract instance (which is indexed) has a list of ABI hashes and a single Bytecode hash. This allows end users to search the search engine for contracts of a particular genre i.e. return all of the ERC20 compatible contracts etc. Of course some smart contract instances might be compatible with multiple ABI standards; this is why there is a list of ABI hashes as apposed to just one ABI has per contract instance.
+At any given time, each smart contract instance (which is indexed) has a list of ABI hashes and a single Bytecode hash. This allows end users to search the search engine for contracts of a particular genre i.e. return all of the ERC20 compatible contracts etc (using the Sha3 hash of the ERC20 ABI as a filter). 
+
+Of course some smart contract instances might be compatible with multiple ABI standards; this is why there is a list of ABI hashes as apposed to just one ABI has per contract instance.
 
 DApp developers can:
-- use any combination of ABI hashes (and the single bytecode hash) to uniquely identify a given contract
-- create the deterministic hashes themselves and build their frontend application regardless of what is or isn't in the search engine at that point in time
-- Use simple code, like the following Javascript example, to dynamically set the contract version in the frontend display of the DApp.
+- use any combination of ABI hashes (and the single Bytecode hash) to uniquely identify a given contract
+- create the deterministic hashes themselves and build their frontend application ahead of time regardless of what is or isn't in the search engine at that point in time (the hashes are deterministic and once a contract instance is deployed it will always be able to be found in the search engine via the hashes)
+- use simple code, like the following Javascript, to dynamically set the contract version in the frontend display of the DApp.
 
 ```Javascript
 // The ABI of their smart contract
