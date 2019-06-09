@@ -348,6 +348,7 @@ class Harvest:
                                 outerData['functionData'] = functionData
                                 outerData["requiresUpdating"] = "yes"
                                 outerData['quality'] = "50"
+                                outerData['indexInProgress'] = "false"
                                 indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
 
                             else:
