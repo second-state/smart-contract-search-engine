@@ -320,33 +320,39 @@ class Harvest:
                         singleTransactionHex = singleTransaction.hex()
                         transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                        transactionContractAddress = transactionReceipt.contractAddress
-                        if transactionContractAddress != None:
-                            try:
+                        itemId = transactionReceipt.contractAddress
+                        dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+                        if dataStatus == False:
+                            transactionContractAddress = transactionReceipt.contractAddress
+                            if transactionContractAddress != None:
+                                try:                                    
+                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
+                                    functionData = self.fetchPureViewFunctionData(contractInstance)
+                                    functionDataId = self.getFunctionDataId(functionData)
+                                except:
+                                    print("Not able to create a contract instance using that ABI")
+                                    continue
                                 outerData = {}
-                                contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                 outerData['abiShaList'] = []
                                 outerData['blockNumber'] = transactionReceipt.blockNumber
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
-                                functionData = self.fetchPureViewFunctionData(contractInstance)
-                                functionDataId = self.getFunctionDataId(functionData)
                                 outerData['functionDataId'] = functionDataId
                                 outerData['functionData'] = functionData
                                 outerData["requiresUpdating"] = "yes"
                                 outerData['quality'] = "50"
-                                itemId = transactionReceipt.contractAddress
-                                dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
-                                if dataStatus == False:
-                                    indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                            except:
-                                print("Unable to process this contract instance with the given ABI")
+                                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+
+                            else:
+                                print("This transaction does not involve a contract, so we will ignore it")
+                                continue
                         else:
-                            print("This transaction does not involve a contract, so we will ignore it")
+                            print("Item is already indexed")
                             continue
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
+
             if _topup == True and len(_argList) == 0:
                 self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
                 if self.upcomingCallTimeHarvest > time.time():
