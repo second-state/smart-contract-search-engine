@@ -151,3 +151,5 @@ if (_responseData.includes(abi1Sha3) && _responseData.includes(abi2Sha3) && _res
     version = "v1"
 }
 ```
+**Why versioning?**
+It is highly likely that each new version will have different logic and/or different public functions and variables (a result of the upgrade from v1 to v2). Being able to deterministically set the version means that the frontend can display data in different ways for each different version i.e. version 2 might have a new field called date and the frontend is going to need to know how to display the date. This date formatting/display will be wasted on version because it won't even have a date field (which may even cause an error in the frontend display). This is why being able to determine the versioning is important.
