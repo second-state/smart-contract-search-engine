@@ -256,22 +256,6 @@ class Harvest:
                 outerData["abiShaList"] = newList
                 doc["doc"] = outerData
                 self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
-
-            # The combined list of ABI hashes will change if a simpler smaller ABI is added to the system. For this reason, the frontend should derive a version by cherrypicking any combination of ABI hashes from the list. 
-            # # Update the version in ES
-            # stringToHash = ""
-            # for abiItem in newList:
-            #     print("Adding %s " % str(abiItem))
-            #     stringToHash = stringToHash + str(abiItem)
-            # stringToHash = stringToHash + str(_source["bytecodeSha3"])
-            # newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
-            # doc = {}
-            # outerData = {}
-            # outerData["abiSha3BytecodeSha3"] = newVersionHash
-            # doc["doc"] = outerData
-            # self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
-            # #except:
-            # #    print("An exception occured!")
     
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
@@ -312,7 +296,7 @@ class Harvest:
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
                         # Sleep if you have to
-            self.abiCompatabilityUpdateDriverPre1 = self.abiCompatabilityUpdateDriverPre1 + 5
+            self.abiCompatabilityUpdateDriverPre1 = self.abiCompatabilityUpdateDriverPre1 + 60
             if self.abiCompatabilityUpdateDriverPre1 > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.abiCompatabilityUpdateDriverPre1 - time.time())
