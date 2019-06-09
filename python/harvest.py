@@ -225,6 +225,7 @@ class Harvest:
         if count == len(listOfKeccakHashes):
             #try:
             newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
+            print("Generated new SHA" + newAbiSha)
             newList = []
             found = False
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
