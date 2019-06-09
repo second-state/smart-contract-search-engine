@@ -247,7 +247,7 @@ class Harvest:
             outerData = {}
             outerData["abiShaList"] = newList
             doc["doc"] = outerData
-            self.updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
 
             # Update the version in ES
             stringToHash = ""
@@ -261,7 +261,7 @@ class Harvest:
             outerData = {}
             outerData["abiSha3BytecodeSha3"] = newVersionHash
             doc["doc"] = outerData
-            self.updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+            self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
             #except:
             #    print("An exception occured!")
     
