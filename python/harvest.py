@@ -263,7 +263,7 @@ class Harvest:
                 doc["doc"] = outerData
                 updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             except:
-                print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
+                print("An exception occured!")
     
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
