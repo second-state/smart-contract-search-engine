@@ -227,7 +227,7 @@ class Harvest:
             newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
             newList = []
             found = False
-            newData = es.get(index=self.commonIndex, id=_source["contractAddress"])
+            newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
                     if item == newAbiSha:
