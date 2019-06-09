@@ -250,11 +250,12 @@ class Harvest:
                 newList.append(newAbiSha)
 
             # Update the ABI list in ES
-            doc = {}
-            outerData = {}
-            outerData["abiShaList"] = newList
-            doc["doc"] = outerData
-            self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
+            if len(newList) > 0:
+                doc = {}
+                outerData = {}
+                outerData["abiShaList"] = newList
+                doc["doc"] = outerData
+                self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
 
             # The combined list of ABI hashes will change if a simpler smaller ABI is added to the system. For this reason, the frontend should derive a version by cherrypicking any combination of ABI hashes from the list. 
             # # Update the version in ES
