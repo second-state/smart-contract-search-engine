@@ -230,6 +230,8 @@ class Harvest:
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
+                    print("Contract Address ...")
+                    print(_source["contractAddress"])
                     print("*************************")
                     print(item)
                     if item == newAbiSha:
