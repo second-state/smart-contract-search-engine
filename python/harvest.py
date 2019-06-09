@@ -268,6 +268,7 @@ class Harvest:
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
         for doc2 in _esTxs:
+            print(doc2)
             source = doc2['_source']
             tabiCompatabilityUpdateDriverPre2 = threading.Thread(target=self.abiCompatabilityUpdate, args=[_abi, source])
             tabiCompatabilityUpdateDriverPre2.daemon = True
