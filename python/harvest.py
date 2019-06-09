@@ -227,7 +227,7 @@ class Harvest:
                 newAbiSha = shaAnAbiWithOrderedKeys(_esAbiSingle)
                 newList = []
                 found = False
-                newData = es.get(index=self.commonIndex, id=_source["contractAddress"])
+                newData = es.get(index=commonIndex, id=_source["contractAddress"])
                 if len(newData["_source"]["abiShaList"]) > 0:
                     for item in newData["_source"]["abiShaList"]:
                         if item == newAbiSha:
@@ -247,7 +247,7 @@ class Harvest:
                 outerData = {}
                 outerData["abiShaList"] = newList
                 doc["doc"] = outerData
-                updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
 
                 # Update the version in ES
                 stringToHash = ""
@@ -261,7 +261,7 @@ class Harvest:
                 outerData = {}
                 outerData["abiSha3BytecodeSha3"] = newVersionHash
                 doc["doc"] = outerData
-                updateDataInElastic(index=self.commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
+                updateDataInElastic(index=commonIndex, id=_source["contractAddress"], body=json.dumps(doc))
             except:
                 print("An exception occured! - Please try and load contract at address: %s manually to diagnose." % transactionContractAddress)
     
@@ -282,10 +282,10 @@ class Harvest:
         abiThreadList = []
         # Get all of the ABIs
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = self.es.get(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        esAbis = self.es.search(index=self.abiIndex, body=queryForAbiIndex)
         # Get all of the contract instance addresses and their respective transaction hashes
         queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
-        esTxs = elasticsearch.helpers.scan(index=self.commonIndex, body=queryForTXs, preserve_order=True)
+        esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
         for doc1 in esAbis:
             source = doc1['_source']
             tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), esTxs])
