@@ -238,7 +238,7 @@ class Harvest:
                             newList.append(newAbiSha)
                             print("Keep comparing")
                     if found == False:
-                    newList.append(newAbiSha)
+                        newList.append(newAbiSha)
                 else:
                     newList.append(newAbiSha)
 
