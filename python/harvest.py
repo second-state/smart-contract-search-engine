@@ -287,8 +287,7 @@ class Harvest:
         queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
         print(esAbis)
         esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
-        for doc1 in esAbis:
-
+        for doc1 in esAbis["hits"]["hits"]:
             source = doc1['_source']
             tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), esTxs])
             tabiCompatabilityUpdateDriverPre1.daemon = True
