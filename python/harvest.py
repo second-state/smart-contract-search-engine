@@ -282,12 +282,12 @@ class Harvest:
         abiThreadList = []
         # Get all of the ABIs
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        esAbis = self.es.get(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         # Get all of the contract instance addresses and their respective transaction hashes
         queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
         esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
-        for i1, doc1 in enumerate(esAbis):
-            source = doc1.get('_source')
+        for doc1 in esAbis:
+            source = doc1['_source']
             tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), esTxs])
             tabiCompatabilityUpdateDriverPre1.daemon = True
             tabiCompatabilityUpdateDriverPre1.start()
