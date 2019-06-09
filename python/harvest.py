@@ -249,21 +249,21 @@ class Harvest:
             doc["doc"] = outerData
             self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
 
-            # Update the version in ES
-            stringToHash = ""
-            for abiItem in newList:
-                print("Adding %s " % str(abiItem))
-                stringToHash = stringToHash + str(abiItem)
-            stringToHash = stringToHash + str(_source["bytecodeSha3"])
-            newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
-            # Update the version list in ES
-            doc = {}
-            outerData = {}
-            outerData["abiSha3BytecodeSha3"] = newVersionHash
-            doc["doc"] = outerData
-            self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
-            #except:
-            #    print("An exception occured!")
+            # The combined list of ABI hashes will change if a simpler smaller ABI is added to the system. For this reason, the frontend should derive a version by cherrypicking any combination of ABI hashes from the list. 
+            # # Update the version in ES
+            # stringToHash = ""
+            # for abiItem in newList:
+            #     print("Adding %s " % str(abiItem))
+            #     stringToHash = stringToHash + str(abiItem)
+            # stringToHash = stringToHash + str(_source["bytecodeSha3"])
+            # newVersionHash = self.web3.toHex(self.web3.sha3(text=stringToHash))
+            # doc = {}
+            # outerData = {}
+            # outerData["abiSha3BytecodeSha3"] = newVersionHash
+            # doc["doc"] = outerData
+            # self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
+            # #except:
+            # #    print("An exception occured!")
     
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
