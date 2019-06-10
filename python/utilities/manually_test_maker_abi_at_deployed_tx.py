@@ -67,6 +67,7 @@ def fetchPureViewFunctionData(_theContractInstance):
         print("Calling:" +  callableFunction)
         print(contract_func)
         print(dir(contract_func))
+        print(dir(_theContractInstance))
         result = contract_func().call()
         if type(result) is list:
             if len(result) > 0:
