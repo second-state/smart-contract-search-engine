@@ -484,15 +484,18 @@ class Harvest:
             else:
                 print("It has been longer than 10 seconds, need to re-update the state immediately ...")
 
-    def updateBytecodeAndVersion(self, _txHash, _abiSha3, _esId):
+    def updateBytecodeAndVersion(self, _txHash, _esId):
+        print("Creating transaction instance")
         transactionInstance = self.web3.eth.getTransaction(str(_txHash))
         dMatchAllInner = {}
         dMatchAll = {}
         dMatchAll["match_all"] = dMatchAllInner
         dQuery = {}
         dQuery["query"] = dMatchAll
+        print("Querying ES " + json.dumps(dQuery))
         esReponseByte = elasticsearch.helpers.scan(client=self.es, index=self.bytecodeIndex , query=json.dumps(dQuery), preserve_order=True)
         for i, doc in enumerate(esReponseByte):
+            print("Processing Bytecode items")
             source = doc.get('_source')
             print("Processing " + str(source))
             if source["bytecode"] in transactionInstance.input:
@@ -506,11 +509,6 @@ class Harvest:
                 outerData["abiSha3BytecodeSha3"] = abiSha3BytecodeSha3
                 doc["doc"] = outerData
                 self.updateDataInElastic(self.commonIndex, _esId, json.dumps(doc))
-            # else:
-            #     print("Did not find bytecode:")
-            #     print(str(source["bytecode"]))
-            #     print("inside the following transaction input")
-            #     print(transactionInstance.input)
 
     def updateBytecode(self):
         self.tupdateBytecode = time.time()
@@ -522,7 +520,7 @@ class Harvest:
             for i, doc in enumerate(versionless):
                 source = doc.get('_source')
                 #print(source)
-                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], source["abiSha3"], doc.get('_id')])
+                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], doc.get('_id')])
                 tVersionless.daemon = True
                 tVersionless.start()
                 self.threadsUpdateBytecode.append(tVersionless)
@@ -562,6 +560,7 @@ if __name__ == "__main__":
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
         print("harvest.py --mode bytecode")
+        print("harvest.py --mode abi")
 
 # Monitor the total number of threads on the operating system
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
