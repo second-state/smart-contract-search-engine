@@ -270,7 +270,7 @@ class Harvest:
                 newList.append(newAbiSha)
 
             # Update the ABI list in ES
-            if len(newList) > 0:
+            if len(newList) > 0 and found == False:
                 doc = {}
                 outerData = {}
                 outerData["abiShaList"] = newList
