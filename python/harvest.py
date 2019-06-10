@@ -161,7 +161,7 @@ class Harvest:
         dWildCard = {}
         dContractAddress = {}
         lContractAddress = []
-        dContractAddress["abiSha3"] = "0x*"
+        dContractAddress["abiShaList"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
         dReauiresUpdating = {}
@@ -178,12 +178,12 @@ class Harvest:
         dOb["bool"] = dBool
         dQuery["query"] = dOb
         lContractAddress.append("contractAddress")
-        lContractAddress.append("abiSha3")
+        lContractAddress.append("abiShaList")
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
             self.esAbiAddresses.append(item["_source"])
-        #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiSha3': '0x*'}}]}}, '_source': ['contractAddress', 'abiSha3']}
+        #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiSha3': '0x*'}}]}}, '_source': ['contractAddress', 'abiShaList']}
 
     # This is a specific function which also restricts what is asked for and what is returned. More efficient on the ES instance.
     def fetchTxHashWithAbis(self):
