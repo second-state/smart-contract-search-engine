@@ -62,6 +62,7 @@ def fetchPureViewFunctionData(_theContractInstance):
                     callableFunctions.append(str(item['name']))
                     print(str(item["name"]))
     theFunctionData = {}
+    print(callableFunction)
     for callableFunction in callableFunctions:
         contract_func = _theContractInstance.functions[str(callableFunction)]
         print("Calling:" +  callableFunction)
