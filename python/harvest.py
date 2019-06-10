@@ -165,7 +165,7 @@ class Harvest:
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
         dReauiresUpdating = {}
-        dReauiresUpdating["field"] = "byteSha3"
+        dReauiresUpdating["field"] = "potentialFutureFilter"
         dMatch["exists"] = dReauiresUpdating
         lMust = []
         lMust.append(dMatch)
@@ -528,6 +528,7 @@ class Harvest:
             self.threadsUpdateBytecode = []
             versionless = self.fetchTxHashWithAbis()
             for versionlessItem in versionless:
+                print(versionlessItem)
                 versionlessItemJSON = json.loads(versionlessItem)
                 tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[versionlessItemJSON["TxHash"], versionlessItemJSON["contractAddress"]])
                 tVersionless.daemon = True
