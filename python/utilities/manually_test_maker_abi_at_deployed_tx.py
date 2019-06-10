@@ -58,20 +58,20 @@ def fetchPureViewFunctionData(_theContractInstance):
         if item['type'] == 'function':
             if len(item['inputs']) == 0:
                 if len(item['outputs']) > 0:
+                    print(item['outputs'])
                     callableFunctions.append(str(item['name']))
     theFunctionData = {}
-    print(_theContractInstance.functions.name().call(block_identifier=4620854))
-    # for callableFunction in callableFunctions:
-    #     contract_func = _theContractInstance.functions[str(callableFunction)]
-    #     result = contract_func().call()
-    #     if type(result) is list:
-    #         if len(result) > 0:
-    #             innerData = {}
-    #             for i in range(len(result)):
-    #                 innerData[i] = result[i]
-    #             theFunctionData[str(callableFunction)] = innerData
-    #     else:
-    #         theFunctionData[str(callableFunction)] = result
+    for callableFunction in callableFunctions:
+        contract_func = _theContractInstance.functions[str(callableFunction)]
+        result = contract_func().call()
+        if type(result) is list:
+            if len(result) > 0:
+                innerData = {}
+                for i in range(len(result)):
+                    innerData[i] = result[i]
+                theFunctionData[str(callableFunction)] = innerData
+        else:
+            theFunctionData[str(callableFunction)] = result
 
 abiUrl = "http://api.etherscan.io/api?module=contract&action=getabi&address=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&format=raw"
 abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
