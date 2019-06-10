@@ -183,10 +183,10 @@ class Harvest:
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
             for singleAbi in item["_source"]["abiShaList"]:
-            obj = {}
-            obj["abiSha3"] = singleAbi
-            obj["contractAddress"] = item["_source"]["contractAddress"]
-            self.esAbiAddresses.append(json.dumps(obj))
+                obj = {}
+                obj["abiSha3"] = singleAbi
+                obj["contractAddress"] = item["_source"]["contractAddress"]
+                self.esAbiAddresses.append(json.dumps(obj))
         #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiShaList': '0x*'}}]}}, '_source': ['contractAddress', 'abiShaList']}
 
     # This is a specific function which also restricts what is asked for and what is returned. More efficient on the ES instance.
