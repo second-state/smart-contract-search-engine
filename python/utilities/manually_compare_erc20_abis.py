@@ -15,7 +15,7 @@ scriptExecutionLocation = os.getcwd()
 # Config
 print("Reading configuration file")
 config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read(os.path.join(scriptExecutionLocation, '../config.ini'))
+config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
 
 abiIndex = config['abiindex']['abi']
 print("Abi index: %s" % abiIndex)
@@ -310,5 +310,3 @@ print("\nKeccak Hashes for official ERC20 ABI:")
 print(officialHashes)
 print("\nKeccak Hashes for Maker (MKR) ABI:")
 print(makerHashes)
-
-
