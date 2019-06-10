@@ -45,6 +45,9 @@ blockchainRpc = config['blockchain']['rpc']
 
 web3 = Web3(HTTPProvider(str(blockchainRpc)))
 
+# This is an example of a blank name which is present in Maker contract ABI
+#{'constant': True, 'inputs': [], 'name': 'owner', 'outputs': [{'name': '', 'type': 'address'}], 'payable': False, 'stateMutability': 'view', 'type': 'function'}
+
 
 def fetchPureViewFunctionData(_theContractInstance):
     callableFunctions = []
@@ -54,6 +57,7 @@ def fetchPureViewFunctionData(_theContractInstance):
             if len(item['inputs']) == 0:
                 if len(item['outputs']) > 0:
                     callableFunctions.append(str(item['name']))
+                    print(str(item["name"]))
     theFunctionData = {}
     for callableFunction in callableFunctions:
         contract_func = _theContractInstance.functions[str(callableFunction)]
