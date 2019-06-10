@@ -72,6 +72,7 @@ def fetchPureViewFunctionData(_theContractInstance):
                 theFunctionData[str(callableFunction)] = innerData
         else:
             theFunctionData[str(callableFunction)] = result
+    print(theFunctionData)
 
 #abiUrl = "http://api.etherscan.io/api?module=contract&action=getabi&address=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&format=raw"
 #BAT 
