@@ -452,12 +452,8 @@ class Harvest:
         self.contractInstanceList = []
         # Populate the global cache of web3 contract instances by instantiating the using the ABI and address from the previously fetched list
         for singleEntry in self.esAbiAddresses:
-            for k, v in singleEntry.items():
-                if key == "abiSha3":
-                    abi = v
-                if key == "contractAddress":
-                    contractAddress = v
-                self.fetchContractInstances(abi, contractAddress)
+            abiAndAddress = json.loads(singleEntry)
+            self.fetchContractInstances(abiAndAddress["abiSha3"], abiAndAddress["contractAddress"])
         
         while True:
             print("updateStateDriverPre")           
