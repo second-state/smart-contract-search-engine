@@ -454,7 +454,7 @@ class Harvest:
         for esAbiSingle in self.esAbiAddresses:
             print(self.esAbiAddresses)
             print(esAbiSingle)
-            self.fetchContractInstances(esAbiSingle[0], esAbiSingle[1])
+            self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             print("Instantiated address " + esAbiSingle['contractAddress'])
         
         while True:
