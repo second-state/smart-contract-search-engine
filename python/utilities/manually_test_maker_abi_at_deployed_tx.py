@@ -62,7 +62,7 @@ def fetchPureViewFunctionData(_theContractInstance):
                     callableFunctions.append(str(item['name']))
                     print(str(item["name"]))
     theFunctionData = {}
-    print(_theContractInstance.name().call(block_identifier=4620854))
+    print(_theContractInstance.functions.name().call(block_identifier=4620854))
     for callableFunction in callableFunctions:
         contract_func = _theContractInstance.functions[str(callableFunction)]
         result = contract_func().call()
