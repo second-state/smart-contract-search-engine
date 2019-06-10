@@ -182,7 +182,7 @@ class Harvest:
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
-            for singleAbi in item["_source"]["abiShaList"]
+            for singleAbi in item["_source"]["abiShaList"]:
             obj = {}
             obj["abiSha3"] = singleAbi
             obj["contractAddress"] = item["_source"]["contractAddress"]
