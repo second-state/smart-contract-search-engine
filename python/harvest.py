@@ -213,9 +213,18 @@ class Harvest:
         dQuery["query"] = dOb
         lContractAddress.append("TxHash")
         lContractAddress.append("abiShaList")
+        lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
         # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiShaList": "0x*"}}]}}, "_source": ["TxHash", "abiShaList"]}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
+        listForResponse = []
+        for item in esReponseAddresses:
+            for singleAbi in item["_source"]["abiShaList"]:
+                obj = {}
+                obj["abiSha3"] = singleAbi
+                obj["TxHash"] = item["_source"]["TxHash"]
+                obj["contractAddress"] = item["_source"]["contractAddress"]
+                listForResponse.append(json.dumps(obj))
         return esReponseAddresses
 
 
@@ -460,13 +469,15 @@ class Harvest:
             originalListOfAddressesAndAbi = self.esAbiAddresses
             origListOfAddresses = []
             for originalItem in originalListOfAddressesAndAbi:
-                if originalItem['contractAddress'] not in origListOfAddresses:
-                    origListOfAddresses.append(originalItem['contractAddress'])
+                originalItemJSON = json.loads(originalItem)
+                if originalItemJSON['contractAddress'] not in origListOfAddresses:
+                    origListOfAddresses.append(originalItemJSON['contractAddress'])
             self.fetchContractAddressesWithAbis()
             for newItem in self.esAbiAddresses:
-                if newItem['contractAddress'] not in origListOfAddresses:
-                    print("Found a new contract " + newItem['contractAddress'] + ", creating a new web3 instance")
-                    self.fetchContractInstances(newItem['abiSha3'], newItem['contractAddress'])
+                newItemJSON = json.loads(newItem)
+                if newItemJSON['contractAddress'] not in origListOfAddresses:
+                    print("Found a new contract " + newItemJSON['contractAddress'] + ", creating a new web3 instance")
+                    self.fetchContractInstances(newItemJSON['abiSha3'], newItemJSON['contractAddress'])
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
@@ -516,10 +527,9 @@ class Harvest:
             print("Starting ...")
             self.threadsUpdateBytecode = []
             versionless = self.fetchTxHashWithAbis()
-            for i, doc in enumerate(versionless):
-                source = doc.get('_source')
-                #print(source)
-                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[source["TxHash"], doc.get('_id')])
+            for versionlessItem in versionless:
+                versionlessItemJSON = json.loads(versionlessItem)
+                tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[versionlessItemJSON["TxHash"], versionlessItemJSON["contractAddress"]])
                 tVersionless.daemon = True
                 tVersionless.start()
                 self.threadsUpdateBytecode.append(tVersionless)
