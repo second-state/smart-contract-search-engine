@@ -182,8 +182,12 @@ class Harvest:
         dQuery["_source"] = lContractAddress
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         for item in esReponseAddresses:
-            self.esAbiAddresses.append(item["_source"])
-        #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiSha3': '0x*'}}]}}, '_source': ['contractAddress', 'abiShaList']}
+            for singleAbi in item["_source"]["abiShaList"]
+            obj = {}
+            obj["abiSha3"] = singleAbi
+            obj["contractAddress"] = item["_source"]["contractAddress"]
+            self.esAbiAddresses.append(json.dumps(obj))
+        #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiShaList': '0x*'}}]}}, '_source': ['contractAddress', 'abiShaList']}
 
     # This is a specific function which also restricts what is asked for and what is returned. More efficient on the ES instance.
     def fetchTxHashWithAbis(self):
@@ -191,7 +195,7 @@ class Harvest:
         dWildCard = {}
         dContractAddress = {}
         lContractAddress = []
-        dContractAddress["abiSha3"] = "0x*"
+        dContractAddress["abiShaList"] = "0x*"
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
         dReauiresUpdating = {}
@@ -208,9 +212,9 @@ class Harvest:
         dOb["bool"] = dBool
         dQuery["query"] = dOb
         lContractAddress.append("TxHash")
-        lContractAddress.append("abiSha3")
+        lContractAddress.append("abiShaList")
         dQuery["_source"] = lContractAddress
-        # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiSha3": "0x*"}}]}}, "_source": ["TxHash", "abiSha3"]}
+        # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiShaList": "0x*"}}]}}, "_source": ["TxHash", "abiShaList"]}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         return esReponseAddresses
 
@@ -447,11 +451,9 @@ class Harvest:
         # Purge the contract instance list as we are about to freshly populate it
         self.contractInstanceList = []
         # Populate the global cache of web3 contract instances by instantiating the using the ABI and address from the previously fetched list
-        for esAbiSingle in self.esAbiAddresses:                    
+        for esAbiSingle in self.esAbiAddresses:
             self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             print("Instantiated address " + esAbiSingle['contractAddress'])
-        print("The following contract instances now exist")
-        #print(self.contractInstanceList)
         
         while True:
             print("updateStateDriverPre")           
