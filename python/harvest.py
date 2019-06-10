@@ -144,10 +144,10 @@ class Harvest:
                 if len(result) > 0:
                     innerData = {}
                     for i in range(len(result)):
-                        innerData[i] = performPossibleStringConversion(result[i])
+                        innerData[i] = self.performPossibleStringConversion(result[i])
                     theFunctionData[str(callableFunction)] = innerData
             else:
-                theFunctionData[str(callableFunction)] = performPossibleStringConversion(result)
+                theFunctionData[str(callableFunction)] = self.performPossibleStringConversion(result)
         return theFunctionData
 
     def getFunctionDataId(self, _theFunctionData):
