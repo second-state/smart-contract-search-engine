@@ -118,6 +118,16 @@ class Harvest:
         except:
             print("Item does not exist yet.")
         return returnVal
+    
+    def performPossibleStringConversion(self, _data):
+        if len(str(_data)) > 10:
+            try:
+                int(_data)
+                return str(_data)
+            except:
+                return _data
+        else:
+            return _data
 
     def fetchPureViewFunctionData(self, _theContractInstance):
         callableFunctions = []
@@ -134,10 +144,10 @@ class Harvest:
                 if len(result) > 0:
                     innerData = {}
                     for i in range(len(result)):
-                        innerData[i] = result[i]
+                        innerData[i] = performPossibleStringConversion(result[i])
                     theFunctionData[str(callableFunction)] = innerData
             else:
-                theFunctionData[str(callableFunction)] = result
+                theFunctionData[str(callableFunction)] = performPossibleStringConversion(result)
         return theFunctionData
 
     def getFunctionDataId(self, _theFunctionData):
@@ -252,7 +262,6 @@ class Harvest:
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
         for i, doc2 in _esTxs.items():
-            print(doc2)
             source = doc2['_source']
             tabiCompatabilityUpdateDriverPre2 = threading.Thread(target=self.abiCompatabilityUpdate, args=[_abi, source])
             tabiCompatabilityUpdateDriverPre2.daemon = True
