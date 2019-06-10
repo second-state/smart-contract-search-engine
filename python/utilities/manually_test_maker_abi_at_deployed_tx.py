@@ -73,7 +73,9 @@ def fetchPureViewFunctionData(_theContractInstance):
         else:
             theFunctionData[str(callableFunction)] = result
 
-abiUrl = "http://api.etherscan.io/api?module=contract&action=getabi&address=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&format=raw"
+#abiUrl = "http://api.etherscan.io/api?module=contract&action=getabi&address=0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2&format=raw"
+#BAT 
+abiUrl = "http://api.etherscan.io/api?module=contract&action=getabi&address=0x0d8775f648430679a709e98d2b0cb6250d2887ef&format=raw"
 abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
 abiData = re.sub(r"[\s]+", " ", abiData)
 makerAbi = json.loads(abiData)
