@@ -253,6 +253,10 @@ class Harvest:
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
+                    print("Comparing old and new abiSha")
+                    print(item)
+                    print(newAbiSha)
+                    print("Finished comparing")
                     if item == newAbiSha:
                         found = True
                         break
