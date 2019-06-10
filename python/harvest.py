@@ -452,7 +452,7 @@ class Harvest:
         self.contractInstanceList = []
         # Populate the global cache of web3 contract instances by instantiating the using the ABI and address from the previously fetched list
         for esAbiSingle in self.esAbiAddresses:
-            print(self.es.esAbiAddresses)
+            print(self.esAbiAddresses)
             print(esAbiSingle)
             self.fetchContractInstances(esAbiSingle['abiSha3'], esAbiSingle['contractAddress'])
             print("Instantiated address " + esAbiSingle['contractAddress'])
