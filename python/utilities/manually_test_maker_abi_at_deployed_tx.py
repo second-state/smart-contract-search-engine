@@ -62,13 +62,9 @@ def fetchPureViewFunctionData(_theContractInstance):
                     callableFunctions.append(str(item['name']))
                     print(str(item["name"]))
     theFunctionData = {}
-    print(callableFunctions)
+    #_theContractInstance.name().call(block_identifier=)
     for callableFunction in callableFunctions:
         contract_func = _theContractInstance.functions[str(callableFunction)]
-        print("Calling:" +  callableFunction)
-        print(contract_func)
-        print(dir(contract_func))
-        print(dir(_theContractInstance))
         result = contract_func().call()
         if type(result) is list:
             if len(result) > 0:
@@ -84,6 +80,8 @@ abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).cont
 abiData = re.sub(r"[\s]+", " ", abiData)
 makerAbi = json.loads(abiData)
 txReceipt = web3.eth.getTransactionReceipt("0xcceb1fd34dcc4b18defa4ff29d51a225b20af8ed179db37da72ec5d5a4e8d385")
+print(txReceipt)
 tx = web3.eth.getTransaction("0xcceb1fd34dcc4b18defa4ff29d51a225b20af8ed179db37da72ec5d5a4e8d385")
 makerInstance = web3.eth.contract(abi=makerAbi, address=txReceipt.contractAddress)
 functionData = fetchPureViewFunctionData(makerInstance)
+
