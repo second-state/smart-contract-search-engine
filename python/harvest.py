@@ -261,6 +261,7 @@ class Harvest:
                         found = True
                         break
                     else:
+                        newList.append(item)
                         print("Still searching")
                 if found == False:
                     print("Did not find " + newAbiSha + " adding it now.")
