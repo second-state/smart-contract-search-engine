@@ -48,6 +48,9 @@ web3 = Web3(HTTPProvider(str(blockchainRpc)))
 # This is an example of a blank name which is present in Maker contract ABI
 #{'constant': True, 'inputs': [], 'name': 'owner', 'outputs': [{'name': '', 'type': 'address'}], 'payable': False, 'stateMutability': 'view', 'type': 'function'}
 
+# The above ABI entry causes the following error
+# web3.exceptions.BadFunctionCallOutput: Could not decode contract function call name return data b'' for output_types ['bytes32']
+
 
 def fetchPureViewFunctionData(_theContractInstance):
     callableFunctions = []
@@ -63,6 +66,7 @@ def fetchPureViewFunctionData(_theContractInstance):
         contract_func = _theContractInstance.functions[str(callableFunction)]
         print("Calling:" +  callableFunction)
         print(contract_func)
+        print(dir(contract_func))
         result = contract_func().call()
         if type(result) is list:
             if len(result) > 0:
