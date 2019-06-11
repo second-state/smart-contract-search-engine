@@ -10,6 +10,7 @@ import requests
 import threading
 import configparser
 import elasticsearch.helpers
+from operator import itemgetter
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
@@ -227,9 +228,25 @@ class Harvest:
                 listForResponse.append(json.dumps(obj))
         return esReponseAddresses
 
+    def sortInternalListsInJsonObject(self, _json):
+        for k, v in _json.items():
+            if type(v) not in (str, bool, int):
+                if type(v[0]) is dict:
+                    v.sort(key=itemgetter("name"))
+                else:
+                    v.sort()
+        return _json
 
-    def shaAnAbiWithOrderedKeys(self, _theAbi):
-        theAbiHash = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theAbi, sort_keys=True))))
+    def cleanAndConvertAbiToText(self, _theAbi):
+        theAbiWithSortedLists = this.sortInternalListsInJsonObject(_theAbi)
+        theAbiAsString = json.dumps(theAbiWithSortedLists, sort_keys=True)
+        theAbiAsString2 = re.sub(r"[\n\t]*", "", theAbiAsString)
+        theAbiAsString3 = re.sub(r"[\s]+", " ", theAbiAsString2)
+        return theAbiAsString3
+
+    def shaAnAbi(self, _theAbi):
+        theAbiAsString = cleanAndConvertAbiToText(_theAbi)
+        theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
         return theAbiHash
 
     def abiCompatabilityUpdate(self, _esAbiSingle, _source):
@@ -247,7 +264,7 @@ class Harvest:
         # If all hashes match then the abi in the master list belongs to this contract
         if count == len(listOfKeccakHashes):
             #try:
-            newAbiSha = self.shaAnAbiWithOrderedKeys(_esAbiSingle)
+            newAbiSha = self.shaAnAbi(_esAbiSingle)
             newList = []
             found = False
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
