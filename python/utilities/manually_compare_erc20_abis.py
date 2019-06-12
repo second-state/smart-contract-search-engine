@@ -1,6 +1,8 @@
-import harvest
+import sys
+sys.path.append("..")
+from harvest import Harvest
 
-harvester = Harvest()
+harvester = Harvest
 
 # Official ABI copied verbatim from the ETH Wiki at https://github.com/ethereum/wiki/wiki/Contract-ERC20-ABI
 officialERC20Abi = '''[
