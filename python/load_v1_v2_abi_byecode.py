@@ -32,7 +32,7 @@ data2 = {}
 data2['indexInProgress'] = "false"
 data2['epochOfLastUpdate'] = int(time.time())
 data2['abi'] = cleanedAndOrderedAbiText2
-harvester.es.index(index=harvesterabiIndex, id=theDeterministicHash2, body=data2)
+harvester.es.index(index=harvester.abiIndex, id=theDeterministicHash2, body=data2)
 
 #v1
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
