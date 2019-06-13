@@ -28,6 +28,7 @@ txReceipt = harvester.web3.eth.getTransactionReceipt("0xcceb1fd34dcc4b18defa4ff2
 tx = harvester.web3.eth.getTransaction("0xcceb1fd34dcc4b18defa4ff29d51a225b20af8ed179db37da72ec5d5a4e8d385")
 #print("Transaction is as follows:")
 #print(tx)
+print(officialAbiJSON)
 batInstance = harvester.web3.eth.contract(abi=officialAbiJSON, address=harvester.web3.toChecksumAddress("0x0d8775f648430679a709e98d2b0cb6250d2887ef"))
 #print(batInstance.abi)
 
