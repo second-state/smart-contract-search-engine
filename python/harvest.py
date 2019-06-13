@@ -374,21 +374,9 @@ class Harvest:
                             if transactionContractAddress != None:
                                 try:                                    
                                     contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    networkAbiJSON = json.dumps(contractInstance.abi)
-                                    networkAbiObject = json.loads(networkAbiJSON)
-                                    networkDeterministicHash = self.shaAnAbi(networkAbiObject)
-                                    storedDeterministicHash = self.shaAnAbi(contractAbiJSONData)
-                                    print("Comparing:")
-                                    print(networkDeterministicHash)
-                                    print(storedDeterministicHash)
-                                    if networkDeterministicHash != storedDeterministicHash:
-                                        print("Skip processing for efficiency ...")
-                                        continue
-                                    else:
-                                        functionData = self.fetchPureViewFunctionData(contractInstance)
-                                        functionDataId = self.getFunctionDataId(functionData)
+                                    functionData = self.fetchPureViewFunctionData(contractInstance)
+                                    functionDataId = self.getFunctionDataId(functionData)
                                 except:
-                                    print("Not able to create a contract instance using that ABI, please try manually using abi: \n" + contractAbiJSONData + "\nAt contract address:\n" + transactionContractAddress )
                                     continue
                                 outerData = {}
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
