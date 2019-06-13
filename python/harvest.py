@@ -238,7 +238,7 @@ class Harvest:
         return _json
 
     def cleanAndConvertAbiToText(self, _theAbi):
-        theAbiWithSortedLists = self..sortInternalListsInJsonObject(_theAbi)
+        theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
         theAbiAsString = json.dumps(theAbiWithSortedLists, sort_keys=True)
         theAbiAsString2 = re.sub(r"[\n\t]*", "", theAbiAsString)
         theAbiAsString3 = re.sub(r"[\s]+", " ", theAbiAsString2)
