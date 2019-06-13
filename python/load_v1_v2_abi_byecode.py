@@ -22,7 +22,7 @@ harvester.es.index(index=harvester.abiIndex, id=theDeterministicHash1, body=data
 
 
 #v2
-abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
+abiUrl2 = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
 abiData2 = requests.get(abiUrl2).content
 abiData2JSON = json.loads(abiData2)
 theDeterministicHash2 = harvester.shaAnAbi(abiData2JSON)
@@ -31,7 +31,7 @@ cleanedAndOrderedAbiText2 = harvester.cleanAndConvertAbiToText(abiData2JSON)
 data2 = {}
 data2['indexInProgress'] = "false"
 data2['epochOfLastUpdate'] = int(time.time())
-data2['abi'] = abiData2
+data2['abi'] = cleanedAndOrderedAbiText2
 harvester.es.index(index=harvesterabiIndex, id=theDeterministicHash2, body=data2)
 
 #v1
