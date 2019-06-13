@@ -1,3 +1,4 @@
+import re
 import json
 import time
 import requests
@@ -17,7 +18,7 @@ data1 = {}
 data1['indexInProgress'] = "false"
 data1['epochOfLastUpdate'] = int(time.time())
 data1['abi'] = cleanedAndOrderedAbiText1
-es.index(index=abiIndex, id=theDeterministicHash1, body=data1)
+harvester.es.index(index=abiIndex, id=theDeterministicHash1, body=data1)
 
 
 #v2
@@ -31,31 +32,31 @@ data2 = {}
 data2['indexInProgress'] = "false"
 data2['epochOfLastUpdate'] = int(time.time())
 data2['abi'] = abiData2
-es.index(index=abiIndex, id=theDeterministicHash2, body=data2)
+harvester.es.index(index=abiIndex, id=theDeterministicHash2, body=data2)
 
 #v1
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCode = re.sub(r"[\n\t\s]*", "", byteCode)
-byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
+byteCodeSha = harvester.web3.toHex(harvester.web3.sha3(text=byteCode))
 print(byteCode)
 print(byteCodeSha)
 data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
-es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
+harvester.es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
 #v2
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
 byteCode = "0x" + binJSONObject['object']
 byteCode = re.sub(r"[\n\t\s]*", "", byteCode)
-byteCodeSha = web3.toHex(web3.sha3(text=byteCode))
+byteCodeSha = harvester.web3.toHex(harvester.web3.sha3(text=byteCode))
 print(byteCode)
 print(byteCodeSha)
 data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
-es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
+harvester.es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
