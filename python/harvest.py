@@ -238,14 +238,14 @@ class Harvest:
         return _json
 
     def cleanAndConvertAbiToText(self, _theAbi):
-        theAbiWithSortedLists = this.sortInternalListsInJsonObject(_theAbi)
+        theAbiWithSortedLists = self..sortInternalListsInJsonObject(_theAbi)
         theAbiAsString = json.dumps(theAbiWithSortedLists, sort_keys=True)
         theAbiAsString2 = re.sub(r"[\n\t]*", "", theAbiAsString)
         theAbiAsString3 = re.sub(r"[\s]+", " ", theAbiAsString2)
         return theAbiAsString3
 
     def shaAnAbi(self, _theAbi):
-        theAbiAsString = cleanAndConvertAbiToText(_theAbi)
+        theAbiAsString = self.cleanAndConvertAbiToText(_theAbi)
         theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
         return theAbiHash
 
