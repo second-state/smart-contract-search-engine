@@ -228,8 +228,8 @@ class Harvest:
                 obj["contractAddress"] = item["_source"]["contractAddress"]
                 listForResponse.append(json.dumps(obj))
         print("Found the following transactions that have abis but no bytecode:")
-        print(esReponseAddresses)
-        return esReponseAddresses
+        print(listForResponse)
+        return listForResponse
 
     def sortInternalListsInJsonObject(self, _json):
         for listItem in _json:
