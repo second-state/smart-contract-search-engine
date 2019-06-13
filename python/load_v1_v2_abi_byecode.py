@@ -1,74 +1,36 @@
-import os
-import re
-import time
 import json
-import argparse
 import requests
-import configparser
-from web3 import Web3, HTTPProvider
-from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
-from elasticsearch import Elasticsearch, RequestsHttpConnection
+from harvest import Harvest
 
-# CWD
-scriptExecutionLocation = os.getcwd()
-
-# Config
-print("Reading configuration file")
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read(os.path.join(scriptExecutionLocation, '../config.ini'))
-
-abiIndex = config['abiindex']['abi']
-print("Abi index: %s" % abiIndex)
-
-# Bytecode index
-bytecodeIndex = config['bytecodeindex']['bytecode']
-print("Bytecode index: %s" % bytecodeIndex)
-
-# Elasticsearch endpoint
-elasticSearchEndpoint = config['elasticSearch']['endpoint']
-print("ElasticSearch Endpoint: %s" % elasticSearchEndpoint)
-
-# Elasticsearch AWS region
-elasticSearchAwsRegion = config['elasticSearch']['aws_region']
-
-auth = BotoAWSRequestsAuth(aws_host=elasticSearchEndpoint, aws_region=elasticSearchAwsRegion, aws_service='es')
-es = Elasticsearch(
-    hosts=[{'host': elasticSearchEndpoint, 'port': 443}],
-    region=elasticSearchAwsRegion,
-    use_ssl=True,
-    verify_certs=True,
-    http_auth=auth,
-    connection_class=RequestsHttpConnection
-)
-
-blockchainRpc = config['blockchain']['rpc']
-
-web3 = Web3(HTTPProvider(str(blockchainRpc)))
+harvester = Harvest()
 
 #v1
-abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
-abiData = re.sub(r"[\s]+", " ", abiData)
-abiSha = web3.toHex(web3.sha3(text=abiData))
-print(abiSha)
-print(abiData)
-data = {}
-data['indexInProgress'] = "false"
-data['epochOfLastUpdate'] = int(time.time())
-data['abi'] = abiData
-es.index(index=abiIndex, id=abiSha, body=data)
+abiUrl1 = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
+abiData1 = requests.get(abiUrl1).content
+abiData1JSON = json.loads(abiData1)
+theDeterministicHash1 = harvester.shaAnAbi(abiData1JSON)
+cleanedAndOrderedAbiText1 = harvester.cleanAndConvertAbiToText(abiData1JSON)
+
+
+data1 = {}
+data1['indexInProgress'] = "false"
+data1['epochOfLastUpdate'] = int(time.time())
+data1['abi'] = cleanedAndOrderedAbiText1
+es.index(index=abiIndex, id=theDeterministicHash1, body=data1)
+
+
 #v2
 abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.abi"
-abiData = re.sub(r"[\n\t]*", "", json.dumps(json.loads(requests.get(abiUrl).content), sort_keys=True))
-abiData = re.sub(r"[\s]+", " ", abiData)
-abiSha = web3.toHex(web3.sha3(text=abiData))
-print(abiSha)
-print(abiData)
-data = {}
-data['indexInProgress'] = "false"
-data['epochOfLastUpdate'] = int(time.time())
-data['abi'] = abiData
-es.index(index=abiIndex, id=abiSha, body=data)
+abiData2 = requests.get(abiUrl2).content
+abiData2JSON = json.loads(abiData2)
+theDeterministicHash2 = harvester.shaAnAbi(abiData2JSON)
+cleanedAndOrderedAbiText2 = harvester.cleanAndConvertAbiToText(abiData2JSON)
+
+data2 = {}
+data2['indexInProgress'] = "false"
+data2['epochOfLastUpdate'] = int(time.time())
+data2['abi'] = abiData2
+es.index(index=abiIndex, id=theDeterministicHash2, body=data2)
 
 #v1
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
