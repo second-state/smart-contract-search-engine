@@ -18,7 +18,7 @@ data1 = {}
 data1['indexInProgress'] = "false"
 data1['epochOfLastUpdate'] = int(time.time())
 data1['abi'] = cleanedAndOrderedAbiText1
-harvester.es.index(index=abiIndex, id=theDeterministicHash1, body=data1)
+harvester.es.index(index=harvester.abiIndex, id=theDeterministicHash1, body=data1)
 
 
 #v2
@@ -32,7 +32,7 @@ data2 = {}
 data2['indexInProgress'] = "false"
 data2['epochOfLastUpdate'] = int(time.time())
 data2['abi'] = abiData2
-harvester.es.index(index=abiIndex, id=theDeterministicHash2, body=data2)
+harvester.es.index(index=harvesterabiIndex, id=theDeterministicHash2, body=data2)
 
 #v1
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.bin").content
@@ -46,7 +46,7 @@ data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
-harvester.es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
+harvester.es.index(index=harvester.bytecodeIndex, id=byteCodeSha, body=data)
 #v2
 binObject = requests.get("https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v2/dapp/FairPlay.bin").content
 binJSONObject = json.loads(binObject)
@@ -59,4 +59,4 @@ data = {}
 data['indexInProgress'] = "false"
 data['epochOfLastUpdate'] = int(time.time())
 data['bytecode'] = byteCode
-harvester.es.index(index=bytecodeIndex, id=byteCodeSha, body=data)
+harvester.es.index(index=harvester.bytecodeIndex, id=byteCodeSha, body=data)
