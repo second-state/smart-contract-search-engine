@@ -1,10 +1,8 @@
 import sys
 import json
-
-sys.path.append("..")
 from harvest import Harvest
 
-harvester = Harvest
+harvester = Harvest()
 
 # Official ABI copied verbatim from the ETH Wiki at https://github.com/ethereum/wiki/wiki/Contract-ERC20-ABI
 officialERC20Abi = '''[
@@ -232,7 +230,13 @@ officialERC20Abi = '''[
 '''
 
 officialAbiJSON = json.loads(officialERC20Abi)
-erc20Hashes = harvester.createUniqueAbiComparisons(officialAbiJSON)
+theDeterministicHash = shaAnAbi(officialAbiJSON)
+cleanedAndOrderedAbiText = cleanAndConvertAbiToText(officialAbiJSON)
+erc20Hashes = harvester.createUniqueAbiComparisons(json.loads(cleanedAndOrderedAbiText))
 
-print("\nKeccak Hashes for official ERC20 ABI:")
+print("\nThe cleaned and ordered ABI is as follows:")
+print(cleanedAndOrderedAbiText)
+print("\nThe Sha3 of this ABI is as follows:")
+print(theDeterministicHash)
+print("\nThe unique function hashes for this official ERC20 ABI are as follows:")
 print(erc20Hashes)
