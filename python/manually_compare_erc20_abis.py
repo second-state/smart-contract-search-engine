@@ -230,8 +230,8 @@ officialERC20Abi = '''[
 '''
 
 officialAbiJSON = json.loads(officialERC20Abi)
-theDeterministicHash = shaAnAbi(officialAbiJSON)
-cleanedAndOrderedAbiText = cleanAndConvertAbiToText(officialAbiJSON)
+theDeterministicHash = harvester.shaAnAbi(officialAbiJSON)
+cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(officialAbiJSON)
 erc20Hashes = harvester.createUniqueAbiComparisons(json.loads(cleanedAndOrderedAbiText))
 
 print("\nThe cleaned and ordered ABI is as follows:")
