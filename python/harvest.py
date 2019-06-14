@@ -391,9 +391,10 @@ class Harvest:
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
                                 functionDataList = []
                                 functionDataObject = {}
-                                functionDataObject['abiHash'] = abiHash
-                                functionDataObject['functionDataId'] = functionDataId
-                                functionDataObject['functionData'] = functionData
+                                functionDataObjectInner = {}
+                                functionDataObjectInner['functionDataId'] = functionDataId
+                                functionDataObjectInner['functionData'] = functionData
+                                functionDataObject[abiHash] = functionDataObjectInner
                                 functionDataList.append(functionDataObject)
                                 outerData['functionDataList'] = functionDataList
                                 outerData["requiresUpdating"] = "yes"
