@@ -143,10 +143,10 @@ class Harvest:
             result = contract_func().call()
             if type(result) is list:
                 if len(result) > 0:
-                    innerData = {}
+                    innerDataList = []
                     for i in range(len(result)):
-                        innerData[i] = self.performPossibleStringConversion(result[i])
-                    theFunctionData[str(callableFunction)] = innerData
+                        innerDataList.append(self.performPossibleStringConversion(result[i]))
+                    theFunctionData[str(callableFunction)] = innerDataList
             else:
                 theFunctionData[str(callableFunction)] = self.performPossibleStringConversion(result)
         return theFunctionData
@@ -383,11 +383,19 @@ class Harvest:
                                     continue
                                 outerData = {}
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                outerData['abiShaList'] = []
+                                abiList = []
+                                abiHash = self.shaAnAbi(contractAbiJSONData)
+                                abiList.append(abiHash)
+                                outerData['abiShaList'] = abiList
                                 outerData['blockNumber'] = transactionReceipt.blockNumber
                                 outerData['contractAddress'] = transactionReceipt.contractAddress
-                                outerData['functionDataId'] = functionDataId
-                                outerData['functionData'] = functionData
+                                functionDataList = []
+                                functionDataObject = {}
+                                functionDataObject['abiHash'] = abiHash
+                                functionDataObject['functionDataId'] = functionDataId
+                                functionDataObject['functionData'] = functionData
+                                functionDataList.append(functionDataObject)
+                                outerData['functionDataList'] = functionDataList
                                 outerData["requiresUpdating"] = "yes"
                                 outerData['quality'] = "50"
                                 outerData['indexInProgress'] = "false"
