@@ -464,66 +464,43 @@ class Harvest:
         #print("functionDataId")
         #print(functionDataId)
         abiHash = self.shaAnAbi(_instance.abi)
-        uniqueAbiAndAddressKey = abiHash + _instance.address
+        uniqueAbiAndAddressKey = str(str(abiHash) + str(_instance.address))
         if uniqueAbiAndAddressKey not in self.addressAndFunctionDataHashes.keys():
             print("Instance " + uniqueAbiAndAddressKey + " not in the list yet")
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = ""
         if self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] != functionDataId:
             print("The data is different so we will update " + uniqueAbiAndAddressKey + " record now")
             #try:
-            self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
-            #print(self.addressAndFunctionDataHashes)
-            #TODO the structure of this data needs to change to match the main harvester
-
-
-
-            newList = []
-            found = False
-            newData = self.es.get(index=self.commonIndex, id=_instance.address)
-            if len(newData["_source"]["functionDataList"]) > 0:
-                for item in newData["_source"]["functionDataList"]:
-                    if found == True:
-                        break
-                    for k, v in item.items():
-                        if k == uniqueAbiAndAddressKey:
-                            found = True
-                            break
-                        else:
-                            newList.append(item)
-                            print("Still searching")
-                if found == False:
-                    print("Did not find " + uniqueAbiAndAddressKey + " adding it now.")
-                    newList.append(item)
-            else:
-                newList.append(item)
-
-            # Update the ABI list in ES
-            if len(newList) > 0 and found == False:
-                doc = {}
-                outerData = {}
-                outerData["functionDataList"] = newList
-                doc["doc"] = outerData
-                self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
-
-
-
-
-
-            itemId = _instance.address
-            doc = {}
-            outerData = {}
-            functionDataList = []
+            # Create a new inner object
             functionDataObject = {}
             functionDataObjectInner = {}
             functionDataObjectInner['functionDataId'] = functionDataId
             functionDataObjectInner['functionData'] = freshFunctionData
-            functionDataObject[abiHash] = functionDataObjectInner
-            functionDataList.append(functionDataObject)
-            outerData['functionDataList'] = functionDataList
+            functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
+            print("Item in the list \n" + str(functionDataObject))
+            # Add the key and value to the list for future reference
+            self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
+
+            newList = []
+            newData = self.es.get(index=self.commonIndex, id=_instance.address)
+            if len(newData["_source"]["functionDataList"]) > 0:
+                for item in newData["_source"]["functionDataList"]:
+                    for k, v in item.items():
+                        if k == uniqueAbiAndAddressKey:
+                            newList.append(functionDataObject)
+                            break
+                        else:
+                            newList.append(item)
+                            print("Still searching")
+            else:
+                newList.append(functionDataObject)
+
+            doc = {}
+            outerData = {}
+            outerData["functionDataList"] = newList
             doc["doc"] = outerData
-            print(doc)
-            print(itemId)
-            indexResult = self.updateDataInElastic(self.commonIndex, itemId, json.dumps(doc))
+            self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
+            
             #except:
             #    print("Unable to update the state data in the worker function")
         else:
