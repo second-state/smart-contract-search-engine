@@ -394,7 +394,7 @@ class Harvest:
                                 functionDataObjectInner = {}
                                 functionDataObjectInner['functionDataId'] = functionDataId
                                 functionDataObjectInner['functionData'] = functionData
-                                uniqueAbiAndAddressKey = abiHash + contractInstance.address
+                                uniqueAbiAndAddressKey = str(str(abiHash) + str(contractInstance.address))
                                 functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
                                 functionDataList.append(functionDataObject)
                                 outerData['functionDataList'] = functionDataList
