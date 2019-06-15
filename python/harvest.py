@@ -482,19 +482,21 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
 
             newList = []
+            print(newList)
             newData = self.es.get(index=self.commonIndex, id=_instance.address)
             if len(newData["_source"]["functionDataList"]) > 0:
                 for item in newData["_source"]["functionDataList"]:
                     for k, v in item.items():
                         if k == uniqueAbiAndAddressKey:
+                            print("Adding fresh data to newList")
                             newList.append(functionDataObject)
-                            break
                         else:
+                            print("Adding existing data to newList")
                             newList.append(item)
-                            print("Still searching")
             else:
                 newList.append(functionDataObject)
-
+            print("Finished the for loops ...")
+            print(newList)
             doc = {}
             outerData = {}
             outerData["functionDataList"] = newList
