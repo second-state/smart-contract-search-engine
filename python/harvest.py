@@ -465,7 +465,7 @@ class Harvest:
         abiHash = self.shaAnAbi(_instance.abi)
         uniqueAbiAndAddressKey = abiHash + _instance.address
         if uniqueAbiAndAddressKey not in self.addressAndFunctionDataHashes.keys():
-            print("Instance " + uniqueAbiAndAddressKey + "not in the list yet")
+            print("Instance " + uniqueAbiAndAddressKey + " not in the list yet")
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = ""
         if self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] != functionDataId:
             print("The data is different so we will update " + uniqueAbiAndAddressKey + " record now")
@@ -486,7 +486,8 @@ class Harvest:
             outerData['functionDataList'] = functionDataList
             doc["doc"] = outerData
             print(doc)
-            #indexResult = self.updateDataInElastic(self.commonIndex, itemId, json.dumps(doc))
+            print(itemId)
+            indexResult = self.updateDataInElastic(self.commonIndex, itemId, json.dumps(doc))
             #except:
             #    print("Unable to update the state data in the worker function")
         else:
