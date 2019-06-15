@@ -486,6 +486,8 @@ class Harvest:
             newData = self.es.get(index=self.commonIndex, id=_instance.address)
             if len(newData["_source"]["functionDataList"]) > 0:
                 for item in newData["_source"]["functionDataList"]:
+                    print("\n Processing ITEM")
+                    print(item)
                     for k, v in item.items():
                         if k == uniqueAbiAndAddressKey:
                             print("Adding fresh data to newList")
