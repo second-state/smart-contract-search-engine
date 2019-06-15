@@ -394,7 +394,8 @@ class Harvest:
                                 functionDataObjectInner = {}
                                 functionDataObjectInner['functionDataId'] = functionDataId
                                 functionDataObjectInner['functionData'] = functionData
-                                functionDataObject[abiHash] = functionDataObjectInner
+                                uniqueAbiAndAddressKey = abiHash + contractInstance.address
+                                functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
                                 functionDataList.append(functionDataObject)
                                 outerData['functionDataList'] = functionDataList
                                 outerData["requiresUpdating"] = "yes"
@@ -473,6 +474,41 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
             #print(self.addressAndFunctionDataHashes)
             #TODO the structure of this data needs to change to match the main harvester
+
+
+
+            newList = []
+            found = False
+            newData = self.es.get(index=self.commonIndex, id=_instance.address)
+            if len(newData["_source"]["functionDataList"]) > 0:
+                for item in newData["_source"]["functionDataList"]:
+                    if found == True:
+                        break
+                    for k, v in item.items():
+                        if k == uniqueAbiAndAddressKey:
+                            found = True
+                            break
+                        else:
+                            newList.append(item)
+                            print("Still searching")
+                if found == False:
+                    print("Did not find " + uniqueAbiAndAddressKey + " adding it now.")
+                    newList.append(item)
+            else:
+                newList.append(item)
+
+            # Update the ABI list in ES
+            if len(newList) > 0 and found == False:
+                doc = {}
+                outerData = {}
+                outerData["functionDataList"] = newList
+                doc["doc"] = outerData
+                self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
+
+
+
+
+
             itemId = _instance.address
             doc = {}
             outerData = {}
