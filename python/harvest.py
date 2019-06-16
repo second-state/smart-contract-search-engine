@@ -458,11 +458,8 @@ class Harvest:
         self.contractInstanceList.append(contractInstance)
 
     def worker(self, _instance):
-        #print(self.addressAndFunctionDataHashes)
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
-        #print("functionDataId")
-        #print(functionDataId)
         abiHash = self.shaAnAbi(_instance.abi)
         uniqueAbiAndAddressKey = str(str(abiHash) + str(_instance.address))
         if uniqueAbiAndAddressKey not in self.addressAndFunctionDataHashes.keys():
@@ -470,17 +467,13 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = ""
         if self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] != functionDataId:
             print("The data is different so we will update " + uniqueAbiAndAddressKey + " record now")
-            #try:
-            # Create a new inner object
             functionDataObject = {}
             functionDataObjectInner = {}
             functionDataObjectInner['functionDataId'] = functionDataId
             functionDataObjectInner['functionData'] = freshFunctionData
             functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
             print("Item in the list \n" + str(functionDataObject))
-            # Add the key and value to the list for future reference
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
-
             newList = []
             found = False
             print(newList)
@@ -498,20 +491,13 @@ class Harvest:
             else:
                 newList.append(functionDataObject)
                 found = True
-
             if found == False:
                 newList.append(functionDataObject)
-
-            print("Finished the for loops ...")
-            print(newList)
             doc = {}
             outerData = {}
             outerData["functionDataList"] = newList
             doc["doc"] = outerData
             self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
-            
-            #except:
-            #    print("Unable to update the state data in the worker function")
         else:
             print("The data is still the same so we will move on ...")
 
