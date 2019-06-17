@@ -394,8 +394,9 @@ class Harvest:
                                 functionDataObjectInner = {}
                                 functionDataObjectInner['functionDataId'] = functionDataId
                                 functionDataObjectInner['functionData'] = functionData
-                                uniqueAbiAndAddressKey = str(str(abiHash) + str(contractInstance.address))
-                                functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
+                                uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
+                                uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                                functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
                                 functionDataList.append(functionDataObject)
                                 outerData['functionDataList'] = functionDataList
                                 outerData["requiresUpdating"] = "yes"
@@ -461,19 +462,20 @@ class Harvest:
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
         abiHash = self.shaAnAbi(_instance.abi)
-        uniqueAbiAndAddressKey = str(str(abiHash) + str(_instance.address))
-        if uniqueAbiAndAddressKey not in self.addressAndFunctionDataHashes.keys():
-            print("Instance " + uniqueAbiAndAddressKey + " not in the list yet")
-            self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = ""
-        if self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] != functionDataId:
-            print("The data is different so we will update " + uniqueAbiAndAddressKey + " record now")
+        uniqueAbiAndAddressKey = str(abiHash) + str(_instance.address)
+        uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+        if uniqueAbiAndAddressHash not in self.addressAndFunctionDataHashes.keys():
+            print("Instance " + uniqueAbiAndAddressHash + " not in the list yet")
+            self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = ""
+        if self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] != functionDataId:
+            print("The data is different so we will update " + uniqueAbiAndAddressHash + " record now")
             functionDataObject = {}
             functionDataObjectInner = {}
             functionDataObjectInner['functionDataId'] = functionDataId
             functionDataObjectInner['functionData'] = freshFunctionData
-            functionDataObject[uniqueAbiAndAddressKey] = functionDataObjectInner
+            functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
             print("Item in the list \n" + str(functionDataObject))
-            self.addressAndFunctionDataHashes[uniqueAbiAndAddressKey] = functionDataId
+            self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
             newList = []
             found = False
             print(newList)
@@ -481,7 +483,7 @@ class Harvest:
             if len(newData["_source"]["functionDataList"]) > 0:
                 for item in newData["_source"]["functionDataList"]:
                     for k, v in item.items():
-                        if k == uniqueAbiAndAddressKey:
+                        if k == uniqueAbiAndAddressHash:
                             print("Adding fresh data to newList")
                             newList.append(functionDataObject)
                             found = True
