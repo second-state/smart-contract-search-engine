@@ -71,9 +71,16 @@ def submit_abi():
 def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
+    uniqueDict = {}
+    for result in results:
+        for k, v in result.items():
+            if k in uniqueDict:
+                print("Already have " + k)
+            else:
+                uniqueDict[k] = v
     obj = {}
     num = 1
-    for item in results:
+    for item in uniqueDict:
         obj[str(num)] = item
         num = num+1
     return jsonify(obj)
