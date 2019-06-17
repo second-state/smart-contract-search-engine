@@ -145,7 +145,8 @@ class Harvest:
                 if len(result) > 0:
                     innerDataList = []
                     for i in range(len(result)):
-                        innerDataList.append(self.performPossibleStringConversion(result[i]))
+                        # Lists must be of the same data type so we force a string here
+                        innerDataList.append(str(result[i]))
                     theFunctionData[str(callableFunction)] = innerDataList
             else:
                 theFunctionData[str(callableFunction)] = self.performPossibleStringConversion(result)
