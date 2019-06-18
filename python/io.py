@@ -72,14 +72,22 @@ def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     uniqueDict = {}
-    for result in results:
-        print("Result:")
-        print(result)
-        for k, v in result["_source"].items():
-            if k in uniqueDict:
-                print("Already have " + k)
-            else:
-                uniqueDict[k] = v
+    for rKey, rValue in results:
+        if str(rKey) == "_source":
+            for sKey, sValue in rValue.items():
+                if str(sKey) == "functionDataList":
+                    for fKey, fValue in sValue.items():
+                        if fKey in uniqueDict:
+                            print("We already have " + str(fKey))
+                        else:
+                            uniqueDict[fKey] = fValue
+
+                else:
+                    if sKey in uniqueDict:
+                        print("We already have " + str(sKey))
+                    else:
+                        uniqueDict[sKey] = sValue
+    print(uniqueDict)
     obj = {}
     num = 1
     for item in uniqueDict:
