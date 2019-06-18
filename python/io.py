@@ -72,30 +72,29 @@ def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     uniqueDict = {}
-    for item in results:
-        print(item)
-    # for rKey, rValue in results.items():
-    #     if str(rKey) == "_source":
-    #         for sKey, sValue in rValue.items():
-    #             if str(sKey) == "functionDataList":
-    #                 for fKey, fValue in sValue.items():
-    #                     if fKey in uniqueDict:
-    #                         print("We already have " + str(fKey))
-    #                     else:
-    #                         uniqueDict[fKey] = fValue
+    for returnedItem in results:
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                for sKey, sValue in rValue.items():
+                    if str(sKey) == "functionDataList":
+                        for fKey, fValue in sValue.items():
+                            if fKey in uniqueDict:
+                                print("We already have " + str(fKey))
+                            else:
+                                uniqueDict[fKey] = fValue
 
-    #             else:
-    #                 if sKey in uniqueDict:
-    #                     print("We already have " + str(sKey))
-    #                 else:
-    #                     uniqueDict[sKey] = sValue
-    # print(uniqueDict)
-    # obj = {}
-    # num = 1
-    # for item in uniqueDict:
-    #     obj[str(num)] = item
-    #     num = num+1
-    # return jsonify(obj)
+                    else:
+                        if sKey in uniqueDict:
+                            print("We already have " + str(sKey))
+                        else:
+                            uniqueDict[sKey] = sValue
+    print(uniqueDict)
+    obj = {}
+    num = 1
+    for item in uniqueDict:
+        obj[str(num)] = item
+        num = num+1
+    return jsonify(obj)
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
