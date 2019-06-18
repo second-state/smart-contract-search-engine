@@ -93,7 +93,7 @@ def es_search():
     resultsDict = {}
     resultsDict["results"] = outerList
     print(resultsDict)
-    return jsonify(resultsDict)
+    return jsonify(resultsDict["results"])
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
