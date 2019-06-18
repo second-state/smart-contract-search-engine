@@ -77,12 +77,12 @@ def es_search():
             if str(rKey) == "_source":
                 for sKey, sValue in rValue.items():
                     if str(sKey) == "functionDataList":
-                        for fKey, fValue in sValue.items():
-                            if fKey in uniqueDict:
-                                print("We already have " + str(fKey))
-                            else:
-                                uniqueDict[fKey] = fValue
-
+                        for functionDataListItem in sValue:
+                            for fKey, fValue in functionDataListItem.items():
+                                if fKey in uniqueDict:
+                                    print("We already have " + str(fKey))
+                                else:
+                                    uniqueDict[fKey] = fValue
                     else:
                         if sKey in uniqueDict:
                             print("We already have " + str(sKey))
