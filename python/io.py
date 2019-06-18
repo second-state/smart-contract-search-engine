@@ -90,8 +90,10 @@ def es_search():
                         else:
                             uniqueDict[sKey] = sValue
         outerList.append(uniqueDict)
-    print(outerList)
-    return outerList
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    print(resultsDict)
+    return resultsDict
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
