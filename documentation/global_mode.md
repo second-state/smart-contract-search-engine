@@ -259,6 +259,12 @@ Access to XMLHttpRequest at 'https://search-engine.com/api/es_search' from origi
 ```
 To enable CORS please following these instructions.
 
+Ensure that Apache2 has the mod_rewrite enabled
+
+```
+sudo a2enmod rewrite
+```
+
 Ensure that Apache2 has the headers library enabled by typing the following command.
 
 ```
