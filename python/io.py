@@ -73,6 +73,8 @@ def es_search():
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     uniqueDict = {}
     for result in results:
+        print("Result:")
+        print(result)
         for k, v in result.items():
             if k in uniqueDict:
                 print("Already have " + k)
