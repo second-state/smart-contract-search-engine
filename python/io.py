@@ -72,7 +72,7 @@ def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     uniqueDict = {}
-    for rKey, rValue in results:
+    for rKey, rValue in results.items():
         if str(rKey) == "_source":
             for sKey, sValue in rValue.items():
                 if str(sKey) == "functionDataList":
