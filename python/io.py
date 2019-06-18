@@ -75,7 +75,7 @@ def es_search():
     for result in results:
         print("Result:")
         print(result)
-        for k, v in result.items():
+        for k, v in result["_source"].items():
             if k in uniqueDict:
                 print("Already have " + k)
             else:
