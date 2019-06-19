@@ -299,6 +299,22 @@ python3.6 -m pip uninstall requests
 python3.6 -m pip install requests --user
 ```
 
-
+# Alternative operating systems
+In some cases you may want to run just a single component of this harvester on different hardware (MacOS instead of Ubuntu). The following is a quick reference example of how the core Elasticsearch, AWS and Web3 libraries can be installed on MacOS under a Virtual Environment.
+```
+# Install virtual env
+sudo pip install virtualenv
+virtualenv -p python3 ~/.venv-py3
+# Activate the virtual env
+source ~/.venv-py3/bin/activate
+# Set up the search engine environment to run the Python scripts
+pip install --upgrade pip setuptools
+pip install --upgrade web3
+pip install --upgrade boto3
+pip install --upgrade aws_requests_auth
+pip install --upgrade awscli
+pip install --upgrade elasticsearch
+aws configure
+```
 
 
