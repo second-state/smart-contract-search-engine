@@ -305,15 +305,17 @@ In some cases you may want to run just a single component of this harvester on d
 # Install virtual env
 sudo pip install virtualenv
 virtualenv -p python3 ~/.venv-py3
+# Or don't specify the python
+# virtualenv ~/.venv-py3
 # Activate the virtual env
 source ~/.venv-py3/bin/activate
 # Set up the search engine environment to run the Python scripts
-pip install --upgrade pip setuptools
-pip install --upgrade web3
-pip install --upgrade boto3
-pip install --upgrade aws_requests_auth
-pip install --upgrade awscli
-pip install --upgrade elasticsearch
+pip install --upgrade pip setuptools --user
+pip install --upgrade web3 --user
+pip install --upgrade boto3 --user
+pip install --upgrade aws_requests_auth --user
+pip install --upgrade awscli --user
+pip install --upgrade elasticsearch --user
 aws configure
 ```
 
