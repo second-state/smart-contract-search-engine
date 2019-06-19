@@ -310,12 +310,12 @@ virtualenv -p python3 ~/.venv-py3
 # Activate the virtual env
 source ~/.venv-py3/bin/activate
 # Set up the search engine environment to run the Python scripts
-pip install --upgrade pip setuptools --user
-pip install --upgrade web3 --user
-pip install --upgrade boto3 --user
-pip install --upgrade aws_requests_auth --user
-pip install --upgrade awscli --user
-pip install --upgrade elasticsearch --user
+pip install --upgrade pip setuptools
+pip install --upgrade web3
+pip install --upgrade boto3
+pip install --upgrade aws_requests_auth
+pip install --upgrade awscli
+pip install --upgrade elasticsearch
 aws configure
 ```
 
