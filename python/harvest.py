@@ -455,11 +455,13 @@ class Harvest:
 
     def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
         processMultipleTransactionsThreads = []
+        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
         for transaction in _esTransactions:
             transactionHash = transaction['_source']['TxHash']
-            tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[esAbiSingle, transactionHash])
+            tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
+            time.sleep(1)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
