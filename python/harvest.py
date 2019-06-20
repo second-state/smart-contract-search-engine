@@ -383,10 +383,8 @@ class Harvest:
                 #    print("Unable to instantiate web3 contract object")
             else:
                 print("Item is already indexed")
-                continue
         else:
             print("This transaction does not involve a contract, so we will ignore it")
-            continue
 
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
