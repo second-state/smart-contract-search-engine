@@ -123,7 +123,7 @@ class Harvest:
                                 singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
                                 bulkList.append(singleItem)
                                 print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                if len(bulkList) == 1:
+                                if len(bulkList) == 1000:
                                     elasticsearch.helpers.bulk(self.es, bulkList)
                                     time.sleep(2)
                                     bulkList = []
