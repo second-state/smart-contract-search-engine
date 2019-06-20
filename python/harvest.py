@@ -357,6 +357,7 @@ class Harvest:
                     functionData = self.fetchPureViewFunctionData(contractInstance)
                     functionDataId = self.getFunctionDataId(functionData)
                 except:
+                    print("Unable to instantiate web3 contract object")
                     continue
                 outerData = {}
                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
