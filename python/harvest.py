@@ -352,13 +352,10 @@ class Harvest:
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == False:
-                try:                                    
-                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
-                    functionData = self.fetchPureViewFunctionData(contractInstance)
-                    functionDataId = self.getFunctionDataId(functionData)
-                except:
-                    print("Unable to instantiate web3 contract object")
-                    continue
+                #try:                                    
+                contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
+                functionData = self.fetchPureViewFunctionData(contractInstance)
+                functionDataId = self.getFunctionDataId(functionData)
                 outerData = {}
                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                 abiList = []
@@ -382,6 +379,8 @@ class Harvest:
                 outerData['indexInProgress'] = "false"
                 print(json.dumps(outerData))
                 indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+                #except:
+                #    print("Unable to instantiate web3 contract object")
             else:
                 print("Item is already indexed")
                 continue
