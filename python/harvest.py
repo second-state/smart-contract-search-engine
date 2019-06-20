@@ -345,6 +345,48 @@ class Harvest:
             else:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")
 
+    def processSingleTransaction(self,_contractAbiJSONData, _transactionHex):
+        transactionData = self.web3.eth.getTransaction(str(_transactionHex))
+        transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
+        itemId = transactionReceipt.contractAddress
+        if itemId != None:
+            dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+            if dataStatus == False:
+                try:                                    
+                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
+                    functionData = self.fetchPureViewFunctionData(contractInstance)
+                    functionDataId = self.getFunctionDataId(functionData)
+                except:
+                    continue
+                outerData = {}
+                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                abiList = []
+                abiHash = self.shaAnAbi(_contractAbiJSONData)
+                abiList.append(abiHash)
+                outerData['abiShaList'] = abiList
+                outerData['blockNumber'] = transactionReceipt.blockNumber
+                outerData['contractAddress'] = transactionReceipt.contractAddress
+                functionDataList = []
+                functionDataObject = {}
+                functionDataObjectInner = {}
+                functionDataObjectInner['functionDataId'] = functionDataId
+                functionDataObjectInner['functionData'] = functionData
+                uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
+                uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
+                functionDataList.append(functionDataObject)
+                outerData['functionDataList'] = functionDataList
+                outerData["requiresUpdating"] = "yes"
+                outerData['quality'] = "50"
+                outerData['indexInProgress'] = "false"
+                print(json.dumps(outerData))
+                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+            else:
+                print("Item is already indexed")
+                continue
+        else:
+            print("This transaction does not involve a contract, so we will ignore it")
+            continue
 
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
@@ -368,50 +410,7 @@ class Harvest:
                 if blockTransactionCount > 0:
                     block = self.web3.eth.getBlock(blockNumber)
                     for singleTransaction in block.transactions:
-                        singleTransactionHex = singleTransaction.hex()
-                        transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
-                        transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                        itemId = transactionReceipt.contractAddress
-                        dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
-                        if dataStatus == False:
-                            transactionContractAddress = transactionReceipt.contractAddress
-                            if transactionContractAddress != None:
-                                try:                                    
-                                    contractInstance = self.web3.eth.contract(abi=contractAbiJSONData, address=transactionContractAddress)
-                                    functionData = self.fetchPureViewFunctionData(contractInstance)
-                                    functionDataId = self.getFunctionDataId(functionData)
-                                except:
-                                    continue
-                                outerData = {}
-                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                abiList = []
-                                abiHash = self.shaAnAbi(contractAbiJSONData)
-                                abiList.append(abiHash)
-                                outerData['abiShaList'] = abiList
-                                outerData['blockNumber'] = transactionReceipt.blockNumber
-                                outerData['contractAddress'] = transactionReceipt.contractAddress
-                                functionDataList = []
-                                functionDataObject = {}
-                                functionDataObjectInner = {}
-                                functionDataObjectInner['functionDataId'] = functionDataId
-                                functionDataObjectInner['functionData'] = functionData
-                                uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
-                                uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-                                functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
-                                functionDataList.append(functionDataObject)
-                                outerData['functionDataList'] = functionDataList
-                                outerData["requiresUpdating"] = "yes"
-                                outerData['quality'] = "50"
-                                outerData['indexInProgress'] = "false"
-                                print(json.dumps(outerData))
-                                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-
-                            else:
-                                print("This transaction does not involve a contract, so we will ignore it")
-                                continue
-                        else:
-                            print("Item is already indexed")
-                            continue
+                        self.processSingleTransaction(contractAbiJSONData, singleTransaction)
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
@@ -424,7 +423,7 @@ class Harvest:
                 if _topup == False and len(_argList) == 2:
                     break
 
-    def harvestDriver(self, _stop=False):
+    def harvestBlocksDriver(self, _stop=False):
         print("harvestDriver")
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
@@ -453,6 +452,37 @@ class Harvest:
                     harvestDriverThreads.append(tFullDriver)
         for harvestDriverThread in harvestDriverThreads:
             harvestDriverThread.join()
+
+    def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
+        processMultipleTransactionsThreads = []
+        for transaction in _esTransactions:
+            transactionHash = transaction['_source']['TxHash']
+            tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[esAbiSingle, transactionHash])
+            tFullDriver3.daemon = True
+            tFullDriver3.start()
+            processMultipleTransactionsThreads.append(tFullDriver3)
+        for harvestDriverThread3 in processMultipleTransactionsThreads:
+            harvestDriverThread3.join()
+
+
+    def harvestTransactionsDriver(self):
+        print("Harvesting transactions from masterindex")
+        # Fetch the ABIs from the abi index
+        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+        harvestTransactionsDriverThreads = []
+        # Fetch the transactions from the master index
+        queryForTransactionIndex = {"query": {"match_all": {}}}
+        esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
+        # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
+        # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        for esAbiSingle in esAbis:
+            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[esAbiSingle, esTransactions])
+            tFullDriver2.daemon = True
+            tFullDriver2.start()
+            harvestTransactionsDriverThreads.append(tFullDriver2)
+        for harvestDriverThread2 in harvestTransactionsDriverThreads:
+            harvestDriverThread2.join()
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
@@ -608,10 +638,13 @@ if __name__ == "__main__":
 
     if args.mode == "full":
         print("Performing full harvest")
-        harvester.harvestDriver()
+        harvester.harvestBlocksDriver()
     elif args.mode == "topup":
         print("Performing topup")
-        harvester.harvestDriver(True)
+        harvester.harvestBlocksDriver(True)
+    elif args.mode == "tx":
+        print("Performing harvest of masterindex transactions")
+        harvester.harvestTransactionsDriver()
     elif args.mode == "state":
         print("Performing state update")
         harvester.updateStateDriverPre()
