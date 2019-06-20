@@ -471,12 +471,18 @@ class Harvest:
         queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
         esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
         harvestTransactionsDriverThreads = []
+        # Store the results from the generator in a local list because we can only have one generator open at a time
+        localAbiList = []
+        for esAbiSingle in esAbis:
+            abiList.append(esAbiSingle)
+        time.sleep(1)
         # Fetch the transactions from the master index
         queryForTransactionIndex = {"query": {"match_all": {}}}
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
-        for esAbiSingle in esAbis:
+
+        for localEsAbiSingle in localAbiList:
             tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[esAbiSingle, esTransactions])
             tFullDriver2.daemon = True
             tFullDriver2.start()
