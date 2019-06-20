@@ -143,11 +143,10 @@ class Harvest:
             result = contract_func().call()
             if type(result) is list:
                 if len(result) > 0:
-                    innerDataList = []
+                    innerDataDict = {}
                     for i in range(len(result)):
-                        # Lists must be of the same data type so we force a string here
-                        innerDataList.append(str(result[i]))
-                    theFunctionData[str(callableFunction)] = innerDataList
+                        innerDataDict[i] = self.performPossibleStringConversion(result[i])
+                    theFunctionData[str(callableFunction)] = innerDataDict
             else:
                 theFunctionData[str(callableFunction)] = self.performPossibleStringConversion(result)
         return theFunctionData
@@ -485,9 +484,8 @@ class Harvest:
         for esAbiSingle in esAbis:
             #print("Adding: " + esAbiSingle['_source']['abi'])
             localAbiList.append(esAbiSingle['_source']['abi'])
-        time.sleep(1)
         # Fetch the transactions from the master index
-        queryForTransactionIndex = {"query": {"match_all": {}}}
+        queryForTransactionIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
@@ -498,8 +496,6 @@ class Harvest:
             #if i < 200:
             #print("Adding: " + esTransactionSingle['_source']['TxHash'])
             localTransactionList.append(esTransactionSingle['_source']['TxHash'])
-        time.sleep(1)
-
         for localEsAbiSingle in localAbiList:
             tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
             tFullDriver2.daemon = True

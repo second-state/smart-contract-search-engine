@@ -123,7 +123,7 @@ class Harvest:
                                 singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
                                 bulkList.append(singleItem)
                                 print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                if len(bulkList) == 1000:
+                                if len(bulkList) == 50:
                                     elasticsearch.helpers.bulk(self.es, bulkList)
                                     time.sleep(2)
                                     bulkList = []
@@ -137,9 +137,10 @@ class Harvest:
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
-            print("Adding the last few items which were not bulk loaded already")
-            elasticsearch.helpers.bulk(self.es, bulkList)
-            bulkList = []
+            if len(bulkList) > 1:
+                print("Adding the last few items which were not bulk loaded already")
+                elasticsearch.helpers.bulk(self.es, bulkList)
+                bulkList = []
             if _topup == True and len(_argList) == 0:
                 self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
                 if self.upcomingCallTimeHarvest > time.time():
