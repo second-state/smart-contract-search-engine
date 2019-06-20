@@ -474,7 +474,7 @@ class Harvest:
         # Store the results from the generator in a local list because we can only have one generator open at a time
         localAbiList = []
         for esAbiSingle in esAbis:
-            abiList.append(esAbiSingle)
+            localAbiList.append(esAbiSingle)
         time.sleep(1)
         # Fetch the transactions from the master index
         queryForTransactionIndex = {"query": {"match_all": {}}}
@@ -483,7 +483,7 @@ class Harvest:
         # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
 
         for localEsAbiSingle in localAbiList:
-            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[esAbiSingle, esTransactions])
+            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, esTransactions])
             tFullDriver2.daemon = True
             tFullDriver2.start()
             harvestTransactionsDriverThreads.append(tFullDriver2)
