@@ -217,7 +217,7 @@ class Harvest:
         lContractAddress.append("abiShaList")
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
-        print(dQuery)
+        #print(dQuery)
         # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiShaList": "0x*"}}]}}, "_source": ["TxHash", "abiShaList"]}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
         listForResponse = []
@@ -229,7 +229,7 @@ class Harvest:
                 obj["contractAddress"] = item["_source"]["contractAddress"]
                 listForResponse.append(json.dumps(obj))
         print("Found the following transactions that have abis but no bytecode:")
-        print(listForResponse)
+        #print(listForResponse)
         return listForResponse
 
     def sortInternalListsInJsonObject(self, _json):
@@ -346,9 +346,17 @@ class Harvest:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")
 
     def processSingleTransaction(self,_contractAbiJSONData, _transactionHex):
+        #print("Transaction Hex: \n" + str(_transactionHex))
         transactionData = self.web3.eth.getTransaction(str(_transactionHex))
+        #print("Transaction Data: \n" + str(transactionData))
         transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
-        itemId = transactionReceipt.contractAddress
+        #print("Transaction Receipt: \n" + str(transactionReceipt))
+        itemId = None
+        try:
+            itemId = transactionReceipt.contractAddress
+            print("Found contract: " + itemId)
+        except:
+            print("No contract here ...")
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == False:
@@ -363,7 +371,8 @@ class Harvest:
                     abiList.append(abiHash)
                     outerData['abiShaList'] = abiList
                     outerData['blockNumber'] = transactionReceipt.blockNumber
-                    outerData['contractAddress'] = transactionReceipt.contractAddress
+                    outerData['creator'] = transactionReceipt['from']
+                    outerData['contractAddress'] = itemId
                     functionDataList = []
                     functionDataObject = {}
                     functionDataObjectInner = {}
@@ -377,14 +386,15 @@ class Harvest:
                     outerData["requiresUpdating"] = "yes"
                     outerData['quality'] = "50"
                     outerData['indexInProgress'] = "false"
-                    print(json.dumps(outerData))
+                    #print(json.dumps(outerData))
+                    print("************** LOADING DATA INTO ELASTICSEARCH **************")
                     indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                 except:
                     print("Unable to instantiate web3 contract object")
             else:
                 print("Item is already indexed")
         else:
-            print("This transaction does not involve a contract, so we will ignore it")
+            print("We will ignore this transaction because we are only interested in contracts")
 
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
@@ -453,9 +463,8 @@ class Harvest:
 
     def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
         processMultipleTransactionsThreads = []
-        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
-        for transaction in _esTransactions:
-            transactionHash = transaction['_source']['TxHash']
+        contractAbiJSONData = json.loads(_esAbiSingle)
+        for transactionHash in _esTransactions:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
@@ -474,16 +483,25 @@ class Harvest:
         # Store the results from the generator in a local list because we can only have one generator open at a time
         localAbiList = []
         for esAbiSingle in esAbis:
-            localAbiList.append(esAbiSingle)
+            #print("Adding: " + esAbiSingle['_source']['abi'])
+            localAbiList.append(esAbiSingle['_source']['abi'])
         time.sleep(1)
         # Fetch the transactions from the master index
         queryForTransactionIndex = {"query": {"match_all": {}}}
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         # Creating a thread for every available ABI, however this can be set to a finite amount when sharded indexers/harvesters are in
         # TODO we will also have to set both the indexingInProgress to true and the epochOfLastUpdate to int(time.time) via the updateDataInElastic fuction in this class once we move to sharded indexers/harvesters
+        localTransactionList = []
+        #i = 0
+        for esTransactionSingle in esTransactions:
+            #i = i + 1
+            #if i < 200:
+            #print("Adding: " + esTransactionSingle['_source']['TxHash'])
+            localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+        time.sleep(1)
 
         for localEsAbiSingle in localAbiList:
-            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, esTransactions])
+            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
             tFullDriver2.daemon = True
             tFullDriver2.start()
             harvestTransactionsDriverThreads.append(tFullDriver2)
@@ -516,7 +534,7 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
             newList = []
             found = False
-            print(newList)
+            #print(newList)
             newData = self.es.get(index=self.commonIndex, id=_instance.address)
             if len(newData["_source"]["functionDataList"]) > 0:
                 for item in newData["_source"]["functionDataList"]:
