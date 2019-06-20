@@ -468,7 +468,7 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(1)
+            time.sleep(0.25)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
