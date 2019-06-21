@@ -106,7 +106,10 @@ sudo chown -R $USER:$USER /var/www/search-engine.com/*
 
 Go to the appropriate directory (where the search engine will be served by Apache2) i.e. `cd /var/www/search-engine.com/html/`. We will be staying in that area for all of the following work.
 
-**publicIp in secondStateJS.js**
+### Javascript
+This system uses a single Javascript file which passes events and data back and forth between the HTML and Python. The code repository currently has one Javascript file `secondStateJS.js` which services the [FairPlay - Product Giveaway site](https://cmt.search.secondstate.io/) and one Javascript file `ethJS.js` which services the [Ethereum Search Engine Demonstration](https://ethereum.search.secondstate.io/). One of the strong points of this search engine is that it allows you to create your own custom HTML/JS so that you can render your data in any way.
+
+**publicIp**
 If running this in global mode, please make sure that the `var publicIp = "";` in the [secondStateJS.js file](../js/secondStateJS.js) is set to the public domain name of the server which is hosting the search engine (including the protocol) i.e. 
 ```
 var publicIp = "https://www.search-engine.com"; //No trailing slash please
