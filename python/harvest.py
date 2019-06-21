@@ -337,7 +337,7 @@ class Harvest:
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
                         # Sleep if you have to
-            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 60
+            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 20
             if self.abiCompatabilityUpdateDriverPre1Timer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
@@ -467,11 +467,11 @@ class Harvest:
     def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
         processMultipleTransactionsThreads = []
         contractAbiJSONData = json.loads(_esAbiSingle)
-        for transactionHash in _esTransactions:
+        for transactionHash in reversed(_esTransactions):
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(2)
+            time.sleep(4)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
@@ -516,7 +516,8 @@ class Harvest:
 
 
     def worker(self, _instance):
-        #if _instance.address == "0x96F9B21eD83041Efb73b0FB4f986bb129cDb95C3":
+        print("Processing Instance With Address Of: " + _instance.address)
+        #if _instance.address == "0x63Da8D2d6dEa6635E5aeb2150cF3E7D2bB23D604":
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
         abiHash = self.shaAnAbi(_instance.abi)
@@ -569,81 +570,39 @@ class Harvest:
         else:
             print("The data is still the same so we will move on ...")
 
-    # def worker(self, _instance):
-    #     #if _instance.address == "0x96F9B21eD83041Efb73b0FB4f986bb129cDb95C3":
-    #     freshFunctionData = self.fetchPureViewFunctionData(_instance)
-    #     functionDataId = self.getFunctionDataId(freshFunctionData)
-    #     abiHash = self.shaAnAbi(_instance.abi)
-    #     uniqueAbiAndAddressKey = str(abiHash) + str(_instance.address)
-    #     uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-    #     if uniqueAbiAndAddressHash not in self.addressAndFunctionDataHashes.keys():
-    #         print("Instance " + uniqueAbiAndAddressHash + " not in the list yet")
-    #         self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = ""
-    #     if self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] != functionDataId:
-    #         print("The data is different so we will update " + uniqueAbiAndAddressHash + " record now")
-    #         functionDataObjectInner = {}
-    #         functionDataObjectInner['functionDataId'] = functionDataId
-    #         functionDataObjectInner['functionData'] = freshFunctionData
-    #         functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
-    #         self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
-    #         newList = []
-    #         found = False
-    #         print(newList)
-    #         newData = self.es.get(index=self.commonIndex, id=_instance.address)
-    #         if len(newData["_source"]["functionDataList"]) > 0:
-    #             for item in newData["_source"]["functionDataList"]:
-    #                 for k, v in item.items():
-    #                     if k == uniqueAbiAndAddressHash:
-    #                         # Override the existing data with the newly fetched data
-    #                         newList.append(functionDataObjectInner)
-    #                         found = True
-    #                     else:
-    #                         # Just place this already existing item in the list so it can remain in the index as is
-    #                         print("Adding existing data to newList")
-    #                         newList.append(item)
-    #         else:
-    #             newList.append(functionDataObjectInner)
-    #             found = True
-    #         if found == False:
-    #             newList.append(functionDataObjectInner)
-    #         doc = {}
-    #         outerData = {}
-    #         outerData["functionDataList"] = newList
-    #         doc["doc"] = outerData
-    #         self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
-    #     else:
-    #         print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
-        self.firstRun = True
         self.updateStateDriverPreTimer = time.time()
         self.addressAndFunctionDataHashes = {}
         # Fetch the addresses and ABI hash of records that have an ABI Hash stored (abiSha3)
         self.fetchContractAddressesWithAbis()
-        #print(self.esAbiAddresses)
-        # Create a hash of the list which holds both the address and the ABI hash
-        self.esAbiAddressesHash = self.web3.toHex(self.web3.sha3(text=str(self.esAbiAddresses)))
         # Purge the contract instance list as we are about to freshly populate it
         self.contractInstanceList = []
         # Populate the global cache of web3 contract instances by instantiating the using the ABI and address from the previously fetched list
         for singleEntry in self.esAbiAddresses:
+            print(singleEntry)
             abiAndAddress = json.loads(singleEntry)
             self.fetchContractInstances(abiAndAddress["abiSha3"], abiAndAddress["contractAddress"])
-        
         while True:
             print("updateStateDriverPre")           
             originalListOfAddressesAndAbi = self.esAbiAddresses
             origListOfAddresses = []
             for originalItem in originalListOfAddressesAndAbi:
                 originalItemJSON = json.loads(originalItem)
-                if originalItemJSON['contractAddress'] not in origListOfAddresses:
-                    origListOfAddresses.append(originalItemJSON['contractAddress'])
+                #TODO
+                uniqueAbiAndAddressKey = str(originalItemJSON['abiSha3']) + str(originalItemJSON['contractAddress'])
+                uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                if uniqueAbiAndAddressHash not in origListOfAddresses:
+                    origListOfAddresses.append(uniqueAbiAndAddressHash)
             self.fetchContractAddressesWithAbis()
             for newItem in self.esAbiAddresses:
                 newItemJSON = json.loads(newItem)
-                if newItemJSON['contractAddress'] not in origListOfAddresses:
-                    print("Found a new contract " + newItemJSON['contractAddress'] + ", creating a new web3 instance")
+                uniqueAbiAndAddressKey2 = str(newItemJSON['abiSha3']) + str(newItemJSON['contractAddress'])
+                uniqueAbiAndAddressHash2 = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey2)))
+                if uniqueAbiAndAddressHash2 not in origListOfAddresses:
                     self.fetchContractInstances(newItemJSON['abiSha3'], newItemJSON['contractAddress'])
+                else:
+                    print("We already have that address")
             threadsupdateStateDriverPre = []
             for contractInstanceItem in self.contractInstanceList:
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
