@@ -299,6 +299,15 @@ python3.6 -m pip uninstall requests
 python3.6 -m pip install requests --user
 ```
 
+## Error 3
+Elasticsearch only allows 1000 unique field types. For example in a single index you should only ever need less than 1000 fields such as "name", "address" etc. However, we are all contract data and so the field count could exceeded this limit.
+```
+elasticsearch.exceptions.RequestError: RequestError(400, 'illegal_argument_exception', '[fXAH4Nb][x.x.x.x:9300][indices:data/write/update[s]]')
+```
+## Fix 3
+You can raise the limit of fields using the following simple PUT request.
+https://discuss.elastic.co/t/total-fields-limit-setting/53004
+
 # Alternative operating systems
 In some cases you may want to run just a single component of this harvester on different hardware (MacOS instead of Ubuntu). The following is a quick reference example of how the core Elasticsearch, AWS and Web3 libraries can be installed on MacOS under a Virtual Environment.
 ```
