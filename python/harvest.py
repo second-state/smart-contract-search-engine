@@ -107,6 +107,7 @@ class Harvest:
 
     def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.update(index=_theIndex, id=_theId, body=_thePayLoad)
+        print(esReponseD)
         return esReponseD
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
@@ -373,15 +374,17 @@ class Harvest:
                     outerData['creator'] = transactionReceipt['from']
                     outerData['contractAddress'] = itemId
                     functionDataList = []
-                    functionDataObject = {}
                     functionDataObjectInner = {}
+                    
                     functionDataObjectInner['functionDataId'] = functionDataId
                     functionDataObjectInner['functionData'] = functionData
                     uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
                     uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-                    functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
-                    functionDataList.append(functionDataObject)
-                    outerData['functionDataList'] = functionDataList
+                    functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
+                    functionDataList.append(functionDataObjectInner)
+                    functionDataObjectOuter = {}
+                    functionDataObjectOuter["0"] = functionDataList
+                    outerData['functionDataList'] = functionDataObjectOuter
                     outerData["requiresUpdating"] = "yes"
                     outerData['quality'] = "50"
                     outerData['indexInProgress'] = "false"
@@ -393,7 +396,7 @@ class Harvest:
             else:
                 print("Item is already indexed")
         else:
-            print("We will ignore this transaction because we are only interested in contracts")
+            print("Problem with transaction hex: " + str(_transactionHex))
 
 
     def harvest(self, _esAbiSingle, _argList,  _topup=False):
@@ -417,7 +420,8 @@ class Harvest:
                 if blockTransactionCount > 0:
                     block = self.web3.eth.getBlock(blockNumber)
                     for singleTransaction in block.transactions:
-                        self.processSingleTransaction(contractAbiJSONData, singleTransaction)
+                        singleTransactionHex = str(self.web3.toHex(singleTransaction))
+                        self.processSingleTransaction(contractAbiJSONData, singleTransactionHex)
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
@@ -467,7 +471,7 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(0.25)
+            time.sleep(2)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
@@ -492,9 +496,9 @@ class Harvest:
         localTransactionList = []
         #i = 0
         for esTransactionSingle in esTransactions:
-            #i = i + 1
-            #if i < 200:
-            #print("Adding: " + esTransactionSingle['_source']['TxHash'])
+        #    i = i + 1
+        #    if i < 200:
+        #        print("Adding: " + esTransactionSingle['_source']['TxHash'])
             localTransactionList.append(esTransactionSingle['_source']['TxHash'])
         for localEsAbiSingle in localAbiList:
             tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
@@ -510,7 +514,9 @@ class Harvest:
         contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
 
+
     def worker(self, _instance):
+        #if _instance.address == "0x96F9B21eD83041Efb73b0FB4f986bb129cDb95C3":
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
         abiHash = self.shaAnAbi(_instance.abi)
@@ -521,39 +527,92 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = ""
         if self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] != functionDataId:
             print("The data is different so we will update " + uniqueAbiAndAddressHash + " record now")
-            functionDataObject = {}
+            functionDataObjectOuter = {}
             functionDataObjectInner = {}
             functionDataObjectInner['functionDataId'] = functionDataId
             functionDataObjectInner['functionData'] = freshFunctionData
-            functionDataObject[uniqueAbiAndAddressHash] = functionDataObjectInner
-            print("Item in the list \n" + str(functionDataObject))
+            functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
             newList = []
             found = False
-            #print(newList)
+            print(newList)
             newData = self.es.get(index=self.commonIndex, id=_instance.address)
-            if len(newData["_source"]["functionDataList"]) > 0:
-                for item in newData["_source"]["functionDataList"]:
+            if len(newData["_source"]["functionDataList"]["0"]) > 0:
+                for item in newData["_source"]["functionDataList"]["0"]:
                     for k, v in item.items():
-                        if k == uniqueAbiAndAddressHash:
-                            print("Adding fresh data to newList")
-                            newList.append(functionDataObject)
-                            found = True
-                        else:
-                            print("Adding existing data to newList")
-                            newList.append(item)
+                        if k == "uniqueAbiAndAddressHash":
+                            if v == uniqueAbiAndAddressHash:
+                            # Override the existing data with the newly fetched data
+                                newList.append(functionDataObjectInner)
+                                found = True
+                            else:
+                                # Just place this already existing item in the list so it can remain in the index as is
+                                print("Adding existing data to newList")
+                                newList.append(item)
             else:
-                newList.append(functionDataObject)
+                newList.append(functionDataObjectInner)
                 found = True
             if found == False:
-                newList.append(functionDataObject)
+                newList.append(functionDataObjectInner)
             doc = {}
             outerData = {}
-            outerData["functionDataList"] = newList
+            functionDataObjectOuter["0"] = newList
+            outerData["functionDataList"] = functionDataObjectOuter
             doc["doc"] = outerData
+            print(newList)
+            print("\n")
+            print(json.dumps(doc))
+            print("\n")
+
+            # Now we can add our updated list 
             self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
         else:
             print("The data is still the same so we will move on ...")
+
+    # def worker(self, _instance):
+    #     #if _instance.address == "0x96F9B21eD83041Efb73b0FB4f986bb129cDb95C3":
+    #     freshFunctionData = self.fetchPureViewFunctionData(_instance)
+    #     functionDataId = self.getFunctionDataId(freshFunctionData)
+    #     abiHash = self.shaAnAbi(_instance.abi)
+    #     uniqueAbiAndAddressKey = str(abiHash) + str(_instance.address)
+    #     uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+    #     if uniqueAbiAndAddressHash not in self.addressAndFunctionDataHashes.keys():
+    #         print("Instance " + uniqueAbiAndAddressHash + " not in the list yet")
+    #         self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = ""
+    #     if self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] != functionDataId:
+    #         print("The data is different so we will update " + uniqueAbiAndAddressHash + " record now")
+    #         functionDataObjectInner = {}
+    #         functionDataObjectInner['functionDataId'] = functionDataId
+    #         functionDataObjectInner['functionData'] = freshFunctionData
+    #         functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
+    #         self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
+    #         newList = []
+    #         found = False
+    #         print(newList)
+    #         newData = self.es.get(index=self.commonIndex, id=_instance.address)
+    #         if len(newData["_source"]["functionDataList"]) > 0:
+    #             for item in newData["_source"]["functionDataList"]:
+    #                 for k, v in item.items():
+    #                     if k == uniqueAbiAndAddressHash:
+    #                         # Override the existing data with the newly fetched data
+    #                         newList.append(functionDataObjectInner)
+    #                         found = True
+    #                     else:
+    #                         # Just place this already existing item in the list so it can remain in the index as is
+    #                         print("Adding existing data to newList")
+    #                         newList.append(item)
+    #         else:
+    #             newList.append(functionDataObjectInner)
+    #             found = True
+    #         if found == False:
+    #             newList.append(functionDataObjectInner)
+    #         doc = {}
+    #         outerData = {}
+    #         outerData["functionDataList"] = newList
+    #         doc["doc"] = outerData
+    #         self.updateDataInElastic(self.commonIndex, _instance.address, json.dumps(doc))
+    #     else:
+    #         print("The data is still the same so we will move on ...")
 
     def updateStateDriverPre(self):
         self.firstRun = True
@@ -679,6 +738,7 @@ if __name__ == "__main__":
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
+        print("harvest.py --mode tx")
         print("harvest.py --mode bytecode")
         print("harvest.py --mode abi")
 

@@ -159,7 +159,7 @@ if __name__ == "__main__":
     if args.mode == "full":
         print("Performing full harvest")
         latestBlockNumber = harvester.web3.eth.getBlock('latest').number
-        threadsToUse = 876
+        threadsToUse = 654
         blocksPerThread = int(latestBlockNumber / threadsToUse)
         harvester.fastThreads = []
         for startingBlock in range(1, latestBlockNumber, blocksPerThread):
