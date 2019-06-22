@@ -86,7 +86,7 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: "We have a total of " + contractsWithAbisAmount.toLocaleString() + " contracts indexed with supporting ABIs"
+                text: "We have " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
             });
             contractsWithAbis.appendTo(dlOverview);
         },
@@ -273,7 +273,7 @@ $(document).ready(function() {
             dMultiMatch["multi_match"] = dTemp;
             dQueryOuter["query"] = dMultiMatch;
             var jsonString = JSON.stringify(dQueryOuter);
-            
+
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
