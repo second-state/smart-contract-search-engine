@@ -89,6 +89,10 @@ async function pageSetup(){
         }
     });
 
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     if (this.contractsWithAbisAmount == null || this.contractAmount == null){
         console.log("Waiting ...");
         await this.sleep(500);
