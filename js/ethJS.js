@@ -529,6 +529,15 @@ function renderItems(_hits) {
         var lineBreak = jQuery("<hr/>", {});
         lineBreak.appendTo(".results");
 
+        var shaList = value.abiShalist;
+        if shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286"){
+            var type = jQuery("<dt/>", {
+                text: "Type: ERC20"
+            });
+            type.appendTo(dl);
+        }
+
+
         
 /*
         var description = jQuery("<dd/>", {
