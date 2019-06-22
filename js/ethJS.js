@@ -412,7 +412,8 @@ function getItemsViaFlask() {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            renderItems(response);
+            console.log(response)
+            //renderItems(response);
         },
         error: function(xhr) {
             console.log("Get items failed");
