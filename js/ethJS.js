@@ -40,7 +40,7 @@ $(document).ready(function() {
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
 
 
-    await $.ajax({
+    $.ajax({
         url: master,
         type: "post",
         data: contractsQuery,
@@ -55,7 +55,7 @@ $(document).ready(function() {
         }
     });
 
-    await $.ajax({
+    $.ajax({
         url: common,
         type: "post",
         data: contractsQuery,
@@ -70,10 +70,10 @@ $(document).ready(function() {
         }
     });
 
-    setTimeout(pageSetup, 1000, this.contractAmount, this.contractsWithAbisAmount);
+    setTimeout(pageSetup(), 1000, this.contractAmount, this.contractsWithAbisAmount);
 });
 
-async function pageSetup(_contractAmount, _contractsWithAbisAmount){
+function pageSetup(_contractAmount, _contractsWithAbisAmount){
     $(".overview").empty();
 
     var overviewRow = jQuery("<div/>", {
@@ -98,7 +98,7 @@ async function pageSetup(_contractAmount, _contractsWithAbisAmount){
         text: "We have a total of " + _contractsWithAbisAmount + " contracts indexed with supporting ABIs"
     });
     contractsWithAbis.appendTo(dlOverview);
-    }
+}
 
 $(document).ready(function() {
     window.addEventListener("load", function() {
