@@ -71,10 +71,10 @@ def submit_abi():
 def es_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
-    return jsonify(results)
-    # outerList = []
-    # for returnedItem in results:
-    #     uniqueDict = {}
+    outerList = []
+    for returnedItem in results:
+        outerList.append(returnedItem)
+    #    uniqueDict = {}
     #     for rKey, rValue in returnedItem.items():
     #         if str(rKey) == "_source":
     #             for sKey, sValue in rValue.items():
@@ -91,10 +91,10 @@ def es_search():
     #                     else:
     #                         uniqueDict[sKey] = sValue
     #     outerList.append(uniqueDict)
-    # resultsDict = {}
-    # resultsDict["results"] = outerList
-    # print(resultsDict)
-    # return jsonify(resultsDict["results"])
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
