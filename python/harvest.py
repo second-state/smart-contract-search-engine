@@ -323,7 +323,7 @@ class Harvest:
                 abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
-            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 20
+            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 10
             if self.abiCompatabilityUpdateDriverPre1Timer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
@@ -378,70 +378,6 @@ class Harvest:
         else:
             print("Problem with transaction hex: " + str(_transactionHex))
 
-
-    def harvest(self, _esAbiSingle, _argList,  _topup=False):
-        self.upcomingCallTimeHarvest = time.time()
-        contractAbiJSONData = json.loads(_esAbiSingle['_source']['abi'])
-        while True:
-            latestBlockNumber = self.web3.eth.getBlock('latest').number
-            print("Latest block is %s" % latestBlockNumber)
-            stopAtBlock = 0
-            if _topup == True and len(_argList) == 0:
-                stopAtBlock = latestBlockNumber - 24
-            if _topup == False and len(_argList) == 2:
-                latestBlockNumber = _argList[0]
-                stopAtBlock = latestBlockNumber - _argList[1]
-                if stopAtBlock < 0:
-                    stopAtBlock = 0
-                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
-            for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
-                print("\nProcessing block number %s" % blockNumber)
-                blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
-                if blockTransactionCount > 0:
-                    block = self.web3.eth.getBlock(blockNumber)
-                    for singleTransaction in block.transactions:
-                        singleTransactionHex = str(self.web3.toHex(singleTransaction))
-                        self.processSingleTransaction(contractAbiJSONData, singleTransactionHex)
-                else:
-                    print("Skipping block number %s - No transactions found!" % blockNumber)
-                    continue
-
-            if _topup == True and len(_argList) == 0:
-                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
-                if self.upcomingCallTimeHarvest > time.time():
-                    time.sleep(self.upcomingCallTimeHarvest - time.time())
-            else:
-                if _topup == False and len(_argList) == 2:
-                    break
-
-    def harvestBlocksDriver(self, _stop=False):
-        print("harvestDriver")
-        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
-        harvestDriverThreads = []
-        latestBlockNumber = self.web3.eth.getBlock('latest').number
-        threadsToUse = 100
-        blocksPerThread = int(latestBlockNumber / threadsToUse)
-        for esAbiSingle in esAbis:
-            if _stop == False:
-                for startingBlock in range(1, latestBlockNumber, blocksPerThread):
-                    argList = []
-                    argList.append(startingBlock)
-                    argList.append(blocksPerThread)
-                    tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
-                    tFullDriver.daemon = True
-                    tFullDriver.start()
-                    harvestDriverThreads.append(tFullDriver)
-            else:
-                if _stop == True:
-                    argList = []
-                    tFullDriver = threading.Thread(target=self.harvest, args=[esAbiSingle, argList, _stop])
-                    tFullDriver.daemon = True
-                    tFullDriver.start()
-                    harvestDriverThreads.append(tFullDriver)
-        for harvestDriverThread in harvestDriverThreads:
-            harvestDriverThread.join()
-
     def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
         processMultipleTransactionsThreads = []
         contractAbiJSONData = json.loads(_esAbiSingle)
@@ -449,7 +385,7 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(4)
+            time.sleep(10)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
@@ -610,9 +546,69 @@ class Harvest:
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
             print("Finished")
-            self.tupdateBytecode = self.tupdateBytecode + 30
+            self.tupdateBytecode = self.tupdateBytecode + 10
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
+
+
+    def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
+        bulkList = []
+        self.upcomingCallTimeHarvest = time.time()
+        while True:
+            latestBlockNumber = self.web3.eth.getBlock('latest').number
+            print("Latest block is %s" % latestBlockNumber)
+            stopAtBlock = 0
+            if _topup == True and len(_argList) == 0:
+                stopAtBlock = latestBlockNumber - 24
+            if _topup == False and len(_argList) == 2:
+                latestBlockNumber = _argList[0]
+                stopAtBlock = latestBlockNumber - _argList[1]
+                if stopAtBlock < 0:
+                    stopAtBlock = 0
+                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
+            for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
+                print("\nProcessing block number %s" % blockNumber)
+                blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
+                if blockTransactionCount > 0:
+                    block = self.web3.eth.getBlock(blockNumber)
+                    for singleTransaction in block.transactions:
+                        singleTransactionHex = singleTransaction.hex()
+                        transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
+                        transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
+                        transactionContractAddress = transactionReceipt.contractAddress
+                        if transactionContractAddress != None:
+                            outerData = {}
+                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                            outerData['blockNumber'] = transactionReceipt.blockNumber
+                            outerData['contractAddress'] = transactionReceipt.contractAddress
+                            outerData['from'] = transactionReceipt['from']
+                            outerData["indexed"] = "false"
+                            itemId = transactionReceipt.contractAddress
+                            dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                            if dataStatus == False:
+                                singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                bulkList.append(singleItem)
+                                print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                if len(bulkList) == 50:
+                                    elasticsearch.helpers.bulk(self.es, bulkList)
+                                    bulkList = []
+                        else:
+                            continue
+                else:
+                    print("Skipping block number %s - No transactions found!" % blockNumber)
+                    continue
+            if len(bulkList) > 1:
+                print("Adding the last few items which were not bulk loaded already")
+                elasticsearch.helpers.bulk(self.es, bulkList)
+                bulkList = []
+            if _topup == True and len(_argList) == 0:
+                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+                if self.upcomingCallTimeHarvest > time.time():
+                    time.sleep(self.upcomingCallTimeHarvest - time.time())
+            else:
+                if _topup == False and len(_argList) == 2:
+                    break
+
 
 
 if __name__ == "__main__":
@@ -624,10 +620,24 @@ if __name__ == "__main__":
 
     if args.mode == "full":
         print("Performing full harvest")
-        harvester.harvestBlocksDriver()
+        latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+        threadsToUse = 654
+        blocksPerThread = int(latestBlockNumber / threadsToUse)
+        harvester.fastThreads = []
+        for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+            argList = []
+            argList.append(startingBlock)
+            argList.append(blocksPerThread)
+            tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=[harvester.masterIndex, argList, False])
+            tFullDriver.daemon = True
+            tFullDriver.start()
+            harvester.fastThreads.append(tFullDriver)
+        for tt in harvester.fastThreads:
+            tt.join()
     elif args.mode == "topup":
         print("Performing topup")
-        harvester.harvestBlocksDriver(True)
+        argsList = []
+        harvester.harvestAllContracts(harvester.masterIndex, argsList, True)
     elif args.mode == "tx":
         print("Performing harvest of masterindex transactions")
         harvester.harvestTransactionsDriver()
@@ -653,8 +663,9 @@ if __name__ == "__main__":
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
 
 # Monitor the number of threads per pid; run any of the following commands and paste THE_PID into the watch command below
-#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
-#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m tx >/dev/null 2>&1 &
 #cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
+#cd ~/htdocs/python && nohup /usr/bin/python3.6 harvest.py -m abi >/dev/null 2>&1 &
 
 # watch -n 2 -d "ps -eL THE_PID | wc -l"
