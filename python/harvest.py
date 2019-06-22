@@ -155,7 +155,7 @@ class Harvest:
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
         return theId
 
-    def fetchContractAddressesWithAbis(self):
+    def fetchTxHashWithAbis(self, _not):
         self.esAbiAddresses = []
         dQuery = {}
         dWildCard = {}
@@ -165,40 +165,7 @@ class Harvest:
         dWildCard["wildcard"] = dContractAddress 
         dMatch = {}
         dReauiresUpdating = {}
-        dReauiresUpdating["field"] = "potentialFutureFilter"
-        dMatch["exists"] = dReauiresUpdating
-        lMust = []
-        lMust.append(dMatch)
-        dBool = {}
-        dBool["must_not"] = lMust
-        lShould = []
-        lShould.append(dWildCard)
-        dBool["should"] = lShould
-        dOb = {}
-        dOb["bool"] = dBool
-        dQuery["query"] = dOb
-        lContractAddress.append("contractAddress")
-        lContractAddress.append("abiShaList")
-        dQuery["_source"] = lContractAddress
-        esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
-        for item in esReponseAddresses:
-            for singleAbi in item["_source"]["abiShaList"]:
-                obj = {}
-                obj["abiSha3"] = singleAbi
-                obj["contractAddress"] = item["_source"]["contractAddress"]
-                self.esAbiAddresses.append(json.dumps(obj))
-                #{'query': {'bool': {'must_not': [{'exists': {'field': 'byteSha3'}}], 'should': [{'wildcard': {'abiShaList': '0x*'}}]}}, '_source': ['contractAddress', 'abiShaList']}
-
-    def fetchTxHashWithAbis(self):
-        dQuery = {}
-        dWildCard = {}
-        dContractAddress = {}
-        lContractAddress = []
-        dContractAddress["abiShaList"] = "0x*"
-        dWildCard["wildcard"] = dContractAddress 
-        dMatch = {}
-        dReauiresUpdating = {}
-        dReauiresUpdating["field"] = "bytecodeSha3"
+        dReauiresUpdating["field"] = _not
         dMatch["exists"] = dReauiresUpdating
         lMust = []
         lMust.append(dMatch)
@@ -214,18 +181,15 @@ class Harvest:
         lContractAddress.append("abiShaList")
         lContractAddress.append("contractAddress")
         dQuery["_source"] = lContractAddress
-        # {"query": {"bool": {"must_not": [{"exists": {"field": "bytecodeSha3"}}], "should": [{"wildcard": {"abiShaList": "0x*"}}]}}, "_source": ["TxHash", "abiShaList"]}
         esReponseAddresses = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=json.dumps(dQuery), preserve_order=True)
-        listForResponse = []
         for item in esReponseAddresses:
             for singleAbi in item["_source"]["abiShaList"]:
                 obj = {}
                 obj["abiSha3"] = singleAbi
                 obj["TxHash"] = item["_source"]["TxHash"]
                 obj["contractAddress"] = item["_source"]["contractAddress"]
-                listForResponse.append(json.dumps(obj))
-        print("Found the following transactions that have abis but no bytecode:")
-        return listForResponse
+                self.esAbiAddresses.append(json.dumps(obj))
+
 
     def sortInternalListsInJsonObject(self, _json):
         for listItem in _json:
@@ -466,7 +430,7 @@ class Harvest:
     def updateStateDriverPre(self):
         self.updateStateDriverPreTimer = time.time()
         self.addressAndFunctionDataHashes = {}
-        self.fetchContractAddressesWithAbis()
+        self.fetchTxHashWithAbis("potentialFutureFilter")
         self.contractInstanceList = []
         for singleEntry in self.esAbiAddresses:
             abiAndAddress = json.loads(singleEntry)
@@ -481,7 +445,7 @@ class Harvest:
                 uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
                 if uniqueAbiAndAddressHash not in origListOfAddresses:
                     origListOfAddresses.append(uniqueAbiAndAddressHash)
-            self.fetchContractAddressesWithAbis()
+            self.fetchTxHashWithAbis("potentialFutureFilter")
             for newItem in self.esAbiAddresses:
                 newItemJSON = json.loads(newItem)
                 uniqueAbiAndAddressKey2 = str(newItemJSON['abiSha3']) + str(newItemJSON['contractAddress'])
@@ -535,8 +499,8 @@ class Harvest:
         while True:
             print("Starting ...")
             self.threadsUpdateBytecode = []
-            versionless = self.fetchTxHashWithAbis()
-            for versionlessItem in versionless:
+            self.fetchTxHashWithAbis("bytecodeSha3")
+            for versionlessItem in self.esAbiAddresses:
                 print(versionlessItem)
                 versionlessItemJSON = json.loads(versionlessItem)
                 tVersionless = threading.Thread(target=self.updateBytecodeAndVersion, args=[versionlessItemJSON["TxHash"], versionlessItemJSON["contractAddress"]])
