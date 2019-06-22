@@ -156,8 +156,8 @@ do
     cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m abi >/dev/null 2>&1 &
     cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
     cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
     break
   else
     echo "Got $STATUS please wait"
