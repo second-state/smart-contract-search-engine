@@ -74,6 +74,11 @@ def es_search():
     outerList = []
     for returnedItem in results:
         outerList.append(returnedItem)
+        for rKey, rValue in returnedItem.items():
+            print("rkey:")
+            print(rKey)
+            print("rValue")
+            print(rValue)
     #    uniqueDict = {}
     #     for rKey, rValue in returnedItem.items():
     #         if str(rKey) == "_source":
