@@ -56,6 +56,8 @@ async function pageSetup(){
 
     await renderOverview();
 
+    await new Promise((resolve, reject) => setTimeout(resolve, 500));
+
     var contracts = jQuery("<dt/>", {
         text: "We have a total of " + this.contractAmount + " contracts indexed"
     });
@@ -73,14 +75,14 @@ async function renderOverview(){
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
 
     
-    let this.contractAmount = await $.ajax({
+    await $.ajax({
         url: master,
         type: "post",
         data: contractsQuery,
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            #this.contractAmount = response["hits"]["total"];
+            this.contractAmount = response["hits"]["total"];
             console.log("Fetched contract amount: " + this.contractAmount);
         },
         error: function(xhr) {
@@ -88,14 +90,14 @@ async function renderOverview(){
         }
     });
 
-    let this.contractsWithAbisAmount = await $.ajax({
+    await $.ajax({
         url: common,
         type: "post",
         data: contractsQuery,
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            #this.contractsWithAbisAmount = response["hits"]["total"];
+            this.contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + this.contractsWithAbisAmount);
         },
         error: function(xhr) {
