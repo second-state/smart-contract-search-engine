@@ -66,8 +66,8 @@ async function renderOverview(){
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            console.log("Fetched contract amount");
             this.contractAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + this.contractAmount);
         },
         error: function(xhr) {
             console.log("Get amount failed");
@@ -81,8 +81,8 @@ async function renderOverview(){
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            console.log("Fetched contracts with ABI amount");
             this.contractsWithAbisAmount = response["hits"]["total"];
+            console.log("Fetched contracts with ABI amount: " + this.contractsWithAbisAmount);
         },
         error: function(xhr) {
             console.log("Get amount failed");
