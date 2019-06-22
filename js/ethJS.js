@@ -38,7 +38,8 @@ $(document).ready(function() {
     contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
-
+    contractAmount = 0;
+    contractsWithAbisAmount = 0;
 
     $.ajax({
         url: master,
@@ -47,8 +48,8 @@ $(document).ready(function() {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            this.contractAmount = response["hits"]["total"];
-            console.log("Fetched contract amount: " + this.contractAmount);
+            contractAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + contractAmount);
         },
         error: function(xhr) {
             console.log("Get amount failed");
@@ -62,15 +63,15 @@ $(document).ready(function() {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            this.contractsWithAbisAmount = response["hits"]["total"];
-            console.log("Fetched contracts with ABI amount: " + this.contractsWithAbisAmount);
+            contractsWithAbisAmount = response["hits"]["total"];
+            console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
         },
         error: function(xhr) {
             console.log("Get amount failed");
         }
     });
 
-    setTimeout(pageSetup(), 1000, this.contractAmount, this.contractsWithAbisAmount);
+    setTimeout(pageSetup(), 2000, contractAmount, contractsWithAbisAmount);
 });
 
 function pageSetup(_contractAmount, _contractsWithAbisAmount){
