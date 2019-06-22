@@ -90,12 +90,12 @@ async function renderOverview(){
     });
 
     var contracts = jQuery("<dt/>", {
-        text: "We have a total of " + contractAmount + " contracts indexed"
+        text: "We have a total of " + this.contractAmount + " contracts indexed"
     });
     contracts.appendTo(dlOverview);
 
     var contractsWithAbis = jQuery("<dt/>", {
-        text: "We have a total of " + contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+        text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
     });
     contractsWithAbis.appendTo(dlOverview);
 
