@@ -41,6 +41,10 @@ $(document).ready(function() {
 async function pageSetup(){
     $(".overview").empty();
 
+    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
+    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
+    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
+
     var overviewRow = jQuery("<div/>", {
         class: "row",
     });
@@ -53,26 +57,6 @@ async function pageSetup(){
 
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
-
-    await renderOverview();
-
-    await new Promise((resolve, reject) => setTimeout(resolve, 500));
-
-    var contracts = jQuery("<dt/>", {
-        text: "We have a total of " + this.contractAmount + " contracts indexed"
-    });
-    contracts.appendTo(dlOverview);
-
-    var contractsWithAbis = jQuery("<dt/>", {
-        text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
-    });
-    contractsWithAbis.appendTo(dlOverview);
-}
-
-async function renderOverview(){
-    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
-    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
-    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
 
     
     await $.ajax({
@@ -105,8 +89,21 @@ async function renderOverview(){
         }
     });
 
-}
+    if (this.contractsWithAbisAmount == null || this.contractAmount == null){
+        console.log("Waiting ...");
+        await this.sleep(500);
+        var contracts = jQuery("<dt/>", {
+        text: "We have a total of " + this.contractAmount + " contracts indexed"
+        });
+        contracts.appendTo(dlOverview);
 
+        var contractsWithAbis = jQuery("<dt/>", {
+            text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+        });
+        contractsWithAbis.appendTo(dlOverview);
+    }
+
+}
 
 
 $(document).ready(function() {
