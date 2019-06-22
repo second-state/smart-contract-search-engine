@@ -54,12 +54,8 @@ $(document).ready(function() {
     overviewDetails.appendTo(overviewRow);
 
     var overviewText = jQuery("<div/>", {
-        text: "This is an open source smart contract search engine and API.",
-    });
-    overviewText.appendTo(overviewDetails);
-
-    var overviewText = jQuery("<div/>", {
         text: "This demonstration, of the Ethereum MainNet has:",
+        class: centeredText,
     });
     overviewText.appendTo(overviewDetails);
 
