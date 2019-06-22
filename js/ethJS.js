@@ -41,9 +41,9 @@ $(document).ready(function() {
     var contracts = "";
     var contractsWithAbis = "";
 
-    //$(".overview").empty();
+    $(".overview").empty();
 
-    var overviewRow1 = jQuery("<div/>", {
+    var overviewRow = jQuery("<div/>", {
         class: "row",
     });
     overviewRow.appendTo(".overview");
@@ -52,6 +52,11 @@ $(document).ready(function() {
         class: "col-sm-12"
     });
     overviewDetails.appendTo(overviewRow);
+
+    var overviewText = jQuery("<div/>", {
+        text: "This is an open source smart contract search engine and API. This demonstration, of the Ethereum MainNet has:",
+    });
+    overviewText.appendTo(overviewDetails);
 
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
