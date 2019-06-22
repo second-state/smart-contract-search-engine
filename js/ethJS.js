@@ -273,7 +273,7 @@ $(document).ready(function() {
             dMultiMatch["multi_match"] = dTemp;
             dQueryOuter["query"] = dMultiMatch;
             var jsonString = JSON.stringify(dQueryOuter);
-
+            
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
@@ -464,11 +464,7 @@ function getItemsViaFlask() {
     console.log("getItemsViaFlask");
     console.log(theUrlForData2);
     console.log("POST");
-    _data = {
-        "query": {
-                "match_all": {}
-        }
-    }
+    _data = {"query":{"match_all":{}},"size":100}
     var _dataString = JSON.stringify(_data);
     $.ajax({
         url: theUrlForData2,
