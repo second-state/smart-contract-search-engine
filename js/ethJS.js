@@ -35,10 +35,6 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    //, "post", jsonString, "json", "application/json"
-    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
-    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
-    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
 
     $(".overview").empty();
 
@@ -69,6 +65,10 @@ $(document).ready(function() {
 });
 
 async function renderOverview(){
+    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
+    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
+    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
+
     
     await $.ajax({
         url: master,
