@@ -506,10 +506,30 @@ function renderItems(_hits) {
         var dl = jQuery("<dl/>", {});
         dl.appendTo(details);
 
+        var address = jQuery("<dt/>", {
+            text: "Address: " + value.contractAddress
+        });
+        address.appendTo(dl);
+
+        var block = jQuery("<dt/>", {
+            text: "Block: " + value.blockNumber
+        });
+        block.appendTo(dl);
+
+        var transaction = jQuery("<dt/>", {
+            text: "Address: " + value.TxHash
+        });
+        transaction.appendTo(dl);
+
         var creator = jQuery("<dt/>", {
             text: "Creator: " + value.creator
         });
         creator.appendTo(dl);
+
+        var lineBreak = jQuery("<hr/>", {});
+        lineBreak.appendTo(".results");
+
+        
 /*
         var description = jQuery("<dd/>", {
             text: "Description: " + value._source.functionData.info[2]
