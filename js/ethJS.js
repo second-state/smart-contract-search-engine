@@ -73,7 +73,8 @@ $(document).ready(function() {
             contractAmount = response["hits"]["total"];
             console.log("Fetched contract amount: " + contractAmount);
             contracts = jQuery("<dt/>", {
-                text: " - " + contractAmount.toLocaleString() + " contracts indexed"
+                text: " - " + contractAmount.toLocaleString() + " contracts indexed",
+                class: "centeredText",
             });
             contracts.appendTo(dlOverview);
         },
@@ -92,7 +93,8 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
+                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs",
+                class: "centeredText",
             });
             contractsWithAbis.appendTo(dlOverview);
         },
