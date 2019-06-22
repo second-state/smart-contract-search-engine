@@ -73,32 +73,26 @@ def es_search():
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     outerList = []
     for returnedItem in results:
-        outerList.append(returnedItem)
+       uniqueDict = {}
         for rKey, rValue in returnedItem.items():
-            print("rkey:")
-            print(rKey)
-            print("rValue")
-            print(rValue)
-    #    uniqueDict = {}
-    #     for rKey, rValue in returnedItem.items():
-    #         if str(rKey) == "_source":
-    #             for sKey, sValue in rValue.items():
-    #                 if str(sKey) == "functionDataList":
-    #                     for functionDataListItem in sValue:
-    #                         for fKey, fValue in functionDataListItem.items():
-    #                             if fKey in uniqueDict:
-    #                                 print("We already have " + str(fKey))
-    #                             else:
-    #                                 uniqueDict[fKey] = fValue
-    #                 else:
-    #                     if sKey in uniqueDict:
-    #                         print("We already have " + str(sKey))
-    #                     else:
-    #                         uniqueDict[sKey] = sValue
-    #     outerList.append(uniqueDict)
+            if str(rKey) == "_source":
+                for sKey, sValue in rValue.items():
+                    if str(sKey) == "functionDataList":
+                        for functionDataListItem in sValue['0']:
+                            for fKey, fValue in functionDataListItem.items():
+                                if fKey in uniqueDict:
+                                    print("We already have " + str(fKey))
+                                else:
+                                    uniqueDict[fKey] = fValue
+                    else:
+                        if sKey in uniqueDict:
+                            print("We already have " + str(sKey))
+                        else:
+                            uniqueDict[sKey] = sValue
+        outerList.append(uniqueDict)
     resultsDict = {}
     resultsDict["results"] = outerList
-    #print(resultsDict)
+    print(resultsDict)
     return jsonify(resultsDict["results"])
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
