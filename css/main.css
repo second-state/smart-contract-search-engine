@@ -49,6 +49,11 @@ body {
 	text-shadow: 2px 1px #f9f9f9;
 }
 
+.pageLinks {
+	text-align: center;
+	padding: 1%;
+}
+
 .expired {
 	color: red;
 }
