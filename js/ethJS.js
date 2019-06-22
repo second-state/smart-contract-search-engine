@@ -23,6 +23,7 @@ if (searchEngineNetwork == "1") {
 }
 
 var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
 // CONFIG END
 
 // CODE START
@@ -32,6 +33,75 @@ function checkNetwork() {
         alert("Please download \nhttps://metamask.io/ \nand/or\n select the correct network in your correctly installed MetaMask Chrome extension!");
     }
 }
+
+$(document).ready(function() {
+    renderOverview();
+});
+
+async function renderOverview(){
+    //, "post", jsonString, "json", "application/json"
+    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
+    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
+    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
+
+    $(".overview").empty();
+
+    var overviewRow = jQuery("<div/>", {
+        class: "row",
+    });
+    overviewRow.appendTo(".overview");
+
+    var overviewDetails = jQuery("<div/>", {
+        class: "col-sm-12"
+    });
+    overviewDetails.appendTo(overviewRow);
+
+    var dlOverview = jQuery("<dl/>", {});
+    dlOverview.appendTo(overviewDetails);
+
+    await $.ajax({
+        url: master,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            console.log("Fetched contract amount");
+            this.contractAmount = response["hits"]["total"];
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+    await $.ajax({
+        url: common,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            console.log("Fetched contracts with ABI amount");
+            this.contractsWithAbisAmount = response["hits"]["total"];
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+    var contracts = jQuery("<dt/>", {
+        text: "We have a total of " + contractAmount + " contracts indexed"
+    });
+    contracts.appendTo(dlOverview);
+
+    var contractsWithAbis = jQuery("<dt/>", {
+        text: "We have a total of " + contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+    });
+    contractsWithAbis.appendTo(dlOverview);
+
+    }
+
+
 
 $(document).ready(function() {
     window.addEventListener("load", function() {
@@ -422,6 +492,8 @@ function getItemsViaFlask() {
 
 }
 
+
+
 function renderItems(_hits) {
     $(".results").empty();
     $.each(_hits, function(index, value) {
@@ -703,7 +775,7 @@ function renderItems(_hits) {
         var lineBreak = jQuery("<hr/>", {});
         lineBreak.appendTo(".results");
         */
-        
+
     });
 }
 
