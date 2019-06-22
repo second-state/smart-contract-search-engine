@@ -41,9 +41,9 @@ $(document).ready(function() {
     var contracts = "";
     var contractsWithAbis = "";
 
-    $(".overview").empty();
+    //$(".overview").empty();
 
-    var overviewRow = jQuery("<div/>", {
+    var overviewRow1 = jQuery("<div/>", {
         class: "row",
     });
     overviewRow.appendTo(".overview");
@@ -67,7 +67,7 @@ $(document).ready(function() {
             contractAmount = response["hits"]["total"];
             console.log("Fetched contract amount: " + contractAmount);
             contracts = jQuery("<dt/>", {
-                text: "We have a total of " + contractAmount.toLocaleString() + " contracts indexed"
+                text: contractAmount.toLocaleString() + " contracts indexed"
             });
             contracts.appendTo(dlOverview);
         },
@@ -86,7 +86,7 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: "We have " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
+                text: contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
             });
             contractsWithAbis.appendTo(dlOverview);
         },
