@@ -251,6 +251,8 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         $(".results").empty()
+        getItemsViaFlask(elasticSearchUrl);
+        /*
         var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
         //console.log($.trim(theAddress.length));
@@ -411,6 +413,7 @@ $(document).ready(function() {
 
             //console.log(itemArray);
         }
+        */
 
     });
 });
