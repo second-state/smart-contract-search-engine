@@ -35,30 +35,11 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    pageSetup();
-});
-
-async function pageSetup(){
-    $(".overview").empty();
-
     contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
 
-    var overviewRow = jQuery("<div/>", {
-        class: "row",
-    });
-    overviewRow.appendTo(".overview");
 
-    var overviewDetails = jQuery("<div/>", {
-        class: "col-sm-12"
-    });
-    overviewDetails.appendTo(overviewRow);
-
-    var dlOverview = jQuery("<dl/>", {});
-    dlOverview.appendTo(overviewDetails);
-
-    
     await $.ajax({
         url: master,
         type: "post",
@@ -89,26 +70,35 @@ async function pageSetup(){
         }
     });
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+    setTimeout(pageSetup, 1000, this.contractAmount, this.contractsWithAbisAmount);
+});
+
+async function pageSetup(_contractAmount, _contractsWithAbisAmount){
+    $(".overview").empty();
+
+    var overviewRow = jQuery("<div/>", {
+        class: "row",
+    });
+    overviewRow.appendTo(".overview");
+
+    var overviewDetails = jQuery("<div/>", {
+        class: "col-sm-12"
+    });
+    overviewDetails.appendTo(overviewRow);
+
+    var dlOverview = jQuery("<dl/>", {});
+    dlOverview.appendTo(overviewDetails);
+
+    var contracts = jQuery("<dt/>", {
+    text: "We have a total of " + _contractAmount + " contracts indexed"
+    });
+    contracts.appendTo(dlOverview);
+
+    var contractsWithAbis = jQuery("<dt/>", {
+        text: "We have a total of " + _contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+    });
+    contractsWithAbis.appendTo(dlOverview);
     }
-
-    if (this.contractsWithAbisAmount == null || this.contractAmount == null){
-        console.log("Waiting ...");
-        await sleep(500);
-        var contracts = jQuery("<dt/>", {
-        text: "We have a total of " + this.contractAmount + " contracts indexed"
-        });
-        contracts.appendTo(dlOverview);
-
-        var contractsWithAbis = jQuery("<dt/>", {
-            text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
-        });
-        contractsWithAbis.appendTo(dlOverview);
-    }
-
-}
-
 
 $(document).ready(function() {
     window.addEventListener("load", function() {
