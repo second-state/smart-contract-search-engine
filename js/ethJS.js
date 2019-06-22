@@ -412,8 +412,8 @@ function getItemsViaFlask() {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            console.log(response)
-            //renderItems(response);
+            //console.log(response)
+            renderItems(response);
         },
         error: function(xhr) {
             console.log("Get items failed");
@@ -431,31 +431,19 @@ function renderItems(_hits) {
         });
         row.appendTo(".results");
 
-        var imageContainer = jQuery("<div/>", {
-            class: "col-sm-4"
-        });
-        imageContainer.appendTo(row);
-
-        var image = jQuery("<img/>", {
-            class: "img-thumbnail",
-            src: value._source.functionData.info[3],
-            alt: "giveaway"
-        });
-        image.appendTo(imageContainer);
-
         var details = jQuery("<div/>", {
-            class: "col-sm-8"
+            class: "col-sm-12"
         });
         details.appendTo(row);
 
         var dl = jQuery("<dl/>", {});
         dl.appendTo(details);
 
-        var title = jQuery("<dt/>", {
-            text: "Title: " + value._source.functionData.info[1]
+        var creator = jQuery("<dt/>", {
+            text: "Creator: " + value.creator
         });
-        title.appendTo(dl);
-
+        creator.appendTo(dl);
+/*
         var description = jQuery("<dd/>", {
             text: "Description: " + value._source.functionData.info[2]
         });
@@ -556,7 +544,7 @@ function renderItems(_hits) {
 
         //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
 
-        /* More details */
+
         var pGroup = jQuery("<div/>", {
             class: "panel-group"
         });
@@ -714,6 +702,9 @@ function renderItems(_hits) {
         }
         var lineBreak = jQuery("<hr/>", {});
         lineBreak.appendTo(".results");
+        */
+        
     });
 }
+
 // CODE END
