@@ -55,7 +55,7 @@ $(document).ready(function() {
 
     var overviewText = jQuery("<div/>", {
         text: "This demonstration, of the Ethereum MainNet has:",
-        class: centeredText,
+        class: "centeredText",
     });
     overviewText.appendTo(overviewDetails);
 
