@@ -67,7 +67,7 @@ $(document).ready(function() {
             contractAmount = response["hits"]["total"];
             console.log("Fetched contract amount: " + contractAmount);
             contracts = jQuery("<dt/>", {
-                text: "We have a total of " + contractAmount + " contracts indexed"
+                text: "We have a total of " + contractAmount.toLocaleString() + " contracts indexed"
             });
             contracts.appendTo(dlOverview);
         },
@@ -86,7 +86,7 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: "We have a total of " + contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+                text: "We have a total of " + contractsWithAbisAmount.toLocaleString() + " contracts indexed with supporting ABIs"
             });
             contractsWithAbis.appendTo(dlOverview);
         },
