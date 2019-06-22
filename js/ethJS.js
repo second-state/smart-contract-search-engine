@@ -35,7 +35,10 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
+    pageSetup();
+});
 
+async function pageSetup(){
     $(".overview").empty();
 
     var overviewRow = jQuery("<div/>", {
@@ -51,7 +54,7 @@ $(document).ready(function() {
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
 
-    renderOverview();
+    await renderOverview();
 
     var contracts = jQuery("<dt/>", {
         text: "We have a total of " + this.contractAmount + " contracts indexed"
@@ -62,7 +65,7 @@ $(document).ready(function() {
         text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
     });
     contractsWithAbis.appendTo(dlOverview);
-});
+}
 
 async function renderOverview(){
     contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
