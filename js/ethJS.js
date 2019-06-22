@@ -531,6 +531,21 @@ function renderItems(_hits) {
                 text: "Type: ERC20"
             });
             type.appendTo(dl);
+
+            var name = jQuery("<dt/>", {
+                text: "ERC20 Name: " + value.functionData.name
+            });
+            name.appendTo(dl);
+
+            var symbol = jQuery("<dt/>", {
+                text: "ERC20 Symbol: " + value.functionData.symbol
+            });
+            symbol.appendTo(dl);
+
+            var supply = jQuery("<dt/>", {
+                text: "ERC20 Supply: " + value.functionData.totalSupply
+            });
+            supply.appendTo(dl);
         }
         console.log(value);
 
