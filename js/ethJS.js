@@ -467,7 +467,7 @@ function getItemsViaFlask() {
     console.log("getItemsViaFlask");
     console.log(theUrlForData2);
     console.log("POST");
-    _data = {"query":{"match_all":{}},"size":100}
+    _data = {"query":{"match_all":{}},"size":25}
     var _dataString = JSON.stringify(_data);
     $.ajax({
         url: theUrlForData2,
