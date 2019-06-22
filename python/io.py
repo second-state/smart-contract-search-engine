@@ -73,7 +73,7 @@ def es_search():
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     outerList = []
     for returnedItem in results:
-       uniqueDict = {}
+        uniqueDict = {}
         for rKey, rValue in returnedItem.items():
             if str(rKey) == "_source":
                 for sKey, sValue in rValue.items():
