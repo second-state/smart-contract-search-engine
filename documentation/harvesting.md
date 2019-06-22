@@ -1,145 +1,5 @@
 ## Harvesting 
-
-The harvesting code is written in Python; it requires a particular smart contract's ABI and bytecode as well as a link to the blockchain (an RPC endpoint to the network where the contract was deployed)
-
-### Getting the code
-Simply clone the repository.
-```
-git clone https://github.com/second-state/smart-contract-search-engine.git
-```
-
-### Configuring the harvesting code
-Open the [config.ini](https://github.com/second-state/smart-contract-search-engine/blob/master/python/config.ini) file. 
-
-**Blockchain -> rpc variable in config.ini**
-It is important that the search engine is pointing to the correct RPC endpoint i.e. CMT TestNet vs MainNet
-```
-[blockchain]
-rpc = https://testnet-rpc.cybermiles.io:8545
-```
-
-**Elasticsearch**
-Please also put in your Elasticsearch URL and region.
-
-```
-[blockchain]
-rpc = https://testnet-rpc.cybermiles.io:8545
-
-[elasticSearch]
-endpoint = search-smart-contract-search-engine-cdul5cxmqop325ularygq62khi.ap-southeast-2.es.amazonaws.com
-aws_region = ap-southeast-2
-
-```
-
-**Index names**
-The masterindex, abiindex and bytecode index can all stay as they are below. You might just want to change the commonindex to be more descriptive i.e. mainnet, testnet etc.
-
-```
-[masterindex]
-all = all
-
-[abiindex]
-abi = abi
-
-[bytecodeindex]
-bytecode = bytecode
-
-[commonindex]
-network = cmttestnetmultiabi
-```
-
-### Full - smart contract harvest
-
-The Python file, at `python/harvest.py` harvests the entire blockchain (in reverse, from the latest block, right back to the genesis block).
-
-```python3
-python3.6 harvest.py -m full
-```
-
-Keep in mind, the full - smart contract harvest does check if each contract instance already exists (and so there is no real downside if it ever runs more than once.
-
-```bash
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
-```
-
-### Topup - smart contract harvest
-
-The Python file, at `python/harvest.py` harvests only the most recent blocks in the chain. This does not have to be repeated in a cron task etc. This will loop over the most recent blocks in the chain over and over without stopping.
-
-```bash
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
-```
-
-### Update - smart contract harvest
-
-The Python file, at `python/harvest.py` also continously updates the state of already harvested contracts.
-
-```bash
-cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
-```
-
-This state update will also run repeatedly without the need for calling this command again. 
-
-### Recommended usage - Run once at startup!
-**Run at startup**
-
-Technically speaking you will just want to run all of these commands the **one** time, at startup!. 
-The system will take care of itself. Here is an example of how to run this once at startup.
-
-**Step 1**
-Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file. 
-**Please**  be sure to replace `https://testnet-rpc.cybermiles.io:8545` with that of your RPC.
-
-```bash
-#!/bin/bash
-while true
-do
-  STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
-  if [ $STATUS -eq 200 ]; then
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
-    break
-  else
-    echo "Got $STATUS please wait"
-  fi
-  sleep 10
-done
-```
-**Step 2**
-Add the following command to cron using `crontab -e` command.
-```bash
-@reboot ~/startup.sh
-```
-The smart contract search engine will autonomously harvest upon bootup.
-
-## Keep alive
-The following script ensures that the system will wait out any time periods where the RPC endpoint is not available. The system will essentially perform a quick reboot if the RPC goes down. You may have already noticed that the startup1.sh and startup2.sh scripts perform a similar URL status check; so rest assured that they will not start harvesting again until the RPC endpoint is back up.
-
-Please create the following bash script and make it executable using `chmod`. Please be sure to use your own RPC endpoint as apposed to the `https://testnet-rpc.cybermiles.io:8545` here.
-```
-#!/bin/bash
-STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
-if [ $STATUS -eq 200 ]; then
-  echo "Got 200! All done!"
-else
-  HARVEST_COUNT=$(ps ax | grep harvest.py | wc -l)
-  if [ $HARVEST_COUNT -le 2 ]; then 
-    echo "Obviously the system just rebooted so we are still waiting for the startup1.sh & startup2.sh scripts to activate (this will only happen when the RPC endpoint is back in service)"
-  else
-    echo "It seems that we have harvesting processes running but no working RPC endpoint, time to reboot... "
-    sudo shutdown -r now
-  fi 
-fi
-```
-
-Please add the following to your crontab -e
-```
-* * * * * nohup ~/rpcCheck.sh >/dev/null 2>&1 &
-```
+Please follow the instructions below so that your system can automatically execute all of the search engine's scripts.
 
 # Preparing your operating system for harvesting - installing the necessary libraries
 
@@ -273,6 +133,68 @@ Please use this code for now. It will upload the FairPlay V1 and FairPlay V2 ABI
 
 ```
 https://github.com/second-state/smart-contract-search-engine/blob/master/python/load_v1_v2_abi_byecode.py
+```
+
+
+### Recommended usage - Run once at startup!
+**Run at startup**
+
+Technically speaking you will just want to run all of these commands the **one** time, at startup!. 
+The system will take care of itself. Here is an example of how to run this once at startup.
+
+**Step 1**
+Create a bash file, say, `~/startup.sh` and make it executable with the `chmod a+x` command. Then put the following code in the file. 
+**Please**  be sure to replace `https://testnet-rpc.cybermiles.io:8545` with that of your RPC.
+
+```bash
+#!/bin/bash
+while true
+do
+  STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://YOUR RPC NODE GOES HERE)
+  if [ $STATUS -eq 200 ]; then
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m tx >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m abi >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m full >/dev/null 2>&1 &
+    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest_all.py -m topup >/dev/null 2>&1 &
+    break
+  else
+    echo "Got $STATUS please wait"
+  fi
+  sleep 10
+done
+```
+**Step 2**
+Add the following command to cron using `crontab -e` command.
+```bash
+@reboot ~/startup.sh
+```
+The smart contract search engine will autonomously harvest upon bootup.
+
+## Keep alive
+The following script ensures that the system will wait out any time periods where the RPC endpoint is not available. The system will essentially perform a quick reboot if the RPC goes down. You may have already noticed that the startup1.sh and startup2.sh scripts perform a similar URL status check; so rest assured that they will not start harvesting again until the RPC endpoint is back up.
+
+Please create the following bash script and make it executable using `chmod`. Please be sure to use your own RPC endpoint as apposed to the `https://testnet-rpc.cybermiles.io:8545` here.
+```
+#!/bin/bash
+STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://testnet-rpc.cybermiles.io:8545)
+if [ $STATUS -eq 200 ]; then
+  echo "Got 200! All done!"
+else
+  HARVEST_COUNT=$(ps ax | grep harvest.py | wc -l)
+  if [ $HARVEST_COUNT -le 2 ]; then 
+    echo "Obviously the system just rebooted so we are still waiting for the startup1.sh & startup2.sh scripts to activate (this will only happen when the RPC endpoint is back in service)"
+  else
+    echo "It seems that we have harvesting processes running but no working RPC endpoint, time to reboot... "
+    sudo shutdown -r now
+  fi 
+fi
+```
+
+Please add the following to your crontab -e
+```
+* * * * * nohup ~/rpcCheck.sh >/dev/null 2>&1 &
 ```
 
 # Known system errors
