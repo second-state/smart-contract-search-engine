@@ -95,7 +95,7 @@ async function pageSetup(){
 
     if (this.contractsWithAbisAmount == null || this.contractAmount == null){
         console.log("Waiting ...");
-        await this.sleep(500);
+        await sleep(500);
         var contracts = jQuery("<dt/>", {
         text: "We have a total of " + this.contractAmount + " contracts indexed"
         });
