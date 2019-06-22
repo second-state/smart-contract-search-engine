@@ -513,7 +513,7 @@ function renderItems(_hits) {
         block.appendTo(dl);
 
         var transaction = jQuery("<dt/>", {
-            text: "Address: " + value.TxHash
+            text: "Transaction: " + value.TxHash
         });
         transaction.appendTo(dl);
 
@@ -532,6 +532,7 @@ function renderItems(_hits) {
             });
             type.appendTo(dl);
         }
+        console.log(value);
 
 
         
