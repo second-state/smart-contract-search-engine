@@ -54,7 +54,12 @@ $(document).ready(function() {
     overviewDetails.appendTo(overviewRow);
 
     var overviewText = jQuery("<div/>", {
-        text: "This is an open source smart contract search engine and API. This demonstration, of the Ethereum MainNet has:",
+        text: "This is an open source smart contract search engine and API.",
+    });
+    overviewText.appendTo(overviewDetails);
+
+    var overviewText = jQuery("<div/>", {
+        text: "This demonstration, of the Ethereum MainNet has:",
     });
     overviewText.appendTo(overviewDetails);
 
@@ -72,7 +77,7 @@ $(document).ready(function() {
             contractAmount = response["hits"]["total"];
             console.log("Fetched contract amount: " + contractAmount);
             contracts = jQuery("<dt/>", {
-                text: contractAmount.toLocaleString() + " contracts indexed"
+                text: " - " + contractAmount.toLocaleString() + " contracts indexed"
             });
             contracts.appendTo(dlOverview);
         },
@@ -91,7 +96,7 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
+                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs"
             });
             contractsWithAbis.appendTo(dlOverview);
         },
