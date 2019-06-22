@@ -38,43 +38,9 @@ $(document).ready(function() {
     contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
-    contractAmount = 0;
-    contractsWithAbisAmount = 0;
+    var contracts = "";
+    var contractsWithAbis = "";
 
-    $.ajax({
-        url: master,
-        type: "post",
-        data: contractsQuery,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(response) {
-            contractAmount = response["hits"]["total"];
-            console.log("Fetched contract amount: " + contractAmount);
-        },
-        error: function(xhr) {
-            console.log("Get amount failed");
-        }
-    });
-
-    $.ajax({
-        url: common,
-        type: "post",
-        data: contractsQuery,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(response) {
-            contractsWithAbisAmount = response["hits"]["total"];
-            console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
-        },
-        error: function(xhr) {
-            console.log("Get amount failed");
-        }
-    });
-
-    setTimeout(pageSetup(), 2000, contractAmount, contractsWithAbisAmount);
-});
-
-function pageSetup(_contractAmount, _contractsWithAbisAmount){
     $(".overview").empty();
 
     var overviewRow = jQuery("<div/>", {
@@ -90,16 +56,47 @@ function pageSetup(_contractAmount, _contractsWithAbisAmount){
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
 
-    var contracts = jQuery("<dt/>", {
-    text: "We have a total of " + _contractAmount + " contracts indexed"
-    });
-    contracts.appendTo(dlOverview);
 
-    var contractsWithAbis = jQuery("<dt/>", {
-        text: "We have a total of " + _contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+    $.ajax({
+        url: master,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            contractAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + contractAmount);
+            contracts = jQuery("<dt/>", {
+                text: "We have a total of " + _contractAmount + " contracts indexed"
+            });
+            contracts.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
     });
-    contractsWithAbis.appendTo(dlOverview);
-}
+
+    $.ajax({
+        url: common,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            contractsWithAbisAmount = response["hits"]["total"];
+            console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
+            contractsWithAbis = jQuery("<dt/>", {
+                text: "We have a total of " + _contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+            });
+            contractsWithAbis.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+});
+
 
 $(document).ready(function() {
     window.addEventListener("load", function() {
