@@ -35,10 +35,6 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    renderOverview();
-});
-
-async function renderOverview(){
     //, "post", jsonString, "json", "application/json"
     contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
@@ -59,6 +55,21 @@ async function renderOverview(){
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
 
+    renderOverview();
+
+    var contracts = jQuery("<dt/>", {
+        text: "We have a total of " + this.contractAmount + " contracts indexed"
+    });
+    contracts.appendTo(dlOverview);
+
+    var contractsWithAbis = jQuery("<dt/>", {
+        text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
+    });
+    contractsWithAbis.appendTo(dlOverview);
+});
+
+async function renderOverview(){
+    
     await $.ajax({
         url: master,
         type: "post",
@@ -89,17 +100,7 @@ async function renderOverview(){
         }
     });
 
-    var contracts = jQuery("<dt/>", {
-        text: "We have a total of " + this.contractAmount + " contracts indexed"
-    });
-    contracts.appendTo(dlOverview);
-
-    var contractsWithAbis = jQuery("<dt/>", {
-        text: "We have a total of " + this.contractsWithAbisAmount + " contracts indexed with supporting ABIs"
-    });
-    contractsWithAbis.appendTo(dlOverview);
-
-    }
+}
 
 
 
