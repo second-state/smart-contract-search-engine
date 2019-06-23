@@ -1,49 +1,11 @@
-
-#IMPORTS
-import os
-import time
+import re
 import json
-import boto3 
+import time
 import requests
-import configparser
+from harvest import Harvest
 import elasticsearch.helpers
-from flask import Flask, jsonify, request
-from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
-from elasticsearch import Elasticsearch, RequestsHttpConnection 
 
-# CONFIG
-
-# CWD
-scriptExecutionLocation = os.getcwd()
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
-
-host = config['elasticSearch']['endpoint']
-print("ElasticSearch Endpoint: %s" % host)
-
-masterIndex = config['masterindex']['all']
-print("masterIndex: %s" % masterIndex)
-
-commonIndex = config['commonindex']['network']
-print("commonIndex: %s" % commonIndex)
-
-abiIndex = config['abiindex']['abi']
-print("abiIndex: %s" % abiIndex)
-
-bytecodeIndex = config['bytecodeindex']['bytecode']
-print("bytecodeIndex: %s" % bytecodeIndex)
-
-elasticSearchAwsRegion = config['elasticSearch']['aws_region']
-
-auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
-es = Elasticsearch(
-    hosts=[{'host': host, 'port': 443}],
-    region=elasticSearchAwsRegion,
-    use_ssl=True,
-    verify_certs=True,
-    http_auth=auth,
-    connection_class=RequestsHttpConnection
-)
+harvester = Harvest()
 
 app = Flask(__name__)
 
@@ -51,20 +13,22 @@ app = Flask(__name__)
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
-    ## The users would have visited the upload_abi page which would have displayed all of the contracts without ABIShA3 field. 
-    ## The "all" index is the one which has all of the contract addresses we refer to it as the masterIndex
-    ## Instantiate a web3 contract instance using the abi and the address provided from the submit_api page
-    ## If this passes then create an ES update query like this
-    ## The ABI
-    ## abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-    ## abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+    theDeterministicHash = harvester.shaAnAbi(jsonRequestData["abi"])
+    cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonRequestData["abi"])
+    transactionHash = jsonRequestData["hash"]
 
-    ## Once we have cleaned the ABI we create the hash of it 
-    ## abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
-    ## Use Elasticsearch to update the record 
-    ## data = {}
-    ## data['abi'] = abiData
-    ## es.index(index="abi", id=abiSha, body=abiData)
+    try:
+        # Try and index the contract instance directly into the common index
+        harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
+        # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
+        data = {}
+        data['indexInProgress'] = "false"
+        data['epochOfLastUpdate'] = int(time.time())
+        data['abi'] = cleanedAndOrderedAbiText
+        harvester.loadDataIntoElastic(index=harvester.abiIndex, id=theDeterministicHash, body=data)
+        print("Index was a success")
+    except:
+        print("There was an error indexing this contract")
 
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
@@ -102,7 +66,7 @@ def getAll():
     query = {}
     query["query"] = matchAll
     allQuery = json.loads(json.dumps(query))
-    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=allQuery)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=allQuery)
     obj = {}
     num = 1
     for item in results:
@@ -120,7 +84,7 @@ def es_update_quality():
         outerData = {}
         outerData["quality"] = qualityScore
         doc["doc"] = outerData
-        theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+        theResponse = harvester.es.update(index=harvester.commonIndex, id=itemId, body=json.dumps(doc))
         return jsonify(theResponse)
 
 if __name__ == "__main__":
