@@ -91,6 +91,12 @@ class Harvest:
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
+    def getOnly100Records(self):
+        query = {"query":{"match_all":{}},"size": 100}
+        textQuery = json.dumps(query)
+        results = self.es.get(index=self.commonIndex, body=query)
+        return results
+
     def fetchAbiUsingHash(self, _esId):
         try:
             esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)

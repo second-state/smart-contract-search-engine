@@ -34,13 +34,42 @@ def submit_abi():
         harvester.loadDataIntoElastic(index=harvester.abiIndex, id=theDeterministicHash, body=data)
         print("Index was a success")
 
-
+@app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
+def es_quick_100_search():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    results = harvest.getOnly100Records()
+    outerList = []
+    for returnedItem in results:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                for sKey, sValue in rValue.items():
+                    if str(sKey) == "functionDataList":
+                        for functionDataListItem in sValue['0']:
+                            for fKey, fValue in functionDataListItem.items():
+                                if fKey in uniqueDict:
+                                    #print("We already have " + str(fKey))
+                                    print(".")
+                                else:
+                                    uniqueDict[fKey] = fValue
+                    else:
+                        if sKey in uniqueDict:
+                            #print("We already have " + str(sKey))
+                            print(".")
+                        else:
+                            uniqueDict[sKey] = sValue
+        outerList.append(uniqueDict)
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
     print(request)
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData, size=100)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData)
     outerList = []
     for returnedItem in results:
         uniqueDict = {}

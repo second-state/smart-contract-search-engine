@@ -366,17 +366,34 @@ function renderContractVariables(_result) {
         });
     }
 
+    function getQuickItemsViaFlask() {
+        theUrlForData2 = publicIp + "/api/es_quick_100_search";
+        _data = {"query":{"match_all": {}}};
+        var _dataString = JSON.stringify(_data);
+        $.ajax({
+            url: theUrlForData2,
+            type: "POST",
+            data: _dataString,
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response) {
+                //console.log(response)
+                renderItems(response);
+            },
+            error: function(xhr) {
+                console.log("Get items failed");
+            }
+        });
+
+    }
+    es_quick_100_search
+
     function getItemsViaFlask() {
         theUrlForData2 = publicIp + "/api/es_search";
         console.log("getItemsViaFlask");
         console.log(theUrlForData2);
         console.log("POST");
-        _data = {
-            "query": {
-                "match_all": {}
-            },
-            "size": 25
-        }
+        _data = {"query":{"match_all": {}}};
         var _dataString = JSON.stringify(_data);
         $.ajax({
             url: theUrlForData2,
