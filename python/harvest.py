@@ -307,36 +307,36 @@ class Harvest:
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == False:
-                try:                                    
-                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
-                    functionData = self.fetchPureViewFunctionData(contractInstance)
-                    functionDataId = self.getFunctionDataId(functionData)
-                    outerData = {}
-                    outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                    abiList = []
-                    abiHash = self.shaAnAbi(_contractAbiJSONData)
-                    abiList.append(abiHash)
-                    outerData['abiShaList'] = abiList
-                    outerData['blockNumber'] = transactionReceipt.blockNumber
-                    outerData['creator'] = transactionReceipt['from']
-                    outerData['contractAddress'] = itemId
-                    functionDataList = []
-                    functionDataObjectInner = {}
-                    functionDataObjectInner['functionDataId'] = functionDataId
-                    functionDataObjectInner['functionData'] = functionData
-                    uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
-                    uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-                    functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
-                    functionDataList.append(functionDataObjectInner)
-                    functionDataObjectOuter = {}
-                    functionDataObjectOuter["0"] = functionDataList
-                    outerData['functionDataList'] = functionDataObjectOuter
-                    outerData["requiresUpdating"] = "yes"
-                    outerData['quality'] = "50"
-                    outerData['indexInProgress'] = "false"
-                    indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
-                except:
-                    print("Unable to instantiate web3 contract object")
+                #try:                                    
+                contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
+                functionData = self.fetchPureViewFunctionData(contractInstance)
+                functionDataId = self.getFunctionDataId(functionData)
+                outerData = {}
+                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                abiList = []
+                abiHash = self.shaAnAbi(_contractAbiJSONData)
+                abiList.append(abiHash)
+                outerData['abiShaList'] = abiList
+                outerData['blockNumber'] = transactionReceipt.blockNumber
+                outerData['creator'] = transactionReceipt['from']
+                outerData['contractAddress'] = itemId
+                functionDataList = []
+                functionDataObjectInner = {}
+                functionDataObjectInner['functionDataId'] = functionDataId
+                functionDataObjectInner['functionData'] = functionData
+                uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
+                uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
+                functionDataList.append(functionDataObjectInner)
+                functionDataObjectOuter = {}
+                functionDataObjectOuter["0"] = functionDataList
+                outerData['functionDataList'] = functionDataObjectOuter
+                outerData["requiresUpdating"] = "yes"
+                outerData['quality'] = "50"
+                outerData['indexInProgress'] = "false"
+                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+                #except:
+                #    print("Unable to instantiate web3 contract object")
             else:
                 print("Item is already indexed")
         else:
