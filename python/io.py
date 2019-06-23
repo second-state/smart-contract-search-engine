@@ -43,7 +43,7 @@ def es_quick_100_search():
     print(results)
     for returnedItem in results["hits"]["hits"]:
         uniqueDict = {}
-        for rKey, rValue in returnedItem:
+        for rKey, rValue in returnedItem.items():
             if str(rKey) == "_source":
                 for sKey, sValue in rValue.items():
                     if str(sKey) == "functionDataList":
