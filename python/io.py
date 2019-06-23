@@ -40,6 +40,7 @@ def es_quick_100_search():
     jsonRequestData = json.loads(request.data)
     results = harvester.getOnly100Records()
     outerList = []
+    print(results)
     for returnedItem in results:
         uniqueDict = {}
         for rKey, rValue in returnedItem.items():
