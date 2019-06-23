@@ -33,6 +33,9 @@ def submit_abi():
         data['abi'] = cleanedAndOrderedAbiText
         harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
         print("Index was a success")
+        doc = {}
+        doc["response"] = 'Successfully indexed contract.'
+        return jsonify(doc)
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
 def es_quick_100_search():

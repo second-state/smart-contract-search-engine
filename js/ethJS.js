@@ -290,7 +290,17 @@ $(document).ready(function() {
                 contentType: "application/json",
                 success: function(response) {
                     console.log(response);
-                    renderContractVariables(response)
+                    $(".results").empty();
+                        var row = jQuery("<div/>", {
+                            class: "row",
+                        });
+                        row.appendTo(".results");
+
+                        var details = jQuery("<div/>", {
+                            class: "col-sm-12",
+                            text: response,
+                        });
+                        details.appendTo(row);
                 },
                 error: function(xhr) {
                     console.log("Index failed");
