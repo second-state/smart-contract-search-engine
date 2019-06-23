@@ -38,7 +38,7 @@ def submit_abi():
 def es_quick_100_search():
     print(request)
     jsonRequestData = json.loads(request.data)
-    results = harvest.getOnly100Records()
+    results = harvester.getOnly100Records()
     outerList = []
     for returnedItem in results:
         uniqueDict = {}
