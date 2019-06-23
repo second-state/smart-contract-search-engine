@@ -298,7 +298,7 @@ $(document).ready(function() {
 
                         var details = jQuery("<div/>", {
                             class: "col-sm-12",
-                            text: response["response"],
+                            text: "Congratulations, we have indexed the smart contract and its assocated ABI!",
                         });
                         details.appendTo(row);
                 },
