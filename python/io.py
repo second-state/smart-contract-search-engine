@@ -31,7 +31,7 @@ def submit_abi():
         data['indexInProgress'] = "false"
         data['epochOfLastUpdate'] = int(time.time())
         data['abi'] = cleanedAndOrderedAbiText
-        harvester.loadDataIntoElastic(index=harvester.abiIndex, id=theDeterministicHash, body=data)
+        harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
         print("Index was a success")
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
