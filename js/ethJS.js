@@ -290,11 +290,11 @@ $(document).ready(function() {
                 contentType: "application/json",
                 success: function(response) {
                     console.log(response);
-                    $(".results").empty();
+                    $(".abi").empty();
                         var row = jQuery("<div/>", {
                             class: "row",
                         });
-                        row.appendTo(".results");
+                        row.appendTo(".abi");
 
                         var details = jQuery("<div/>", {
                             class: "col-sm-12",
