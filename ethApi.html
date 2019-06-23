@@ -60,13 +60,13 @@
             <div class="col-sm-8">
             	The API can be accessed from any command line using the following Curl syntax.
             	<br />
-    <pre class="wideInput">
+    <code class="wideInput">
         curl -X GET "https://ethereum.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}'
-    </pre>
+    </code>
             	<br />
             	The above code (which fetches the Gemini (GUSD) token will return the following data)
             	<br />
-    <pre class="wideInput">
+    <code class="wideInput">
         [
           {
             "TxHash": "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b", 
@@ -93,7 +93,7 @@
             "uniqueAbiAndAddressHash": "0xbf4975d6d9d20a2a8a300beac225c91d0b0029fce0a5045d6b6a0480886d4d5e"
           }
         ]
-    </pre>
+    </code>
             	<br />
 
             </div>
