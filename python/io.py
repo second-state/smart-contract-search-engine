@@ -34,6 +34,7 @@ def submit_abi():
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
+    print(request)
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
     outerList = []
