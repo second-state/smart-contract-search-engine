@@ -281,7 +281,7 @@ $(document).ready(function() {
             data = {};
             data["abi"] = theAbi;
             data["hash"] = theHash;
-            dataString = json.stringify(data);
+            dataString = JSON.stringify(data);
             $.ajax({
                 url: abiLoadUrl,
                 type: "POST",
