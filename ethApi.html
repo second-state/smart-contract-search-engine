@@ -1,68 +1,65 @@
-<!doctype html><html lang="en"><head>
-<!-- Never cache -->
-<meta charset="utf-8">
-	<meta http-equiv='cache-control' content='no-cache'>
-		<meta http-equiv='expires' content='0'>
-			<meta http-equiv='pragma' content='no-cache'>
-				<!-- Required meta tags -->
-				<meta charset="utf-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-						<!-- Bootstrap CSS -->
-						<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"/>
-						<!-- Font CSS -->
-						<link href="https://fonts.googleapis.com/css?family=Spectral" rel="stylesheet"/>
-						<!-- SecondState CSS -->
-						<link rel="stylesheet" href="../css/main.css"/>
-						<!-- JQuery -->
-						<script type="text/javascript" src="../js/jquery-3.4.0.min.js"></script>
-						<!-- Custom SecondState functions -->
-						<script type="text/javascript" src="../js/ethJS.js"></script>
-						<!-- Web3 CMT -->
-						<script type="text/javascript" src="../js/web3-cmt.js"></script>
-						<title>Ethereum MainNet Search</title>
-					</head>
-					<body>
-						<div class="container rounded shaded">
-							<h1 class="centralHeading"><a href="ethIndex.html">Ethereum MainNet Search</a></h1>
-							<div class="row">
-									<div class="col-sm-4 centeredText"><a href="ethIndex.html">Home</a></div><div class="col-sm-4 centeredText"><a href="ethAbi.html">Upload your ABI</a></div><div class="col-sm-4  centeredText"><a href="ethApi.html">Try the API</a></div>
-								</div>
-						</div>
-						<div class="row">
-									<div class="col-sm-12 centeredText">This is an <a target="_blank" href="https://github.com/second-state/smart-contract-search-engine">open source smart contract search engine and API.</a></div>
-						</div>
-						<div class="container rounded bg-secondary" id="centralHeader2">
-							<!-- Start collapsable advanced search section -->
-							<br />
-							<br />
-								<div class="row">
-									<div class="col-sm-2"></div>
-									<div class="col-sm-8">
-										<!--
-										<input type="text" id="searchAddressInput" placeholder="Search using an address: 0x12345...">
-											<br />
-											<input type="text" id="searchTextInput" placeholder="Search using text: i.e. demonstration...">
-											<br />	
-										-->
-												<button class="bg-light" id="searchAddressButton">Search</button>
-												<br />
-											</div>
-											<div class="col-sm-2"></div>
-										</div>
+<!doctype html>
+<html lang="en">
 
-								
-									<!-- End collapsable advances search section -->
-								</div>
-								<hr class="hr"></hr>
-								<div class="container rounded shaded">
-									<div class="overview"></div>
-								</div>
-								<hr class="hr"></hr>
-								<div class="container rounded shaded">
-									<div class="api"></div>
-									<!-- Closing DIV of the page -->
-								</div>
-								<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-								<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-							</body>
-						</html>
+<head>
+    <!-- Never cache -->
+    <meta charset="utf-8">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <!-- Font CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&display=swap" rel="stylesheet">
+    <!-- SecondState CSS -->
+    <link rel="stylesheet" href="../css/main.css" />
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery-3.4.0.min.js"></script>
+    <!-- Custom SecondState functions -->
+    <script type="text/javascript" src="../js/ethJS.js"></script>
+    <!-- Web3 CMT -->
+    <script type="text/javascript" src="../js/web3-cmt.js"></script>
+    <title>Ethereum MainNet Search</title>
+</head>
+
+<body>
+    <div class="container rounded bg-darktm">
+        <br />
+        <div class="row">
+
+            <div class="col-sm-4"></div>
+            <div class="col-sm-8"><img src="../images/eth.png"></div>
+            <div class="col-sm-4"></div>
+        </div>
+        <br />
+    </div>
+
+    <div class="container rounded shaded">
+
+        <div class="row">
+            <div class="col-sm-4 centeredText"><a href="ethIndex.html">Search</a></div>
+            <div class="col-sm-4 centeredText"><a href="ethAbi.html">Upload ABI</a></div>
+            <div class="col-sm-4  centeredText"><a href="ethApi.html">Try API</a></div>
+        </div>
+    </div>
+    <div class="row text-whitetm">
+        <div class="col-sm-12 centeredText">This is an <a target="_blank" href="https://github.com/second-state/smart-contract-search-engine">open source smart contract search engine and API.</a></div>
+    </div>
+
+    <hr class="hr"></hr>
+    <div class="container rounded shaded">
+        <div class="overview"></div>
+    </div>
+    <hr class="hr"></hr>
+    <div class="container rounded shaded">
+        <div class="api"></div>
+        <!-- Closing DIV of the page -->
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+
+</html>
