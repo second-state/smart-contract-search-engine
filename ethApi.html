@@ -55,18 +55,18 @@
     </div>
     <hr class="hr"></hr>
     <div class="container rounded shaded">
-        <div class="api"></div>
+        <div class="api">
          <div class="col-sm-4"></div>
             <div class="col-sm-8">
             	The API can be accessed from any command line using the following Curl syntax.
             	<br />
-    <code class="wideInput">
+    <pre>
         curl -X GET "https://ethereum.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}'
-    </code>
+    </pre>
             	<br />
             	The above code (which fetches the Gemini (GUSD) token will return the following data)
             	<br />
-    <code class="wideInput">
+    <pre>
         [
           {
             "TxHash": "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b", 
@@ -93,7 +93,7 @@
             "uniqueAbiAndAddressHash": "0xbf4975d6d9d20a2a8a300beac225c91d0b0029fce0a5045d6b6a0480886d4d5e"
           }
         ]
-    </code>
+    </pre>
             	<br />
 
             </div>
@@ -101,6 +101,7 @@
         
         <!-- Closing DIV of the page -->
     </div>
+</div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <p class="text-whitetm"><a href="https://en.bitcoinwiki.org/wiki/File:Ethereum11.png">Logo by Artillar (CC-BY-SA)</a></p>
