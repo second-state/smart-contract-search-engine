@@ -1,5 +1,5 @@
 body {
-	font-family: 'Spectral', serif;
+	font-family: 'Open Sans Condensed', sans-serif;
 }
 
 #searchAddressInput {
@@ -29,6 +29,15 @@ body {
 #pageResetText {
 	font.size: 3px;
 }
+
+.bg-darktm {
+    background-color: #000!important;
+}
+
+.text-whitetm {
+    color: #FFF!important;
+}
+
 
 .wideInput {
 	width: 70%;
