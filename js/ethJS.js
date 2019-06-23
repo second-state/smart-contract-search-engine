@@ -264,7 +264,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         $(".results").empty()
-        getItemsViaFlask(elasticSearchUrl);
+        getQuickItemsViaFlask(elasticSearchUrl);
     });
 });
 
@@ -386,7 +386,6 @@ function renderContractVariables(_result) {
         });
 
     }
-    es_quick_100_search
 
     function getItemsViaFlask() {
         theUrlForData2 = publicIp + "/api/es_search";
