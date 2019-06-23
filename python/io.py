@@ -25,6 +25,9 @@ def submit_abi():
         success = True
     except:
         print("Unable to process that single transaction")
+        doc = {}
+        doc["response"] = 'Failed to index contract'
+        return jsonify(doc)
     # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
     if success == True:
         data = {}
