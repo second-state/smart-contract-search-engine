@@ -30,6 +30,14 @@ body {
 	font.size: 3px;
 }
 
+.wideInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
 .searchAddressButtons {
 	width: 70%;
 	padding: 1%;
