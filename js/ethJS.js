@@ -350,7 +350,7 @@ function renderContractVariables(_result) {
             dataType: "json",
             contentType: "application/json",
             success: function(response) {
-                console.log(response);
+                //console.log(response);
                 renderItems(response);
             },
             error: function(xhr) {
