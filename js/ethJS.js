@@ -274,15 +274,18 @@ $(document).ready(function() {
         var abiLoadUrl = publicIp + "/api/submit_abi";
         var theAbi = $("#abiInput").val();
         var theHash = $("#hashInput").val();
+        console.log(theAbi)
+        console.log(theHash)
         var hashLength = $.trim(theHash.length)
         if (hashLength == 66) {
             data = {};
             data["abi"] = theAbi;
             data["hash"] = theHash;
+            dataString = json.stringify(data);
             $.ajax({
                 url: abiLoadUrl,
                 type: "POST",
-                data: data,
+                data: dataString,
                 dataType: "json",
                 contentType: "application/json",
                 success: function(response) {
