@@ -18,26 +18,29 @@ def submit_abi():
     theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
     cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
     transactionHash = jsonRequestData["hash"]
-
+    success = False
     try:
         # Try and index the contract instance directly into the common index
         harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
-        # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
+        success = True
+    except:
+        print("Unable to process that single transaction")
+    # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
+    if success == True:
         data = {}
         data['indexInProgress'] = "false"
         data['epochOfLastUpdate'] = int(time.time())
         data['abi'] = cleanedAndOrderedAbiText
         harvester.loadDataIntoElastic(index=harvester.abiIndex, id=theDeterministicHash, body=data)
         print("Index was a success")
-    except:
-        print("There was an error indexing this contract")
+
 
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
     print(request)
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=commonIndex, query=jsonRequestData)
     outerList = []
     for returnedItem in results:
         uniqueDict = {}
