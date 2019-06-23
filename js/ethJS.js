@@ -7,7 +7,7 @@ var publicIp = "https://ethereum.search.secondstate.io"; // If you are hosting t
 
 // Check blockchain network and accounts
 // This is used to confirm that the user"s chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
-var searchEngineNetwork = "1"; 
+var searchEngineNetwork = "1";
 
 var currentNetwork = "";
 var currentAccount = "";
@@ -35,7 +35,12 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    contractsQuery = JSON.stringify({"query":{"match_all" :{}},"size":0})
+    contractsQuery = JSON.stringify({
+        "query": {
+            "match_all": {}
+        },
+        "size": 0
+    })
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
     var contracts = "";
@@ -270,7 +275,7 @@ $(document).ready(function() {
         var theAbi = $("#abiInput").val();
         var theHash = $("#hashInput").val();
         var hashLength = $.trim(theHash.length)
-        if (hashLength == 66){
+        if (hashLength == 66) {
             data = {};
             data["abi"] = theAbi;
             data["hash"] = theHash;
@@ -289,9 +294,8 @@ $(document).ready(function() {
                 }
             });
             //Index using Transaction Hash
-        }
-        else{
-            if(hashLength == 42){
+        } else {
+            if (hashLength == 42) {
                 console.log("We can upload the ABI and your contract will appear after some time")
                 console.log("If you use a transaction hash (instead of an address) your contract will be permanently indexed in real time.")
                 //Index using Address
@@ -301,153 +305,157 @@ $(document).ready(function() {
     });
 });
 
-function renderContractVariables(_result){
+function renderContractVariables(_result) {
     $(".results").empty();
-        var row = jQuery("<div/>", {
-            class: "row",
-        });
-        row.appendTo(".results");
+    var row = jQuery("<div/>", {
+        class: "row",
+    });
+    row.appendTo(".results");
 
-        var details = jQuery("<div/>", {
-            class: "col-sm-12",
-            text: _result,
-        });
-        details.appendTo(row);
+    var details = jQuery("<div/>", {
+        class: "col-sm-12",
+        text: _result,
+    });
+    details.appendTo(row);
+}
 
-function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
-    $.ajax({
-        url: _url,
-        type: _type,
-        data: _data,
-        dataType: _dataType,
-        contentType: _contentType,
-        success: function(response) {
-            renderItems(response.hits.hits);
-        },
-        error: function(xhr) {
-            console.log("Get items failed");
+    function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
+        $.ajax({
+            url: _url,
+            type: _type,
+            data: _data,
+            dataType: _dataType,
+            contentType: _contentType,
+            success: function(response) {
+                renderItems(response.hits.hits);
+            },
+            error: function(xhr) {
+                console.log("Get items failed");
+            }
+        });
+    }
+
+    function getItemsUsingDataViaFlask(_data) {
+        theUrlForData1 = publicIp + "/api/es_search";
+        console.log("getItemsUsingDataViaFlask");
+        console.log(theUrlForData1);
+        console.log(_data);
+        $.ajax({
+            url: theUrlForData1,
+            type: "POST",
+            data: _data,
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response) {
+                console.log(response);
+                renderItems(response);
+            },
+            error: function(xhr) {
+                console.log("Get items failed");
+            }
+        });
+    }
+
+    function getItems(_url) {
+        $.get(_url, function(data, status) {
+            //console.log(data.hits.hits);
+            renderItems(data.hits.hits);
+        });
+    }
+
+    function getItemsViaFlask() {
+        theUrlForData2 = publicIp + "/api/es_search";
+        console.log("getItemsViaFlask");
+        console.log(theUrlForData2);
+        console.log("POST");
+        _data = {
+            "query": {
+                "match_all": {}
+            },
+            "size": 25
         }
-    });
-}
-
-function getItemsUsingDataViaFlask(_data) {
-    theUrlForData1 = publicIp + "/api/es_search";
-    console.log("getItemsUsingDataViaFlask");
-    console.log(theUrlForData1);
-    console.log(_data);
-    $.ajax({
-        url: theUrlForData1,
-        type: "POST",
-        data: _data,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(response) {
-            console.log(response);
-            renderItems(response);
-        },
-        error: function(xhr) {
-            console.log("Get items failed");
-        }
-    });
-}
-
-function getItems(_url) {
-    $.get(_url, function(data, status) {
-        //console.log(data.hits.hits);
-        renderItems(data.hits.hits);
-    });
-}
-
-function getItemsViaFlask() {
-    theUrlForData2 = publicIp + "/api/es_search";
-    console.log("getItemsViaFlask");
-    console.log(theUrlForData2);
-    console.log("POST");
-    _data = {"query":{"match_all":{}},"size":25}
-    var _dataString = JSON.stringify(_data);
-    $.ajax({
-        url: theUrlForData2,
-        type: "POST",
-        data: _dataString,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(response) {
-            //console.log(response)
-            renderItems(response);
-        },
-        error: function(xhr) {
-            console.log("Get items failed");
-        }
-    });
-
-}
-
-
-
-function renderItems(_hits) {
-    $(".results").empty();
-    $.each(_hits, function(index, value) {
-
-        var row = jQuery("<div/>", {
-            class: "row",
+        var _dataString = JSON.stringify(_data);
+        $.ajax({
+            url: theUrlForData2,
+            type: "POST",
+            data: _dataString,
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response) {
+                //console.log(response)
+                renderItems(response);
+            },
+            error: function(xhr) {
+                console.log("Get items failed");
+            }
         });
-        row.appendTo(".results");
 
-        var details = jQuery("<div/>", {
-            class: "col-sm-12"
-        });
-        details.appendTo(row);
+    }
 
-        var dl = jQuery("<dl/>", {});
-        dl.appendTo(details);
 
-        var address = jQuery("<dt/>", {
-            text: "Address: " + value.contractAddress
-        });
-        address.appendTo(dl);
 
-        var block = jQuery("<dt/>", {
-            text: "Block: " + value.blockNumber
-        });
-        block.appendTo(dl);
+    function renderItems(_hits) {
+        $(".results").empty();
+        $.each(_hits, function(index, value) {
 
-        var transaction = jQuery("<dt/>", {
-            text: "Transaction: " + value.TxHash
-        });
-        transaction.appendTo(dl);
-
-        var creator = jQuery("<dt/>", {
-            text: "Creator: " + value.creator
-        });
-        creator.appendTo(dl);
-
-        var lineBreak = jQuery("<hr/>", {});
-        lineBreak.appendTo(".results");
-
-        var shaList = value.abiShaList;
-        if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")){
-            var type = jQuery("<dt/>", {
-                text: "Type: ERC20"
+            var row = jQuery("<div/>", {
+                class: "row",
             });
-            type.appendTo(dl);
+            row.appendTo(".results");
 
-            var name = jQuery("<dt/>", {
-                text: "ERC20 Name: " + value.functionData.name
+            var details = jQuery("<div/>", {
+                class: "col-sm-12"
             });
-            name.appendTo(dl);
+            details.appendTo(row);
 
-            var symbol = jQuery("<dt/>", {
-                text: "ERC20 Symbol: " + value.functionData.symbol
+            var dl = jQuery("<dl/>", {});
+            dl.appendTo(details);
+
+            var address = jQuery("<dt/>", {
+                text: "Address: " + value.contractAddress
             });
-            symbol.appendTo(dl);
+            address.appendTo(dl);
 
-            var supply = jQuery("<dt/>", {
-                text: "ERC20 Supply: " + value.functionData.totalSupply
+            var block = jQuery("<dt/>", {
+                text: "Block: " + value.blockNumber
             });
-            supply.appendTo(dl);
-        }
-        console.log(value);
-    });
-}
+            block.appendTo(dl);
 
-// CODE END
+            var transaction = jQuery("<dt/>", {
+                text: "Transaction: " + value.TxHash
+            });
+            transaction.appendTo(dl);
+
+            var creator = jQuery("<dt/>", {
+                text: "Creator: " + value.creator
+            });
+            creator.appendTo(dl);
+
+            var lineBreak = jQuery("<hr/>", {});
+            lineBreak.appendTo(".results");
+
+            var shaList = value.abiShaList;
+            if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")) {
+                var type = jQuery("<dt/>", {
+                    text: "Type: ERC20"
+                });
+                type.appendTo(dl);
+
+                var name = jQuery("<dt/>", {
+                    text: "ERC20 Name: " + value.functionData.name
+                });
+                name.appendTo(dl);
+
+                var symbol = jQuery("<dt/>", {
+                    text: "ERC20 Symbol: " + value.functionData.symbol
+                });
+                symbol.appendTo(dl);
+
+                var supply = jQuery("<dt/>", {
+                    text: "ERC20 Supply: " + value.functionData.totalSupply
+                });
+                supply.appendTo(dl);
+            }
+            console.log(value);
+        });
+    }
