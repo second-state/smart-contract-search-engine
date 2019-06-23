@@ -4,6 +4,7 @@ import time
 import requests
 from harvest import Harvest
 import elasticsearch.helpers
+from flask import Flask, jsonify, request
 
 harvester = Harvest()
 
