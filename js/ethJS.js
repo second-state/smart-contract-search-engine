@@ -22,8 +22,8 @@ if (searchEngineNetwork == "1") {
     esIndexName = "ercchecker";
 }
 
-var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
-var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+//var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search";
 // CONFIG END
 
 // CODE START
