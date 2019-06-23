@@ -94,7 +94,7 @@ class Harvest:
     def getOnly100Records(self):
         query = {"query":{"match_all":{}},"size": 100}
         textQuery = json.dumps(query)
-        results = self.es.get(index=self.commonIndex, body=query)
+        results = self.es.post(index=self.commonIndex, body=query)
         return results
 
     def fetchAbiUsingHash(self, _esId):
