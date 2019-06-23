@@ -41,9 +41,9 @@ def es_quick_100_search():
     results = harvester.getOnly100Records()
     outerList = []
     print(results)
-    for returnedItem in results:
+    for returnedItem in results["hits"]["hits"]:
         uniqueDict = {}
-        for rKey, rValue in returnedItem.items():
+        for rKey, rValue in returnedItem:
             if str(rKey) == "_source":
                 for sKey, sValue in rValue.items():
                     if str(sKey) == "functionDataList":
