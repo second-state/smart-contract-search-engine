@@ -298,7 +298,7 @@ $(document).ready(function() {
 
                         var details = jQuery("<div/>", {
                             class: "col-sm-12",
-                            text: response,
+                            text: response["response"],
                         });
                         details.appendTo(row);
                 },
