@@ -40,7 +40,7 @@ def submit_abi():
 def es_search():
     print(request)
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData, size=100)
     outerList = []
     for returnedItem in results:
         uniqueDict = {}
@@ -51,12 +51,14 @@ def es_search():
                         for functionDataListItem in sValue['0']:
                             for fKey, fValue in functionDataListItem.items():
                                 if fKey in uniqueDict:
-                                    print("We already have " + str(fKey))
+                                    #print("We already have " + str(fKey))
+                                    print(".")
                                 else:
                                     uniqueDict[fKey] = fValue
                     else:
                         if sKey in uniqueDict:
-                            print("We already have " + str(sKey))
+                            #print("We already have " + str(sKey))
+                            print(".")
                         else:
                             uniqueDict[sKey] = sValue
         outerList.append(uniqueDict)
