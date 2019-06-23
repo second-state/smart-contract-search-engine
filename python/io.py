@@ -40,7 +40,7 @@ def submit_abi():
 def es_search():
     print(request)
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=harvester.es, index=commonIndex, query=jsonRequestData)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData)
     outerList = []
     for returnedItem in results:
         uniqueDict = {}
