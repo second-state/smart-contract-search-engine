@@ -62,7 +62,7 @@ def es_search():
         outerList.append(uniqueDict)
     resultsDict = {}
     resultsDict["results"] = outerList
-    print(resultsDict)
+    #print(resultsDict)
     return jsonify(resultsDict["results"])
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
