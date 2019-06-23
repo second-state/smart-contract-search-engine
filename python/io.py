@@ -14,10 +14,10 @@ app = Flask(__name__)
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
-    jsonRequestDataObj = json.loads(jsonRequestData)
-    theDeterministicHash = harvester.shaAnAbi(jsonRequestDataObj["abi"])
-    cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonRequestDataObj["abi"])
-    transactionHash = jsonRequestDataObj["hash"]
+    jsonAbiObj = json.loads(jsonRequestData["abi"])
+    theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
+    cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
+    transactionHash = jsonRequestData["hash"]
 
     try:
         # Try and index the contract instance directly into the common index
