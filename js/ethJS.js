@@ -501,6 +501,13 @@ function renderContractVariables(_result) {
                 });
                 supply.appendTo(dl);
             }
-            console.log(value);
+            else{
+                $.each(value.functionData, function( key, value ) {
+                  var theUnknownData = jQuery("<dt/>", {
+                    text: key + ": " + value
+                    });
+                    theUnknownData.appendTo(dl);
+                });
+            }
         });
     }
