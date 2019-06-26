@@ -19,7 +19,7 @@ var blockExplorer = "";
 
 if (searchEngineNetwork == "1") {
     blockExplorer = "https://etherscan.io/";
-    esIndexName = "ercchecker";
+    esIndexName = "erccheckervtwo";
 }
 
 //var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
@@ -43,7 +43,7 @@ $(document).ready(function() {
     })
     var abi = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/abiercchecker/_search";
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
-    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
+    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/erccheckervtwo/_search";
     var contracts = "";
     var contractsWithAbis = "";
 
