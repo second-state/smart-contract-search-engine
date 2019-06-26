@@ -515,8 +515,6 @@ function renderContractVariables(_result) {
             });
             etherscanButton.appendTo(etherscan);
             etherscan.appendTo(dl);
-
-                https://etherscan.io/token/0x0d8775f648430679a709e98d2b0cb6250d2887ef
             }
             else{
                 $.each(value.functionData, function( key, value ) {
