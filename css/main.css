@@ -92,3 +92,12 @@ body {
 	border-style: inset;
 	border-width: 1px;
 }
+
+.headerImg {
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
