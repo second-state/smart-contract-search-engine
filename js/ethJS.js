@@ -500,6 +500,23 @@ function renderContractVariables(_result) {
                     text: "ERC20 Supply: " + value.functionData.totalSupply
                 });
                 supply.appendTo(dl);
+
+                var etherscan = jQuery("<dd/>", {
+
+                });
+
+                var etherscanUrl = "https://etherscan.io/token/" + value.contractAddress;
+                var etherscanButton = jQuery("<a/>", {
+                href: etherscanUrl,
+                class: "btn btn-success",
+                role: "button",
+                target: "_blank",
+                text: "View on Etherscan"
+            });
+            etherscanButton.appendTo(etherscan);
+            etherscan.appendTo(dl);
+
+                https://etherscan.io/token/0x0d8775f648430679a709e98d2b0cb6250d2887ef
             }
             else{
                 $.each(value.functionData, function( key, value ) {
