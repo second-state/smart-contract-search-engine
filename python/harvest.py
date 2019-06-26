@@ -125,6 +125,9 @@ class Harvest:
         except:
             print("Item does not exist yet.")
         return returnVal
+
+    def performStringConversion(self, _data):
+        return str(_data)
     
     def performPossibleStringConversion(self, _data):
         if len(str(_data)) > 10:
@@ -151,10 +154,10 @@ class Harvest:
                 if len(result) > 0:
                     innerDataDict = {}
                     for i in range(len(result)):
-                        innerDataDict[i] = self.performPossibleStringConversion(result[i])
+                        innerDataDict[i] = self.performStringConversion(result[i])
                     theFunctionData[str(callableFunction)] = innerDataDict
             else:
-                theFunctionData[str(callableFunction)] = self.performPossibleStringConversion(result)
+                theFunctionData[str(callableFunction)] = self.performStringConversion(result)
         return theFunctionData
 
     def getFunctionDataId(self, _theFunctionData):

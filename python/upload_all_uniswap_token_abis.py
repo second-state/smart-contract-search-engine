@@ -12,11 +12,12 @@ abi = [{"name": "NewExchange", "inputs": [{"type": "address", "name": "token", "
 uniswap = w3.eth.contract('0xc0a47dFe034B400B47bDaD5FecDa2621de6c4d95', abi=abi)
 
 events = uniswap.events.NewExchange.createFilter(fromBlock=6627917).get_all_entries()
-#abiUrl1 = "https://raw.githubusercontent.com/Uniswap/contracts-vyper/master/abi/uniswap_exchange.json"
-abiUrl1 = "https://raw.githubusercontent.com/Uniswap/contracts-vyper/master/abi/uniswap_factory.json"
+abiUrl1 = "https://raw.githubusercontent.com/Uniswap/contracts-vyper/master/abi/uniswap_exchange.json"
+#abiUrl1 = "https://raw.githubusercontent.com/Uniswap/contracts-vyper/master/abi/uniswap_factory.json"
 abiData1 = requests.get(abiUrl1).content
 abiData1JSON = json.loads(abiData1)
 theDeterministicHash1 = harvester.shaAnAbi(abiData1JSON)
+print("The Uniswap exchange contract ABI SHA is: " + theDeterministicHash1)
 cleanedAndOrderedAbiText1 = harvester.cleanAndConvertAbiToText(abiData1JSON)
 
 i = 0
