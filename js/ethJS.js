@@ -501,6 +501,9 @@ function renderContractVariables(_result) {
                 });
                 supply.appendTo(dl);
 
+                var break = jQuery("<br />", {});
+                break.appendTo(".results");
+
                 var etherscan = jQuery("<dd/>", {
 
                 });
@@ -508,7 +511,7 @@ function renderContractVariables(_result) {
                 var etherscanUrl = "https://etherscan.io/token/" + value.contractAddress;
                 var etherscanButton = jQuery("<a/>", {
                 href: etherscanUrl,
-                class: "btn btn-success",
+                class: "btn btn-primary btn-sm",
                 role: "button",
                 target: "_blank",
                 text: "View on Etherscan"
