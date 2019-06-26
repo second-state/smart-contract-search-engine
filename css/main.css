@@ -85,6 +85,11 @@ body {
 	color: white;
 }
 
+.right{
+	text-align: right;
+	font-size: 0.25em;
+}
+
 .hr {
 	display: block;
 	margin-left: auto;
