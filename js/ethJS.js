@@ -501,8 +501,8 @@ function renderContractVariables(_result) {
                 });
                 supply.appendTo(dl);
 
-                var break = jQuery("<br />", {});
-                break.appendTo(".results");
+                var breaker = jQuery("<br />", {});
+                breaker.appendTo(".results");
 
                 var etherscan = jQuery("<dd/>", {
 
