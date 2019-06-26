@@ -323,6 +323,9 @@ class Harvest:
                 try:
                     functionData = self.fetchPureViewFunctionData(contractInstance)
                     functionDataId = self.getFunctionDataId(functionData)
+                except:
+                    print("Got web3 object OK but no data match!")
+                try:                
                     outerData = {}
                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                     abiList = []
@@ -348,7 +351,7 @@ class Harvest:
                     outerData['indexInProgress'] = "false"
                     indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                 except:
-                    print("Got web3 object OK but no data match!")
+                    print("Got Data OK but no ES index!")
             else:
                 print("Item is already indexed")
         else:
