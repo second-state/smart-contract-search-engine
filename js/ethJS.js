@@ -41,6 +41,7 @@ $(document).ready(function() {
         },
         "size": 0
     })
+    var abi = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/abiercchecker/_search";
     var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
     var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/ercchecker/_search";
     var contracts = "";
@@ -66,6 +67,26 @@ $(document).ready(function() {
 
     var dlOverview = jQuery("<dl/>", {});
     dlOverview.appendTo(overviewDetails);
+
+    $.ajax({
+        url: abi,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            abiAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + abiAmount);
+            abis = jQuery("<dt/>", {
+                text: " - " + abiAmount.toLocaleString() + " unique ABIs uploaded",
+                class: "centeredText",
+            });
+            abis.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
 
 
     $.ajax({
@@ -98,7 +119,7 @@ $(document).ready(function() {
             contractsWithAbisAmount = response["hits"]["total"];
             console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
             contractsWithAbis = jQuery("<dt/>", {
-                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts with supporting ABIs",
+                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts which adhere to ABIs",
                 class: "centeredText",
             });
             contractsWithAbis.appendTo(dlOverview);
