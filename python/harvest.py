@@ -424,7 +424,6 @@ class Harvest:
             # Use the following if you want to query a subset of blocks
             #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
             esAddresses = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForMasterIndex, preserve_order=True)
-
             doc = {}
             outerData = {}
             outerData["indexed"] = "true"
@@ -433,12 +432,10 @@ class Harvest:
             localAddressList = []
             for esAddressSingle in esAddresses:
                 localAddressList.append(esAddressSingle['_source']['contractAddress'])
-
             for address in localAddressList:
                 print("Processing " + str(address))
                 if address in indexedAddressesList:
                     theResponse = self.es.update(index=self.masterIndex, id=address, body=json.dumps(doc))
-
             self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + 1800
             if self.markMasterAsIndexedTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
@@ -676,6 +673,9 @@ if __name__ == "__main__":
     elif args.mode == "abi":
         print("Performing abi comparison update")
         harvester.abiCompatabilityUpdateDriverPre1()
+    elif args.mode == "indexed":
+        print("Updating master index to reflect items which are already indexed")
+        harvester.markMasterAsIndexed()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode full")
@@ -684,6 +684,8 @@ if __name__ == "__main__":
         print("harvest.py --mode tx")
         print("harvest.py --mode bytecode")
         print("harvest.py --mode abi")
+        print("harvest.py --mode indexed")
+
 
 # Monitor the total number of threads on the operating system
 # ps -eo nlwp | tail -n +2 | awk '{ total_threads += $1 } END { print total_threads }'
