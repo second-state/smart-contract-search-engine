@@ -313,6 +313,7 @@ class Harvest:
             print("Found contract: " + itemId)
         except:
             print("No contract here ...")
+            sys.exit() 
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == False:
@@ -320,11 +321,13 @@ class Harvest:
                     contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
                 except:
                     print("Unable to instantiate web3 contract object")
+                    sys.exit() 
                 try:
                     functionData = self.fetchPureViewFunctionData(contractInstance)
                     functionDataId = self.getFunctionDataId(functionData)
                 except:
                     print("Got web3 object OK but no data match!")
+                    sys.exit() 
                 try:                
                     outerData = {}
                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
@@ -352,6 +355,7 @@ class Harvest:
                     indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
                 except:
                     print("Got Data OK but no ES index!")
+                    sys.exit() 
             else:
                 print("Item is already indexed")
         else:
