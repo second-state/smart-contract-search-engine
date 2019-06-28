@@ -399,6 +399,53 @@ class Harvest:
         contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
         self.contractInstanceList.append(contractInstance)
 
+    def markMasterTest(self):
+        bulkList = []
+        body = {}
+        outerData = {}
+        outerData["indexed"] = "true"
+        body["body"] = outerData
+        singleItem = {"_index":str(self.masterIndex), "_id": str(0x8DF3fEAb1CA6B112946c5ec231D3517Fa44269B4), "_type": "document", "_op_type": "update", "doc": json.dumps(body)}
+        bulkList.append(singleItem)
+        elasticsearch.helpers.bulk(self.es, bulkList)
+
+
+    def markMasterAsIndexed(self):
+        self.markMasterAsIndexedTimer = time.time()
+        while True:
+            indexedAddressesList = []
+            queryForCommonIndex = {"query":{"match_all":{}}}
+            esAddressesIndexed = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForCommonIndex, preserve_order=True)
+            for indexedAddress in esAddressesIndexed:
+                indexedAddressesList.append(indexedAddress['_source']['contractAddress'])
+            esAddressesIndexed = ""
+
+            queryForMasterIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
+            # Use the following if you want to query a subset of blocks
+            #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
+            esAddresses = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForMasterIndex, preserve_order=True)
+
+            doc = {}
+            outerData = {}
+            outerData["indexed"] = "true"
+            doc["doc"] = outerData
+
+            localAddressList = []
+            for esAddressSingle in esAddresses:
+                localAddressList.append(esAddressSingle['_source']['contractAddress'])
+
+            for address in localAddressList:
+                print("Processing " + str(address))
+                if address in indexedAddressesList:
+                    theResponse = self.es.update(index=self.masterIndex, id=address, body=json.dumps(doc))
+
+            self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + 1800
+            if self.markMasterAsIndexedTimer > time.time():
+                print("Finished before time limit, will sleep now ...")
+                time.sleep(self.markMasterAsIndexedTimer - time.time())
+                print("Back awake and ready to go ...")
+            else:
+                print("It has been longer than the desired time, need to re-update the state immediately ...")
 
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
