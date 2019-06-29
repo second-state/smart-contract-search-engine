@@ -269,7 +269,7 @@ class Harvest:
             tabiCompatabilityUpdateDriverPre2.daemon = True
             tabiCompatabilityUpdateDriverPre2.start()
             txThreadList.append(tabiCompatabilityUpdateDriverPre2)
-            time.sleep(1)
+            time.sleep(0.5)
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
 
