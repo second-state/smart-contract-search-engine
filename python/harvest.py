@@ -239,10 +239,10 @@ class Harvest:
             newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
             if len(newData["_source"]["abiShaList"]) > 0:
                 for item in newData["_source"]["abiShaList"]:
-                    print("Comparing old and new abiSha")
-                    print(item)
-                    print(newAbiSha)
-                    print("Finished comparing")
+                    # print("Comparing old and new abiSha")
+                    # print(item)
+                    # print(newAbiSha)
+                    # print("Finished comparing")
                     if item == newAbiSha:
                         found = True
                         break
@@ -269,6 +269,7 @@ class Harvest:
             tabiCompatabilityUpdateDriverPre2.daemon = True
             tabiCompatabilityUpdateDriverPre2.start()
             txThreadList.append(tabiCompatabilityUpdateDriverPre2)
+            time.sleep(1)
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
 
@@ -287,7 +288,7 @@ class Harvest:
             for item in esTxs:
                 TxObj[str(num)] = item
                 num = num+1
-            print(TxObj)
+            #print(TxObj)
             for doc1 in esAbis["hits"]["hits"]:
                 source = doc1['_source']
                 tabiCompatabilityUpdateDriverPre1 = threading.Thread(target=self.abiCompatabilityUpdateDriverPre2, args=[json.loads(source["abi"]), json.loads(json.dumps(TxObj))])
@@ -296,7 +297,7 @@ class Harvest:
                 abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
-            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 10
+            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 300
             if self.abiCompatabilityUpdateDriverPre1Timer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
