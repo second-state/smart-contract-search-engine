@@ -522,6 +522,11 @@ function renderContractVariables(_result) {
                 });
                 supply.appendTo(dl);
 
+                var decimals = jQuery("<dt/>", {
+                    text: "ERC20 Decimals: " + value.functionData.decimals
+                });
+                decimals.appendTo(dl);
+
                 var breaker = jQuery("<br />", {});
                 breaker.appendTo(dl);
 
