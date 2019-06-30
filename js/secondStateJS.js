@@ -673,7 +673,7 @@ function renderItems(_hits) {
             });
         }
 
-        if (Object.length(value.functionData.winner_addrs).length == 0) {
+        if (Object.keys(value.functionData.winner_addrs).length == 0) {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var wAddress = jQuery("<dd/>", {
