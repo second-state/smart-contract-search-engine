@@ -623,11 +623,16 @@ class Harvest:
                             dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                             if dataStatus == False:
                                 singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
-                                bulkList.append(singleItem)
-                                print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                if len(bulkList) == 50:
+                                if _topup == True:
+                                    bulkList.append(singleItem)
                                     elasticsearch.helpers.bulk(self.es, bulkList)
                                     bulkList = []
+                                else:
+                                    bulkList.append(singleItem)
+                                    print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                    if len(bulkList) == 50:
+                                        elasticsearch.helpers.bulk(self.es, bulkList)
+                                        bulkList = []
                         else:
                             continue
                 else:
