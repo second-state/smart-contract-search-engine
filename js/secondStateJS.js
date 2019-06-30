@@ -75,7 +75,7 @@ $(document).ready(function() {
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = this.currentAccount;
+            dFunctionDataOwner["functionDataList.0.functionData.owner"] = this.currentAccount;
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             var dMust = {};
@@ -131,6 +131,7 @@ $(document).ready(function() {
             dQuery["query"] = dBool;
             $("#pbc").hide("slow");
             var jsonString = JSON.stringify(dQuery);
+            console.log(jsonString)
 
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
