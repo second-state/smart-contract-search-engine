@@ -130,7 +130,7 @@ $(document).ready(function() {
             //dBool["bool"] = dMust;
             //var dQuery = {};
             //dQuery["query"] = dBool;
-            dQuery = '''{"query":{"query_string":{"fields":["functionDataList.0.functionData.player_addrs.*"],"query":"''' + this.currentAccount '''"}}}'''
+            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.player_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
             var jsonString = dQuery;
             console.log(jsonString)
@@ -178,7 +178,7 @@ $(document).ready(function() {
             //dBool["bool"] = dMust;
             //var dQuery = {};
             //dQuery["query"] = dBool;
-            dQuery = '''{"query":{"query_string":{"fields":["functionDataList.0.functionData.winner_addrs.*"],"query":"''' + this.currentAccount '''"}}}'''
+            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.winner_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
             var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
