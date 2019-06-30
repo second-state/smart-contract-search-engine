@@ -445,7 +445,7 @@ function renderItems(_hits) {
 
         var image = jQuery("<img/>", {
             class: "img-thumbnail",
-            src: value._source.functionData.info[3],
+            src: value.functionData.info[3],
             alt: "giveaway"
         });
         image.appendTo(imageContainer);
@@ -459,22 +459,22 @@ function renderItems(_hits) {
         dl.appendTo(details);
 
         var title = jQuery("<dt/>", {
-            text: "Title: " + value._source.functionData.info[1]
+            text: "Title: " + value.functionData.info[1]
         });
         title.appendTo(dl);
 
         var description = jQuery("<dd/>", {
-            text: "Description: " + value._source.functionData.info[2]
+            text: "Description: " + value.functionData.info[2]
         });
         description.appendTo(dl);
 
         var winners = jQuery("<dd/>", {
-            text: "Number of potential winners: " + value._source.functionData.info[4]
+            text: "Number of potential winners: " + value.functionData.info[4]
         });
         winners.appendTo(dl);
 
         var textStatus = "";
-        if (value._source.functionData.status == 0) {
+        if (value.functionData.status == "0") {
             textStatus = "Winners have not been declared as yet";
             var status = jQuery("<dd/>", {
                 text: textStatus,
@@ -483,7 +483,7 @@ function renderItems(_hits) {
             });
             status.appendTo(dl);
 
-        } else if (value._source.functionData.status == 1) {
+        } else if (value.functionData.status == "1") {
             textStatus = "Winners have been declared";
             var status = jQuery("<dd/>", {
                 text: textStatus,
@@ -494,7 +494,7 @@ function renderItems(_hits) {
         }
 
         // Expiry time
-        var epochRepresentation = value._source.functionData.info[5];
+        var epochRepresentation = value.functionData.info[5];
         if (epochRepresentation.toString().length == 10) {
             var endDate = new Date(epochRepresentation * 1000);
         } else if (epochRepresentation.toString().length == 13) {
@@ -502,10 +502,10 @@ function renderItems(_hits) {
         }
 
         // Setting Dapp Version
-        if (value._source.abiSha3BytecodeSha3 == "0x39e76f559313a52e86c540b63ec64fbf1c88624855ad60cc0380c0d7d47aed4b"){
+        if (value.abiShaList.includes("0xb8a37479196c0f9d8ab647141f1f22863305d3ad86c4dd88f25304c01bff0eb6")){
                 dappVersion = "v1";
             }
-            else if (value._source.abiSha3BytecodeSha3 == "0x82069af99bd87d7c8271916cd33cff9f6176d1bb6da18a75379107df30da6fc5") {
+            else if (value.abiShaList.includes("0xe49f0c6abcbe2ab8264670478d7767df62be6b264d7fc8b067e9767dacf61c99")) {
                 dappVersion = "v2";
             }
 
@@ -523,7 +523,7 @@ function renderItems(_hits) {
 
             });
             
-            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
             var viewButton = jQuery("<a/>", {
                 href: viewUrl,
                 class: "btn btn-info",
@@ -543,7 +543,7 @@ function renderItems(_hits) {
             var play = jQuery("<dd/>", {
 
             });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
             var playButton = jQuery("<a/>", {
                 href: playUrl,
                 class: "btn btn-success",
@@ -611,53 +611,24 @@ function renderItems(_hits) {
         blockNumber.appendTo(dl2);
 
         var blockNumberA = jQuery("<a/>", {
-            text: "- Block " + value._source.blockNumber,
-            href: blockExplorer + "block/" + value._source.blockNumber,
+            text: "- Block " + value.blockNumber,
+            href: blockExplorer + "block/" + value.blockNumber,
             target: "_blank"
         });
         blockNumberA.appendTo(blockNumber);
 
-        if (value._source.TxHash !== undefined) {
+        if (value.TxHash !== undefined) {
             var txHash = jQuery("<dd/>", {
 
             });
             txHash.appendTo(dl2);
 
             var txHashA = jQuery("<a/>", {
-                text: "- Transaction " + value._source.TxHash,
-                href: blockExplorer + "tx/" + value._source.TxHash,
+                text: "- Transaction " + value.TxHash,
+                href: blockExplorer + "tx/" + value.TxHash,
                 target: "_blank"
             });
             txHashA.appendTo(txHash);
-        }
-
-        if (value._source.byteCodeURL !== undefined) {
-            var byteCodeURLO = jQuery("<dd/>", {
-
-            });
-            byteCodeURLO.appendTo(dl2);
-
-            var byteCodeURLOA = jQuery("<a/>", {
-                text: "- Bytecode source",
-                href: value._source.byteCodeURL,
-                target: "_blank"
-            });
-            byteCodeURLOA.appendTo(byteCodeURLO);
-        }
-
-        if (value._source.abiURL !== undefined) {
-            var abiURLO = jQuery("<dd/>", {
-
-            });
-            abiURLO.appendTo(dl2);
-
-            var abiURLOA = jQuery("<a/>", {
-                text: "- ABI source",
-                href: value._source.abiURL,
-                target: "_blank"
-            });
-            abiURLOA.appendTo(abiURLO);
-
         }
 
         var cOwner = jQuery("<dd/>", {
@@ -666,8 +637,8 @@ function renderItems(_hits) {
         cOwner.appendTo(dl2);
 
         var cOwnerA = jQuery("<a/>", {
-            text: "- Contract owner " + value._source.functionData.owner,
-            href: blockExplorer + "address/" + value._source.functionData.owner,
+            text: "- Contract owner " + value.functionData.owner,
+            href: blockExplorer + "address/" + value.functionData.owner,
             target: "_blank"
         });
         cOwnerA.appendTo(cOwner);
@@ -678,8 +649,8 @@ function renderItems(_hits) {
         cAddress.appendTo(dl2);
 
         var cAddressA = jQuery("<a/>", {
-            text: "- Contract address " + value._source.contractAddress,
-            href: blockExplorer + "address/" + value._source.contractAddress,
+            text: "- Contract address " + value.contractAddress,
+            href: blockExplorer + "address/" + value.contractAddress,
             target: "_blank"
         });
         cAddressA.appendTo(cAddress);
