@@ -218,7 +218,7 @@ $(document).ready(function() {
             dTemp["query"] = theText;
             dMultiMatch["multi_match"] = dTemp;
             dQueryOuter["query"] = dMultiMatch;*/
-            var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"' + theText + '":"V1"}}}'
+            var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"query":"' + theText + '"}}}'
             //var jsonString = JSON.stringify(dQueryOuter);
 
             // If this is a public website then we need to call ES using Flask
