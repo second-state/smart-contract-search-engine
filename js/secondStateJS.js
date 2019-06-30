@@ -114,22 +114,6 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-
-            //lShould = [];
-            //for (i = 0; i < 50; i++) {
-            //    var dPTemp = {};
-            //    var dPTemp2 = {};
-            //    var fString = "functionData.player_addrs." + i;
-            //    dPTemp[fString] = this.currentAccount;
-            //    dPTemp2["match"] = dPTemp;
-            //    lShould.push(dPTemp2);
-            // }
-            // var dMust = {};
-            // dMust["should"] = lShould;
-            //var dBool = {};
-            //dBool["bool"] = dMust;
-            //var dQuery = {};
-            //dQuery["query"] = dBool;
             dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.player_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
             var jsonString = dQuery;
@@ -163,24 +147,9 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-            //lShould = [];
-            //for (i = 0; i < 50; i++) {
-            //    var dPTemp = {};
-            //    var dPTemp2 = {};
-            //    var fString = "functionData.winner_addrs." + i;
-            //    dPTemp[fString] = this.currentAccount;
-            //    dPTemp2["match"] = dPTemp;
-            //    lShould.push(dPTemp2);
-            // }
-            //var dMust = {};
-            //dMust["should"] = lShould;
-            //var dBool = {};
-            //dBool["bool"] = dMust;
-            //var dQuery = {};
-            //dQuery["query"] = dBool;
             dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.winner_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
-            var jsonString = JSON.stringify(dQuery);
+            var jsonString = dQuery;
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
