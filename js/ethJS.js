@@ -543,6 +543,9 @@ function renderItems(_hits) {
             });
         }
 
+        var breaker = jQuery("<br />", {});
+        breaker.appendTo(dl);
+
         if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286") || shaList.includes("0x7f63f9caca226af6ac1e87fee18b638da04cfbb980f202e8f17855a6d4617a69")) {
             var etherscan = jQuery("<dd/>", {
 
@@ -559,9 +562,6 @@ function renderItems(_hits) {
             etherscanButton.appendTo(etherscan);
             etherscan.appendTo(dl);
         }
-        
-        var breaker = jQuery("<br />", {});
-        breaker.appendTo(dl);
 
     });
 }
