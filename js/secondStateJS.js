@@ -665,7 +665,7 @@ function renderItems(_hits) {
         } else {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            $.each(value._source.functionData.player_addrs, function(playerIndex, playerValue) {
+            $.each(value.functionData.player_addrs, function(playerIndex, playerValue) {
                 var pAddress = jQuery("<dd/>", {
                     text: "Player : " + playerValue
                 });
@@ -673,7 +673,7 @@ function renderItems(_hits) {
             });
         }
 
-        if (value._source.functionData.winner_addrs == undefined) {
+        if (value.functionData.winner_addrs == undefined) {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var wAddress = jQuery("<dd/>", {
@@ -683,7 +683,7 @@ function renderItems(_hits) {
         } else {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            $.each(value._source.functionData.winner_addrs, function(winnerIndex, winnerValue) {
+            $.each(value.functionData.winner_addrs, function(winnerIndex, winnerValue) {
                 var wAddress = jQuery("<dd/>", {
                     text: "Winner : " + winnerValue
                 });
