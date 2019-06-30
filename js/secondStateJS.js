@@ -655,7 +655,7 @@ function renderItems(_hits) {
         });
         cAddressA.appendTo(cAddress);
 
-        if (Object.keys(value.functionData.player_addrs).length == 0) {
+        if (value.functionData.player_addrs == undefined){
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var pAddress = jQuery("<dd/>", {
@@ -673,7 +673,7 @@ function renderItems(_hits) {
             });
         }
 
-        if (Object.keys(value.functionData.winner_addrs).length == 0) {
+        if (value.functionData.winner_addrs == undefined) {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var wAddress = jQuery("<dd/>", {
