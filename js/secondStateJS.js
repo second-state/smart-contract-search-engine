@@ -208,7 +208,7 @@ $(document).ready(function() {
                 getItems(elasticSearchUrl);
             }
         } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
-            var dFields = {};
+            /*var dFields = {};
             var dQueryInner = {};
             var dMultiMatch = {};
             var dQueryOuter = {};
@@ -217,8 +217,9 @@ $(document).ready(function() {
             dTemp["fields"] = lFields;
             dTemp["query"] = theText;
             dMultiMatch["multi_match"] = dTemp;
-            dQueryOuter["query"] = dMultiMatch;
-            var jsonString = JSON.stringify(dQueryOuter);
+            dQueryOuter["query"] = dMultiMatch;*/
+            var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"' + theText + '":"V1"}}}'
+            //var jsonString = JSON.stringify(dQueryOuter);
 
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
