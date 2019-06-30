@@ -197,166 +197,21 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         $(".results").empty()
-        var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
-        //console.log($.trim(theAddress.length));
-        if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
+        if ($.trim(theText.length) == "0") {
             //console.log("Address and text are both blank, fetching all results without a filter");
             if (publicIp) {
                 getItemsViaFlask(elasticSearchUrl);
             } else {
                 getItems(elasticSearchUrl);
             }
-        } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
-            /*var dFields = {};
-            var dQueryInner = {};
-            var dMultiMatch = {};
-            var dQueryOuter = {};
-            var lFields = ["functionData.info.1", "functionData.info.2"];
-            dTemp = {};
-            dTemp["fields"] = lFields;
-            dTemp["query"] = theText;
-            dMultiMatch["multi_match"] = dTemp;
-            dQueryOuter["query"] = dMultiMatch;*/
+        } else if ($.trim(theText.length) > "0") {
             var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"query":"' + theText + '"}}}'
-            //var jsonString = JSON.stringify(dQueryOuter);
-
-            // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
             } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
-
-            //console.log(itemArray);
-        } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
-            var dDesc = {};
-            dDesc["desc"] = theText;
-            //console.log(dDesc);
-            var dTitle = {};
-            dTitle["title"] = theText;
-            //console.log(dTitle);
-            var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = theAddress;
-            //console.log(dFunctionDataOwner);
-            var dContractAddress = {};
-            dContractAddress["contractAddress"] = theAddress;
-            //console.log(dContractAddress);
-            var dMatchContractAddress = {};
-            dMatchContractAddress["match"] = dContractAddress;
-            //console.log(dMatchContractAddress);
-            var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
-            //console.log(dMatchFunctionDataOwner);
-            var dMatchTitle = {};
-            dMatchTitle["match"] = dTitle;
-            //console.log(dMatchTitle);
-            var dMatchDesc = {};
-            dMatchDesc["match"] = dDesc;
-            //console.log(dMatchDesc);
-            var lShould = [];
-            lShould.push(dMatchContractAddress);
-            lShould.push(dMatchFunctionDataOwner);
-            lShould.push(dMatchTitle);
-            lShould.push(dMatchDesc);
-            // Start - Players and Winners
-            // Players
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.player_addrs" + i;
-                dPTemp[fString] = theAddress;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            // Winners
-            for (i = 0; i < 50; i++) {
-                var dWTemp = {};
-                var dWTemp2 = {};
-                var fStringW = "functionData.player_addrs" + i;
-                dWTemp[fStringW] = theAddress;
-                dWTemp2["match"] = dWTemp;
-                lShould.push(dWTemp2);
-            }
-            // End - Players and Winners
-            //console.log(lShould);
-            var dShould = {};
-            dShould["should"] = lShould;
-            //console.log(dShould);
-            var dBool = {};
-            dBool["bool"] = dShould;
-            //console.log(dBool);
-            var dQuery = {};
-            dQuery["query"] = dBool;
-            //console.log(dQuery);
-            //console.log(JSON.stringify(dQuery));
-            var jsonString = JSON.stringify(dQuery);
-
-            // If this is a public website then we need to call ES using Flask
-            if (publicIp) {
-                var itemArray = getItemsUsingDataViaFlask(jsonString);
-            } else {
-                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            }
-
-            //console.log(itemArray);
-        } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
-            var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = theAddress;
-            //console.log(dFunctionDataOwner);
-            var dContractAddress = {};
-            dContractAddress["contractAddress"] = theAddress;
-            //console.log(dContractAddress);
-            var dMatchContractAddress = {};
-            dMatchContractAddress["match"] = dContractAddress;
-            //console.log(dMatchContractAddress);
-            var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
-            //console.log(dMatchFunctionDataOwner);
-            var lShould = [];
-            lShould.push(dMatchContractAddress);
-            lShould.push(dMatchFunctionDataOwner);
-            // Start - Players and Winners
-            // Players
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.player_addrs" + i;
-                dPTemp[fString] = theAddress;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            // Winners
-            for (i = 0; i < 50; i++) {
-                var dWTemp = {};
-                var dWTemp2 = {};
-                var fStringW = "functionData.winner_addrs" + i;
-                dWTemp[fStringW] = theAddress;
-                dWTemp2["match"] = dWTemp;
-                lShould.push(dWTemp2);
-            }
-            // End - Players and Winners
-            //console.log(lShould);
-            var dShould = {};
-            dShould["should"] = lShould;
-            //console.log(dShould);
-            var dBool = {};
-            dBool["bool"] = dShould;
-            //console.log(dBool);
-            var dQuery = {};
-            dQuery["query"] = dBool;
-            //console.log(dQuery);
-            //console.log(JSON.stringify(dQuery));
-            var jsonString = JSON.stringify(dQuery);
-
-            // If this is a public website then we need to call ES using Flask
-            if (publicIp) {
-                var itemArray = getItemsUsingDataViaFlask(jsonString);
-            } else {
-                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            }
-
-            //console.log(itemArray);
         }
 
     });
