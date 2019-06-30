@@ -429,6 +429,7 @@ function getItemsViaFlask() {
 }
 
 function renderItems(_hits) {
+    console.log(_hits)
     $(".results").empty();
     $.each(_hits, function(index, value) {
 
