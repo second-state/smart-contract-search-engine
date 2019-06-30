@@ -286,7 +286,7 @@ $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         $(".results").empty()
         var theText = $("#searchTextInput").val();
-        if($.trim(theText.length) > "0"){
+        if ($.trim(theText.length) > "0") {
             iQuery = {};
             iQuery["query"] = theText;
             iQueryString = {};
@@ -295,9 +295,8 @@ $(document).ready(function() {
             oQuery["query"] = iQueryString;
             jsonString = JSON.stringify(oQuery);
             getItemsUsingDataViaFlask(jsonString);
-        }
-        else{
-        getQuickItemsViaFlask(elasticSearchUrl);
+        } else {
+            getQuickItemsViaFlask(elasticSearchUrl);
         }
     });
 });
@@ -328,16 +327,16 @@ $(document).ready(function() {
                 success: function(response) {
                     console.log(response);
                     $(".abi").empty();
-                        var row = jQuery("<div/>", {
-                            class: "row",
-                        });
-                        row.appendTo(".abi");
+                    var row = jQuery("<div/>", {
+                        class: "row",
+                    });
+                    row.appendTo(".abi");
 
-                        var details = jQuery("<div/>", {
-                            class: "col-sm-12",
-                            text: "Congratulations, we have indexed the smart contract and its assocated ABI!",
-                        });
-                        details.appendTo(row);
+                    var details = jQuery("<div/>", {
+                        class: "col-sm-12",
+                        text: "Congratulations, we have indexed the smart contract and its assocated ABI!",
+                    });
+                    details.appendTo(row);
                 },
                 error: function(xhr) {
                     console.log("Index failed");
@@ -369,173 +368,191 @@ function renderContractVariables(_result) {
     details.appendTo(row);
 }
 
-    function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
-        $.ajax({
-            url: _url,
-            type: _type,
-            data: _data,
-            dataType: _dataType,
-            contentType: _contentType,
-            success: function(response) {
-                renderItems(response.hits.hits);
-            },
-            error: function(xhr) {
-                console.log("Get items failed");
-            }
+function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
+    $.ajax({
+        url: _url,
+        type: _type,
+        data: _data,
+        dataType: _dataType,
+        contentType: _contentType,
+        success: function(response) {
+            renderItems(response.hits.hits);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+}
+
+function getItemsUsingDataViaFlask(_data) {
+    theUrlForData1 = publicIp + "/api/es_search";
+    console.log("getItemsUsingDataViaFlask");
+    console.log(theUrlForData1);
+    console.log(_data);
+    $.ajax({
+        url: theUrlForData1,
+        type: "POST",
+        data: _data,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response);
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+}
+
+function getItems(_url) {
+    $.get(_url, function(data, status) {
+        //console.log(data.hits.hits);
+        renderItems(data.hits.hits);
+    });
+}
+
+function getQuickItemsViaFlask() {
+    theUrlForData2 = publicIp + "/api/es_quick_100_search";
+    _data = {
+        "query": {
+            "match_all": {}
+        }
+    };
+    var _dataString = JSON.stringify(_data);
+    $.ajax({
+        url: theUrlForData2,
+        type: "POST",
+        data: _dataString,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response)
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+
+}
+
+function getItemsViaFlask() {
+    theUrlForData2 = publicIp + "/api/es_search";
+    console.log("getItemsViaFlask");
+    console.log(theUrlForData2);
+    console.log("POST");
+    _data = {
+        "query": {
+            "match_all": {}
+        }
+    };
+    var _dataString = JSON.stringify(_data);
+    $.ajax({
+        url: theUrlForData2,
+        type: "POST",
+        data: _dataString,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response)
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+
+}
+
+
+
+function renderItems(_hits) {
+    $(".results").empty();
+    $.each(_hits, function(index, value) {
+
+        var row = jQuery("<div/>", {
+            class: "row",
         });
-    }
+        row.appendTo(".results");
 
-    function getItemsUsingDataViaFlask(_data) {
-        theUrlForData1 = publicIp + "/api/es_search";
-        console.log("getItemsUsingDataViaFlask");
-        console.log(theUrlForData1);
-        console.log(_data);
-        $.ajax({
-            url: theUrlForData1,
-            type: "POST",
-            data: _data,
-            dataType: "json",
-            contentType: "application/json",
-            success: function(response) {
-                //console.log(response);
-                renderItems(response);
-            },
-            error: function(xhr) {
-                console.log("Get items failed");
-            }
+        var details = jQuery("<div/>", {
+            class: "col-sm-12"
         });
-    }
+        details.appendTo(row);
 
-    function getItems(_url) {
-        $.get(_url, function(data, status) {
-            //console.log(data.hits.hits);
-            renderItems(data.hits.hits);
+        var dl = jQuery("<dl/>", {});
+        dl.appendTo(details);
+
+        var address = jQuery("<dt/>", {
+            text: "Address: " + value.contractAddress
         });
-    }
+        address.appendTo(dl);
 
-    function getQuickItemsViaFlask() {
-        theUrlForData2 = publicIp + "/api/es_quick_100_search";
-        _data = {"query":{"match_all": {}}};
-        var _dataString = JSON.stringify(_data);
-        $.ajax({
-            url: theUrlForData2,
-            type: "POST",
-            data: _dataString,
-            dataType: "json",
-            contentType: "application/json",
-            success: function(response) {
-                //console.log(response)
-                renderItems(response);
-            },
-            error: function(xhr) {
-                console.log("Get items failed");
-            }
+        var block = jQuery("<dt/>", {
+            text: "Block: " + value.blockNumber
         });
+        block.appendTo(dl);
 
-    }
-
-    function getItemsViaFlask() {
-        theUrlForData2 = publicIp + "/api/es_search";
-        console.log("getItemsViaFlask");
-        console.log(theUrlForData2);
-        console.log("POST");
-        _data = {"query":{"match_all": {}}};
-        var _dataString = JSON.stringify(_data);
-        $.ajax({
-            url: theUrlForData2,
-            type: "POST",
-            data: _dataString,
-            dataType: "json",
-            contentType: "application/json",
-            success: function(response) {
-                //console.log(response)
-                renderItems(response);
-            },
-            error: function(xhr) {
-                console.log("Get items failed");
-            }
+        var transaction = jQuery("<dt/>", {
+            text: "Transaction: " + value.TxHash
         });
+        transaction.appendTo(dl);
 
-    }
+        var creator = jQuery("<dt/>", {
+            text: "Creator: " + value.creator
+        });
+        creator.appendTo(dl);
 
+        var lineBreak = jQuery("<hr/>", {});
+        lineBreak.appendTo(".results");
 
-
-    function renderItems(_hits) {
-        $(".results").empty();
-        $.each(_hits, function(index, value) {
-
-            var row = jQuery("<div/>", {
-                class: "row",
+        var shaList = value.abiShaList;
+        if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")) {
+            var type = jQuery("<dt/>", {
+                text: "Type: ERC20"
             });
-            row.appendTo(".results");
+            type.appendTo(dl);
 
-            var details = jQuery("<div/>", {
-                class: "col-sm-12"
+            var name = jQuery("<dt/>", {
+                text: "ERC20 Name: " + value.functionData.name
             });
-            details.appendTo(row);
+            name.appendTo(dl);
 
-            var dl = jQuery("<dl/>", {});
-            dl.appendTo(details);
-
-            var address = jQuery("<dt/>", {
-                text: "Address: " + value.contractAddress
+            var symbol = jQuery("<dt/>", {
+                text: "ERC20 Symbol: " + value.functionData.symbol
             });
-            address.appendTo(dl);
+            symbol.appendTo(dl);
 
-            var block = jQuery("<dt/>", {
-                text: "Block: " + value.blockNumber
+            var supply = jQuery("<dt/>", {
+                text: "ERC20 Supply: " + value.functionData.totalSupply
             });
-            block.appendTo(dl);
+            supply.appendTo(dl);
 
-            var transaction = jQuery("<dt/>", {
-                text: "Transaction: " + value.TxHash
+            var decimals = jQuery("<dt/>", {
+                text: "ERC20 Decimals: " + value.functionData.decimals
             });
-            transaction.appendTo(dl);
+            decimals.appendTo(dl);
 
-            var creator = jQuery("<dt/>", {
-                text: "Creator: " + value.creator
+            var breaker = jQuery("<br />", {});
+            breaker.appendTo(dl);
+
+            var etherscan = jQuery("<dd/>", {
+
             });
-            creator.appendTo(dl);
 
-            var lineBreak = jQuery("<hr/>", {});
-            lineBreak.appendTo(".results");
-
-            var shaList = value.abiShaList;
-            if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")) {
-                var type = jQuery("<dt/>", {
-                    text: "Type: ERC20"
+        } else {
+            $.each(value.functionData, function(key, value) {
+                var theUnknownData = jQuery("<dt/>", {
+                    text: key + ": " + value
                 });
-                type.appendTo(dl);
+                theUnknownData.appendTo(dl);
+            });
+        }
 
-                var name = jQuery("<dt/>", {
-                    text: "ERC20 Name: " + value.functionData.name
-                });
-                name.appendTo(dl);
-
-                var symbol = jQuery("<dt/>", {
-                    text: "ERC20 Symbol: " + value.functionData.symbol
-                });
-                symbol.appendTo(dl);
-
-                var supply = jQuery("<dt/>", {
-                    text: "ERC20 Supply: " + value.functionData.totalSupply
-                });
-                supply.appendTo(dl);
-
-                var decimals = jQuery("<dt/>", {
-                    text: "ERC20 Decimals: " + value.functionData.decimals
-                });
-                decimals.appendTo(dl);
-
-                var breaker = jQuery("<br />", {});
-                breaker.appendTo(dl);
-
-                var etherscan = jQuery("<dd/>", {
-
-                });
-
-                var etherscanUrl = "https://etherscan.io/token/" + value.contractAddress;
-                var etherscanButton = jQuery("<a/>", {
+        if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")) || shaList.includes("0x7f63f9caca226af6ac1e87fee18b638da04cfbb980f202e8f17855a6d4617a69") {
+            var etherscanUrl = "https://etherscan.io/token/" + value.contractAddress;
+            var etherscanButton = jQuery("<a/>", {
                 href: etherscanUrl,
                 class: "btn btn-primary btn-sm",
                 role: "button",
@@ -544,14 +561,7 @@ function renderContractVariables(_result) {
             });
             etherscanButton.appendTo(etherscan);
             etherscan.appendTo(dl);
-            }
-            else{
-                $.each(value.functionData, function( key, value ) {
-                  var theUnknownData = jQuery("<dt/>", {
-                    text: key + ": " + value
-                    });
-                    theUnknownData.appendTo(dl);
-                });
-            }
-        });
-    }
+        }
+
+    });
+}

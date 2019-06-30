@@ -257,3 +257,58 @@ print("\nThe Sha3 of this ABI is as follows:")
 print(theDeterministicBATHash)
 print("\nThe unique function hashes for this official ERC20 ABI are as follows:")
 print(batHashes)
+
+
+transferABI = '''[{"constant":true,"inputs":[],"name":"proxyType","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[],"name":"implementation","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_masterCopy","type":"address"},{"name":"initializer","type":"bytes"},{"name":"funder","type":"address"},{"name":"paymentToken","type":"address"},{"name":"payment","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"}]'''
+#ERC20 
+transferABIJSON = json.loads(transferABI)
+theDeterministicHash = harvester.shaAnAbi(transferABIJSON)
+cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(transferABIJSON)
+erc20Hashes = harvester.createUniqueAbiComparisons(json.loads(cleanedAndOrderedAbiText))
+print("\nThe original ABI is as follows:")
+print(transferABIJSON)
+print("\nThe cleaned and ordered ABI is as follows:")
+print(cleanedAndOrderedAbiText)
+print("\nThe Sha3 of this ABI is as follows:")
+print(theDeterministicHash)
+print("\nThe unique function hashes for this official ERC20 ABI are as follows:")
+print(erc20Hashes)
+
+
+
+transferABI = '''[{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}]'''
+#ERC20 
+transferABIJSON = json.loads(transferABI)
+theDeterministicHash = harvester.shaAnAbi(transferABIJSON)
+cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(transferABIJSON)
+erc20Hashes = harvester.createUniqueAbiComparisons(json.loads(cleanedAndOrderedAbiText))
+print("\nThe original ABI is as follows:")
+print(transferABIJSON)
+print("\nThe cleaned and ordered ABI is as follows:")
+print(cleanedAndOrderedAbiText)
+print("\nThe Sha3 of this ABI is as follows:")
+print(theDeterministicHash)
+print("\nThe unique function hashes for this official ERC20 ABI are as follows:")
+print(erc20Hashes)
+
+
+transferABI = '''[{"constant":true,"inputs":[],"name":"proxyType","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[],"name":"implementation","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_masterCopy","type":"address"},{"name":"initializer","type":"bytes"},{"name":"funder","type":"address"},{"name":"paymentToken","type":"address"},{"name":"payment","type":"uint256"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"}]'''
+
+transferABIJSON = json.loads(transferABI)
+theDeterministicHash = harvester.shaAnAbi(transferABIJSON)
+cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(transferABIJSON)
+erc20Hashes = harvester.createUniqueAbiComparisons(json.loads(cleanedAndOrderedAbiText))
+print("\nThe original ABI is as follows:")
+print(transferABIJSON)
+print("\nThe cleaned and ordered ABI is as follows:")
+print(cleanedAndOrderedAbiText)
+print("\nThe Sha3 of this ABI is as follows:")
+print(theDeterministicHash)
+print("\nThe unique function hashes for this official ERC20 ABI are as follows:")
+print(erc20Hashes)
+
+
+
+
+
+
