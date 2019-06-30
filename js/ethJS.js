@@ -534,13 +534,6 @@ function renderItems(_hits) {
             });
             decimals.appendTo(dl);
 
-            var breaker = jQuery("<br />", {});
-            breaker.appendTo(dl);
-
-            var etherscan = jQuery("<dd/>", {
-
-            });
-
         } else {
             $.each(value.functionData, function(key, value) {
                 var theUnknownData = jQuery("<dt/>", {
@@ -551,6 +544,10 @@ function renderItems(_hits) {
         }
 
         if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286") || shaList.includes("0x7f63f9caca226af6ac1e87fee18b638da04cfbb980f202e8f17855a6d4617a69")) {
+            var etherscan = jQuery("<dd/>", {
+
+            });
+
             var etherscanUrl = "https://etherscan.io/token/" + value.contractAddress;
             var etherscanButton = jQuery("<a/>", {
                 href: etherscanUrl,
@@ -562,6 +559,9 @@ function renderItems(_hits) {
             etherscanButton.appendTo(etherscan);
             etherscan.appendTo(dl);
         }
+        
+        var breaker = jQuery("<br />", {});
+        breaker.appendTo(dl);
 
     });
 }
