@@ -410,27 +410,36 @@ class Harvest:
 
 
     def harvestTransactionsDriver(self):
-        print("Harvesting transactions from masterindex")
-        queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
-        esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
-        harvestTransactionsDriverThreads = []
-        localAbiList = []
-        for esAbiSingle in esAbis:
-            localAbiList.append(esAbiSingle['_source']['abi'])
-        queryForTransactionIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
-        # Use the following if you want to query a subset of blocks
-        #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
-        esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
-        localTransactionList = []
-        for esTransactionSingle in esTransactions:
-            localTransactionList.append(esTransactionSingle['_source']['TxHash'])
-        for localEsAbiSingle in localAbiList:
-            tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
-            tFullDriver2.daemon = True
-            tFullDriver2.start()
-            harvestTransactionsDriverThreads.append(tFullDriver2)
-        for harvestDriverThread2 in harvestTransactionsDriverThreads:
-            harvestDriverThread2.join()
+        self.harvestTransactionsDriverTimer = time.time()
+        while True:
+            print("Harvesting transactions from masterindex")
+            queryForAbiIndex = {"query":{"match":{"indexInProgress": "false"}}}
+            esAbis = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex, query=queryForAbiIndex, preserve_order=True)
+            harvestTransactionsDriverThreads = []
+            localAbiList = []
+            for esAbiSingle in esAbis:
+                localAbiList.append(esAbiSingle['_source']['abi'])
+            queryForTransactionIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
+            # Use the following if you want to query a subset of blocks
+            #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
+            esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
+            localTransactionList = []
+            for esTransactionSingle in esTransactions:
+                localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+            for localEsAbiSingle in localAbiList:
+                tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
+                tFullDriver2.daemon = True
+                tFullDriver2.start()
+                harvestTransactionsDriverThreads.append(tFullDriver2)
+            for harvestDriverThread2 in harvestTransactionsDriverThreads:
+                harvestDriverThread2.join()
+            self.harvestTransactionsDriverTimer = self.harvestTransactionsDriverTimer + 1800
+            if self.harvestTransactionsDriverTimer > time.time():
+                print("Finished before time limit, will sleep now ...")
+                time.sleep(self.harvestTransactionsDriverTimer - time.time())
+                print("Back awake and ready to go ...")
+            else:
+                print("It has been longer than the desired time, need to re-update the state immediately ...")
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
