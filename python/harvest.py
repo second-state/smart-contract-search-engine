@@ -102,6 +102,8 @@ class Harvest:
             esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
             stringAbi = json.dumps(esReponseAbi["_source"]["abi"])
             jsonAbi = json.loads(stringAbi)
+            #print("Return ABI Object")
+            #print(jsonAbi)
             return jsonAbi
         except:
             print("Unable to fetch ABI from the ABI index")
@@ -202,6 +204,8 @@ class Harvest:
 
     def sortInternalListsInJsonObject(self, _json):
         for listItem in _json:
+            #print("List item")
+            #print(listItem)
             for k, v in listItem.items():
                 if type(v) not in (str, bool, int) and len(v) > 1:
                     if type(v[0]) is dict:
@@ -272,9 +276,22 @@ class Harvest:
             tabiCompatabilityUpdateDriverPre2.daemon = True
             tabiCompatabilityUpdateDriverPre2.start()
             txThreadList.append(tabiCompatabilityUpdateDriverPre2)
-            time.sleep(0.5)
+            #time.sleep(0.5)
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
+
+    def expressUpdateAbiShaList(self, _abiHash):
+        jsonAbi = json.loads(self.fetchAbiUsingHash(_abiHash))
+        #print("JSON ABI")
+        #print(jsonAbi)
+        queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
+        esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
+        TxObj = {}
+        num = 1
+        for item in esTxs:
+            TxObj[str(num)] = item
+            num = num+1
+        self.abiCompatabilityUpdateDriverPre2(jsonAbi, json.loads(json.dumps(TxObj)))
 
 
     def abiCompatabilityUpdateDriverPre1(self):
@@ -377,10 +394,19 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(10)
+            time.sleep(2)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
+
+    def expressHarvestAnAbi(self, _abiSha):
+        jsonAbi = json.loads(self.fetchAbiUsingHash(_abiSha))
+        queryForTransactionIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
+        esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
+        localTransactionList = []
+        for esTransactionSingle in esTransactions:
+            localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+        self.processMultipleTransactions(jsonAbi, localTransactionList)
 
 
     def harvestTransactionsDriver(self):
