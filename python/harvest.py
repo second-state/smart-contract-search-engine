@@ -586,7 +586,6 @@ class Harvest:
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
 
-
     def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
         bulkList = []
         self.upcomingCallTimeHarvest = time.time()
@@ -627,6 +626,22 @@ class Harvest:
                                     bulkList.append(singleItem)
                                     elasticsearch.helpers.bulk(self.es, bulkList)
                                     bulkList = []
+                                    self.threadsAddNewItem = []
+                                    dMatchAllInner = {}
+                                    dMatchAll = {}
+                                    dMatchAll["match_all"] = dMatchAllInner
+                                    dQuery = {}
+                                    dQuery["query"] = dMatchAll
+                                    print("Querying ES " + json.dumps(dQuery))
+                                    esReponseAbi = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex , query=json.dumps(dQuery), preserve_order=True)
+                                    for item in esReponseAbi:
+                                        jsonAbi = json.loads(item["_source"]["abi"])
+                                        tAddNewItem = threading.Thread(target=self.processSingleTransaction, args=[jsonAbi , str(self.web3.toHex(transactionData.hash))])
+                                        tAddNewItem.daemon = True
+                                        tAddNewItem.start()
+                                        self.threadsAddNewItem.append(tAddNewItem)
+                                    for individualAddNewItemThread in self.threadsAddNewItem:
+                                        individualAddNewItemThread.join()
                                 else:
                                     bulkList.append(singleItem)
                                     print("Added item to BULK list, we now have " + str(len(bulkList)))
