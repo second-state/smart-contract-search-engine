@@ -400,13 +400,13 @@ class Harvest:
             harvestDriverThread3.join()
 
     def expressHarvestAnAbi(self, _abiSha):
-        jsonAbi = json.loads(self.fetchAbiUsingHash(_abiSha))
+        jsonAbi = self.fetchAbiUsingHash(_abiSha)
         queryForTransactionIndex = {"query":{"bool":{"must":[{"match":{"indexed":"false"}}]}}}
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         localTransactionList = []
         for esTransactionSingle in esTransactions:
             localTransactionList.append(esTransactionSingle['_source']['TxHash'])
-        self.processMultipleTransactions(jsonAbi, localTransactionList)
+        self.processMultipleTransactions(json.dumps(jsonAbi), localTransactionList)
 
 
     def harvestTransactionsDriver(self):
