@@ -5,6 +5,7 @@ import time
 import json
 import boto3
 import queue
+import random
 import argparse
 import requests
 import threading
@@ -276,7 +277,7 @@ class Harvest:
             tabiCompatabilityUpdateDriverPre2.daemon = True
             tabiCompatabilityUpdateDriverPre2.start()
             txThreadList.append(tabiCompatabilityUpdateDriverPre2)
-            #time.sleep(0.5)
+            time.sleep(1)
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
 
@@ -390,11 +391,13 @@ class Harvest:
     def processMultipleTransactions(self, _esAbiSingle, _esTransactions):
         processMultipleTransactionsThreads = []
         contractAbiJSONData = json.loads(_esAbiSingle)
-        for transactionHash in reversed(_esTransactions):
+        txCount = len(_esTransactions)
+        for i in range(txCount):
+            transactionHash = random.choice(_esTransactions)
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(2)
+            time.sleep(5)
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
