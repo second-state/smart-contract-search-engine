@@ -1,49 +1,12 @@
-
-#IMPORTS
-import os
-import time
+import re
 import json
-import boto3 
+import time
 import requests
-import configparser
+from harvest import Harvest
 import elasticsearch.helpers
 from flask import Flask, jsonify, request
-from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
-from elasticsearch import Elasticsearch, RequestsHttpConnection 
 
-# CONFIG
-
-# CWD
-scriptExecutionLocation = os.getcwd()
-config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
-
-host = config['elasticSearch']['endpoint']
-print("ElasticSearch Endpoint: %s" % host)
-
-masterIndex = config['masterindex']['all']
-print("masterIndex: %s" % masterIndex)
-
-commonIndex = config['commonindex']['network']
-print("commonIndex: %s" % commonIndex)
-
-abiIndex = config['abiindex']['abi']
-print("abiIndex: %s" % abiIndex)
-
-bytecodeIndex = config['bytecodeindex']['bytecode']
-print("bytecodeIndex: %s" % bytecodeIndex)
-
-elasticSearchAwsRegion = config['elasticSearch']['aws_region']
-
-auth = BotoAWSRequestsAuth(aws_host=host, aws_region=elasticSearchAwsRegion, aws_service='es')
-es = Elasticsearch(
-    hosts=[{'host': host, 'port': 443}],
-    region=elasticSearchAwsRegion,
-    use_ssl=True,
-    verify_certs=True,
-    http_auth=auth,
-    connection_class=RequestsHttpConnection
-)
+harvester = Harvest()
 
 app = Flask(__name__)
 
@@ -51,32 +14,94 @@ app = Flask(__name__)
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
-    ## The users would have visited the upload_abi page which would have displayed all of the contracts without ABIShA3 field. 
-    ## The "all" index is the one which has all of the contract addresses we refer to it as the masterIndex
-    ## Instantiate a web3 contract instance using the abi and the address provided from the submit_api page
-    ## If this passes then create an ES update query like this
-    ## The ABI
-    ## abiUrl = "https://raw.githubusercontent.com/CyberMiles/smart_contracts/master/FairPlay/v1/dapp/FairPlay.abi"
-    ## abiData = re.sub(r"[\n\t\s]*", "", json.dumps(json.loads(requests.get(abiUrl).content)))
+    jsonAbiObj = json.loads(jsonRequestData["abi"])
+    theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
+    cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
+    transactionHash = jsonRequestData["hash"]
+    success = False
+    try:
+        # Try and index the contract instance directly into the common index
+        harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
+        success = True
+    except:
+        print("Unable to process that single transaction")
+        doc = {}
+        doc["response"] = 'Failed to index contract'
+        return jsonify(doc)
+    # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
+    if success == True:
+        data = {}
+        data['indexInProgress'] = "false"
+        data['epochOfLastUpdate'] = int(time.time())
+        data['abi'] = cleanedAndOrderedAbiText
+        harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
+        print("Index was a success")
+        doc = {}
+        doc["response"] = 'Successfully indexed contract.'
+        return jsonify(doc)
 
-    ## Once we have cleaned the ABI we create the hash of it 
-    ## abiSha = web3.toHex(web3.sha3(text=json.dumps(abiData)))
-    ## Use Elasticsearch to update the record 
-    ## data = {}
-    ## data['abi'] = abiData
-    ## es.index(index="abi", id=abiSha, body=abiData)
-
+@app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
+def es_quick_100_search():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    results = harvester.getOnly100Records()
+    outerList = []
+    print(results)
+    for returnedItem in results["hits"]["hits"]:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                for sKey, sValue in rValue.items():
+                    if str(sKey) == "functionDataList":
+                        for functionDataListItem in sValue['0']:
+                            for fKey, fValue in functionDataListItem.items():
+                                if fKey in uniqueDict:
+                                    #print("We already have " + str(fKey))
+                                    print(".")
+                                else:
+                                    uniqueDict[fKey] = fValue
+                    else:
+                        if sKey in uniqueDict:
+                            #print("We already have " + str(sKey))
+                            print(".")
+                        else:
+                            uniqueDict[sKey] = sValue
+        outerList.append(uniqueDict)
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
 def es_search():
+    print(request)
     jsonRequestData = json.loads(request.data)
-    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=jsonRequestData)
-    obj = {}
-    num = 1
-    for item in results:
-        obj[str(num)] = item
-        num = num+1
-    return jsonify(obj)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=jsonRequestData)
+    outerList = []
+    for returnedItem in results:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                for sKey, sValue in rValue.items():
+                    if str(sKey) == "functionDataList":
+                        for functionDataListItem in sValue['0']:
+                            for fKey, fValue in functionDataListItem.items():
+                                if fKey in uniqueDict:
+                                    #print("We already have " + str(fKey))
+                                    print(".")
+                                else:
+                                    uniqueDict[fKey] = fValue
+                    else:
+                        if sKey in uniqueDict:
+                            #print("We already have " + str(sKey))
+                            print(".")
+                        else:
+                            uniqueDict[sKey] = sValue
+        outerList.append(uniqueDict)
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
 
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
@@ -85,7 +110,7 @@ def getAll():
     query = {}
     query["query"] = matchAll
     allQuery = json.loads(json.dumps(query))
-    results = elasticsearch.helpers.scan(client=es, index=commonIndex, query=allQuery)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.commonIndex, query=allQuery)
     obj = {}
     num = 1
     for item in results:
@@ -103,7 +128,7 @@ def es_update_quality():
         outerData = {}
         outerData["quality"] = qualityScore
         doc["doc"] = outerData
-        theResponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+        theResponse = harvester.es.update(index=harvester.commonIndex, id=itemId, body=json.dumps(doc))
         return jsonify(theResponse)
 
 if __name__ == "__main__":

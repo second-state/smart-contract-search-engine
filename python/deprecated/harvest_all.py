@@ -1,3 +1,9 @@
+# Harvest all is a script that will find (and index in the masterindex->all index which is set in the config.ini) every transaction receipt which has a contract address associated with it.
+# More specifically, it is a quick reference index which can provide a) the transactionHash to a caller who can provide an actual contract address.
+# Once the caller has the transactionHash, they can go ahead and fetch any and all information such as receipts, block number etc. In addition, if they also have the correct ABI, they can even create a web3 contract instance.
+# The search engine uses this file to rapidly index all of the transactions that involve a contract. If a user uploads an ABI and contract address the code for the upload can quickly obtain everything it needs in order to properly index that contract in the common index (the commonindex->network which is set in the config.ini)
+
+
 import os
 import sys
 import json
@@ -6,6 +12,7 @@ import time
 import argparse
 import threading
 import configparser
+import elasticsearch.helpers
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
 from elasticsearch import Elasticsearch, RequestsHttpConnection
@@ -64,6 +71,7 @@ class Harvest:
         return returnVal
 
     def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
+        bulkList = []
         self.upcomingCallTimeHarvest = time.time()
         while True:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
@@ -88,39 +96,30 @@ class Harvest:
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         transactionContractAddress = transactionReceipt.contractAddress
                         if transactionContractAddress != None:
-                            try:
-                                outerData = {}
-                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                outerData['blockNumber'] = transactionReceipt.blockNumber
-                                outerData['contractAddress'] = transactionReceipt.contractAddress
-                                # from is the contract's creator
-                                outerData['from'] = transactionReceipt['from']
-                                #outerData['abi'] = "false"
-                                #outerData['bytecode'] = "false"
-                                outerData['abiSha3'] = "false"
-                                outerData['bytecodeSha3'] = "false"
-                                outerData['abiSha3bytecodeSha3'] = "false"
-                                # indexingInProgress is a placeholder/lock for sharded harvesting in the future
-                                outerData['indexingInProgress'] = "false"
-                                # contractDestructed will be set by external web3 script
-                                outerData['contractDestructed'] = "false"
-                                # epochOfLastUpdate will be updated by each sharded harvester/indexer and used to detect if a sharded harvester/indexer has gone off line with the indexingInProgress flag set to true
-                                # epochOfLastUpdate will be monitored by external script (the purpose to set the indexingInProgress to false in cases where no recent activity is detected)
-                                # i.e. if contractDestructed == "false" and indexingInProgress == "true" and (time.now - epochOfLastUpdate > 24 hours)
-                                outerData['epochOfLastUpdate'] = block.timestamp 
-
-                                itemId = transactionReceipt.contractAddress
-                                dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
-                                if dataStatus == False:
-                                    indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
-                            except:
-                                print("Error indexing contract")
+                            outerData = {}
+                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                            outerData['blockNumber'] = transactionReceipt.blockNumber
+                            outerData['contractAddress'] = transactionReceipt.contractAddress
+                            outerData['from'] = transactionReceipt['from']
+                            outerData["indexed"] = "false"
+                            itemId = transactionReceipt.contractAddress
+                            dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                            if dataStatus == False:
+                                singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                bulkList.append(singleItem)
+                                print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                if len(bulkList) == 50:
+                                    elasticsearch.helpers.bulk(self.es, bulkList)
+                                    bulkList = []
                         else:
-                            print("This transaction does not involve a contract, so we will ignore it")
                             continue
                 else:
                     print("Skipping block number %s - No transactions found!" % blockNumber)
                     continue
+            if len(bulkList) > 1:
+                print("Adding the last few items which were not bulk loaded already")
+                elasticsearch.helpers.bulk(self.es, bulkList)
+                bulkList = []
             if _topup == True and len(_argList) == 0:
                 self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
                 if self.upcomingCallTimeHarvest > time.time():
@@ -139,7 +138,7 @@ if __name__ == "__main__":
     if args.mode == "full":
         print("Performing full harvest")
         latestBlockNumber = harvester.web3.eth.getBlock('latest').number
-        threadsToUse = 100
+        threadsToUse = 654
         blocksPerThread = int(latestBlockNumber / threadsToUse)
         harvester.fastThreads = []
         for startingBlock in range(1, latestBlockNumber, blocksPerThread):

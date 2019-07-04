@@ -24,7 +24,7 @@ scriptExecutionLocation = os.getcwd()
 # Config
 print("Reading configuration file")
 config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
-config.read(os.path.join(scriptExecutionLocation, '../config.ini'))
+config.read(os.path.join(scriptExecutionLocation, 'config.ini'))
 
 # Master index
 masterIndex = config['masterindex']['all']
@@ -70,7 +70,7 @@ es = Elasticsearch(
 # New data
 doc = {}
 outerData = {}
-outerData["quality"] = "50"
+outerData["indexed"] = "false"
 doc["doc"] = outerData
 # Match all to access all records
 dMatchAllInner = {}
@@ -79,12 +79,23 @@ dMatchAll["match_all"] = dMatchAllInner
 dQuery = {}
 dQuery["query"] = dMatchAll
 # Fetch the items
-esReponseByte = elasticsearch.helpers.scan(client=es, index=commonIndex , query=json.dumps(dQuery), preserve_order=True)
+esReponseByte = elasticsearch.helpers.scan(client=es, index=masterIndex , query=json.dumps(dQuery), preserve_order=True)
 # Access each of the item IDs
+bulkList = []
 for i, data in enumerate(esReponseByte):
-	itemId = data.get('_id')
-	print("Updating ID: %s" % itemId)
+    #print(data)
+    itemId = data.get('_id')
+    #print("Processing: " + itemId)
+    singleItem = {"_index":str(masterIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "update", "_source": json.dumps(doc)}
+    bulkList.append(singleItem)
+    if len(bulkList) == 10000:
+        elasticsearch.helpers.bulk(es, bulkList)
+        print("Performed a bulk update.")
+        bulkList = []
+print("We have reached the end of the list so let's index the rest which came in under the 1000 count")
+elasticsearch.helpers.bulk(es, bulkList)
+bulkList = []
 	# Write the new data from above into the index at the current ID
-	reponse = es.update(index=commonIndex, id=itemId, body=json.dumps(doc))
+	#reponse = es.update(index=masterIndex, id=itemId, body=json.dumps(doc))
 
 

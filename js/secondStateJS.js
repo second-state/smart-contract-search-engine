@@ -3,7 +3,7 @@
 //
 // Local single user vs global multiuser
 //var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
-var publicIp = "http://52.65.144.128"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
+var publicIp = "https://cmt-testnet.search.secondstate.io"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 
 // Check blockchain network and accounts
 // This is used to confirm that the user"s chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
@@ -75,7 +75,7 @@ $(document).ready(function() {
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = this.currentAccount;
+            dFunctionDataOwner["functionDataList.0.functionData.owner"] = this.currentAccount;
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             var dMust = {};
@@ -114,23 +114,10 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-            lShould = [];
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.player_addrs." + i;
-                dPTemp[fString] = this.currentAccount;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            var dMust = {};
-            dMust["should"] = lShould;
-            var dBool = {};
-            dBool["bool"] = dMust;
-            var dQuery = {};
-            dQuery["query"] = dBool;
+            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.player_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
-            var jsonString = JSON.stringify(dQuery);
+            var jsonString = dQuery;
+            console.log(jsonString)
 
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
@@ -160,23 +147,9 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-            lShould = [];
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.winner_addrs." + i;
-                dPTemp[fString] = this.currentAccount;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            var dMust = {};
-            dMust["should"] = lShould;
-            var dBool = {};
-            dBool["bool"] = dMust;
-            var dQuery = {};
-            dQuery["query"] = dBool;
+            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.winner_addrs.*"],"query":"' + this.currentAccount + '"}}}'
             $("#pbc").hide("slow");
-            var jsonString = JSON.stringify(dQuery);
+            var jsonString = dQuery;
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
@@ -193,165 +166,21 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#searchAddressButton").click(function() {
         $(".results").empty()
-        var theAddress = $("#searchAddressInput").val();
         var theText = $("#searchTextInput").val();
-        //console.log($.trim(theAddress.length));
-        if ($.trim(theAddress.length) == "0" && $.trim(theText.length) == "0") {
+        if ($.trim(theText.length) == "0") {
             //console.log("Address and text are both blank, fetching all results without a filter");
             if (publicIp) {
                 getItemsViaFlask(elasticSearchUrl);
             } else {
                 getItems(elasticSearchUrl);
             }
-        } else if ($.trim(theAddress.length) == "0" && $.trim(theText.length) > "0") {
-            var dFields = {};
-            var dQueryInner = {};
-            var dMultiMatch = {};
-            var dQueryOuter = {};
-            var lFields = ["functionData.info.1", "functionData.info.2"];
-            dTemp = {};
-            dTemp["fields"] = lFields;
-            dTemp["query"] = theText;
-            dMultiMatch["multi_match"] = dTemp;
-            dQueryOuter["query"] = dMultiMatch;
-            var jsonString = JSON.stringify(dQueryOuter);
-
-            // If this is a public website then we need to call ES using Flask
+        } else if ($.trim(theText.length) > "0") {
+            var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"query":"' + theText + '"}}}'
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
             } else {
                 var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
             }
-
-            //console.log(itemArray);
-        } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) > "0") {
-            var dDesc = {};
-            dDesc["desc"] = theText;
-            //console.log(dDesc);
-            var dTitle = {};
-            dTitle["title"] = theText;
-            //console.log(dTitle);
-            var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = theAddress;
-            //console.log(dFunctionDataOwner);
-            var dContractAddress = {};
-            dContractAddress["contractAddress"] = theAddress;
-            //console.log(dContractAddress);
-            var dMatchContractAddress = {};
-            dMatchContractAddress["match"] = dContractAddress;
-            //console.log(dMatchContractAddress);
-            var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
-            //console.log(dMatchFunctionDataOwner);
-            var dMatchTitle = {};
-            dMatchTitle["match"] = dTitle;
-            //console.log(dMatchTitle);
-            var dMatchDesc = {};
-            dMatchDesc["match"] = dDesc;
-            //console.log(dMatchDesc);
-            var lShould = [];
-            lShould.push(dMatchContractAddress);
-            lShould.push(dMatchFunctionDataOwner);
-            lShould.push(dMatchTitle);
-            lShould.push(dMatchDesc);
-            // Start - Players and Winners
-            // Players
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.player_addrs" + i;
-                dPTemp[fString] = theAddress;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            // Winners
-            for (i = 0; i < 50; i++) {
-                var dWTemp = {};
-                var dWTemp2 = {};
-                var fStringW = "functionData.player_addrs" + i;
-                dWTemp[fStringW] = theAddress;
-                dWTemp2["match"] = dWTemp;
-                lShould.push(dWTemp2);
-            }
-            // End - Players and Winners
-            //console.log(lShould);
-            var dShould = {};
-            dShould["should"] = lShould;
-            //console.log(dShould);
-            var dBool = {};
-            dBool["bool"] = dShould;
-            //console.log(dBool);
-            var dQuery = {};
-            dQuery["query"] = dBool;
-            //console.log(dQuery);
-            //console.log(JSON.stringify(dQuery));
-            var jsonString = JSON.stringify(dQuery);
-
-            // If this is a public website then we need to call ES using Flask
-            if (publicIp) {
-                var itemArray = getItemsUsingDataViaFlask(jsonString);
-            } else {
-                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            }
-
-            //console.log(itemArray);
-        } else if ($.trim(theAddress.length) > "0" && $.trim(theText.length) == "0") {
-            var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionData.owner"] = theAddress;
-            //console.log(dFunctionDataOwner);
-            var dContractAddress = {};
-            dContractAddress["contractAddress"] = theAddress;
-            //console.log(dContractAddress);
-            var dMatchContractAddress = {};
-            dMatchContractAddress["match"] = dContractAddress;
-            //console.log(dMatchContractAddress);
-            var dMatchFunctionDataOwner = {};
-            dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
-            //console.log(dMatchFunctionDataOwner);
-            var lShould = [];
-            lShould.push(dMatchContractAddress);
-            lShould.push(dMatchFunctionDataOwner);
-            // Start - Players and Winners
-            // Players
-            for (i = 0; i < 50; i++) {
-                var dPTemp = {};
-                var dPTemp2 = {};
-                var fString = "functionData.player_addrs" + i;
-                dPTemp[fString] = theAddress;
-                dPTemp2["match"] = dPTemp;
-                lShould.push(dPTemp2);
-            }
-            // Winners
-            for (i = 0; i < 50; i++) {
-                var dWTemp = {};
-                var dWTemp2 = {};
-                var fStringW = "functionData.winner_addrs" + i;
-                dWTemp[fStringW] = theAddress;
-                dWTemp2["match"] = dWTemp;
-                lShould.push(dWTemp2);
-            }
-            // End - Players and Winners
-            //console.log(lShould);
-            var dShould = {};
-            dShould["should"] = lShould;
-            //console.log(dShould);
-            var dBool = {};
-            dBool["bool"] = dShould;
-            //console.log(dBool);
-            var dQuery = {};
-            dQuery["query"] = dBool;
-            //console.log(dQuery);
-            //console.log(JSON.stringify(dQuery));
-            var jsonString = JSON.stringify(dQuery);
-
-            // If this is a public website then we need to call ES using Flask
-            if (publicIp) {
-                var itemArray = getItemsUsingDataViaFlask(jsonString);
-            } else {
-                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
-            }
-
-            //console.log(itemArray);
         }
 
     });
@@ -385,6 +214,7 @@ function getItemsUsingDataViaFlask(_data) {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
+            console.log(response);
             renderItems(response);
         },
         error: function(xhr) {
@@ -428,6 +258,7 @@ function getItemsViaFlask() {
 }
 
 function renderItems(_hits) {
+    console.log(_hits)
     $(".results").empty();
     $.each(_hits, function(index, value) {
 
@@ -443,7 +274,7 @@ function renderItems(_hits) {
 
         var image = jQuery("<img/>", {
             class: "img-thumbnail",
-            src: value._source.functionData.info[3],
+            src: value.functionData.info[3],
             alt: "giveaway"
         });
         image.appendTo(imageContainer);
@@ -457,22 +288,22 @@ function renderItems(_hits) {
         dl.appendTo(details);
 
         var title = jQuery("<dt/>", {
-            text: "Title: " + value._source.functionData.info[1]
+            text: "Title: " + value.functionData.info[1]
         });
         title.appendTo(dl);
 
         var description = jQuery("<dd/>", {
-            text: "Description: " + value._source.functionData.info[2]
+            text: "Description: " + value.functionData.info[2]
         });
         description.appendTo(dl);
 
         var winners = jQuery("<dd/>", {
-            text: "Number of potential winners: " + value._source.functionData.info[4]
+            text: "Number of potential winners: " + value.functionData.info[4]
         });
         winners.appendTo(dl);
 
         var textStatus = "";
-        if (value._source.functionData.status == 0) {
+        if (value.functionData.status == "0") {
             textStatus = "Winners have not been declared as yet";
             var status = jQuery("<dd/>", {
                 text: textStatus,
@@ -481,7 +312,7 @@ function renderItems(_hits) {
             });
             status.appendTo(dl);
 
-        } else if (value._source.functionData.status == 1) {
+        } else if (value.functionData.status == "1") {
             textStatus = "Winners have been declared";
             var status = jQuery("<dd/>", {
                 text: textStatus,
@@ -492,7 +323,7 @@ function renderItems(_hits) {
         }
 
         // Expiry time
-        var epochRepresentation = value._source.functionData.info[5];
+        var epochRepresentation = value.functionData.info[5];
         if (epochRepresentation.toString().length == 10) {
             var endDate = new Date(epochRepresentation * 1000);
         } else if (epochRepresentation.toString().length == 13) {
@@ -500,10 +331,10 @@ function renderItems(_hits) {
         }
 
         // Setting Dapp Version
-        if (value._source.abiSha3BytecodeSha3 == "0x39e76f559313a52e86c540b63ec64fbf1c88624855ad60cc0380c0d7d47aed4b"){
+        if (value.abiShaList.includes("0xb8a37479196c0f9d8ab647141f1f22863305d3ad86c4dd88f25304c01bff0eb6")){
                 dappVersion = "v1";
             }
-            else if (value._source.abiSha3BytecodeSha3 == "0x82069af99bd87d7c8271916cd33cff9f6176d1bb6da18a75379107df30da6fc5") {
+            else if (value.abiShaList.includes("0xe49f0c6abcbe2ab8264670478d7767df62be6b264d7fc8b067e9767dacf61c99")) {
                 dappVersion = "v2";
             }
 
@@ -521,7 +352,7 @@ function renderItems(_hits) {
 
             });
             
-            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
             var viewButton = jQuery("<a/>", {
                 href: viewUrl,
                 class: "btn btn-info",
@@ -541,7 +372,7 @@ function renderItems(_hits) {
             var play = jQuery("<dd/>", {
 
             });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value._source.contractAddress;
+            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
             var playButton = jQuery("<a/>", {
                 href: playUrl,
                 class: "btn btn-success",
@@ -609,53 +440,24 @@ function renderItems(_hits) {
         blockNumber.appendTo(dl2);
 
         var blockNumberA = jQuery("<a/>", {
-            text: "- Block " + value._source.blockNumber,
-            href: blockExplorer + "block/" + value._source.blockNumber,
+            text: "- Block " + value.blockNumber,
+            href: blockExplorer + "block/" + value.blockNumber,
             target: "_blank"
         });
         blockNumberA.appendTo(blockNumber);
 
-        if (value._source.TxHash !== undefined) {
+        if (value.TxHash !== undefined) {
             var txHash = jQuery("<dd/>", {
 
             });
             txHash.appendTo(dl2);
 
             var txHashA = jQuery("<a/>", {
-                text: "- Transaction " + value._source.TxHash,
-                href: blockExplorer + "tx/" + value._source.TxHash,
+                text: "- Transaction " + value.TxHash,
+                href: blockExplorer + "tx/" + value.TxHash,
                 target: "_blank"
             });
             txHashA.appendTo(txHash);
-        }
-
-        if (value._source.byteCodeURL !== undefined) {
-            var byteCodeURLO = jQuery("<dd/>", {
-
-            });
-            byteCodeURLO.appendTo(dl2);
-
-            var byteCodeURLOA = jQuery("<a/>", {
-                text: "- Bytecode source",
-                href: value._source.byteCodeURL,
-                target: "_blank"
-            });
-            byteCodeURLOA.appendTo(byteCodeURLO);
-        }
-
-        if (value._source.abiURL !== undefined) {
-            var abiURLO = jQuery("<dd/>", {
-
-            });
-            abiURLO.appendTo(dl2);
-
-            var abiURLOA = jQuery("<a/>", {
-                text: "- ABI source",
-                href: value._source.abiURL,
-                target: "_blank"
-            });
-            abiURLOA.appendTo(abiURLO);
-
         }
 
         var cOwner = jQuery("<dd/>", {
@@ -664,8 +466,8 @@ function renderItems(_hits) {
         cOwner.appendTo(dl2);
 
         var cOwnerA = jQuery("<a/>", {
-            text: "- Contract owner " + value._source.functionData.owner,
-            href: blockExplorer + "address/" + value._source.functionData.owner,
+            text: "- Contract owner " + value.functionData.owner,
+            href: blockExplorer + "address/" + value.functionData.owner,
             target: "_blank"
         });
         cOwnerA.appendTo(cOwner);
@@ -676,13 +478,13 @@ function renderItems(_hits) {
         cAddress.appendTo(dl2);
 
         var cAddressA = jQuery("<a/>", {
-            text: "- Contract address " + value._source.contractAddress,
-            href: blockExplorer + "address/" + value._source.contractAddress,
+            text: "- Contract address " + value.contractAddress,
+            href: blockExplorer + "address/" + value.contractAddress,
             target: "_blank"
         });
         cAddressA.appendTo(cAddress);
 
-        if (value._source.functionData.player_addrs == undefined) {
+        if (value.functionData.player_addrs == undefined){
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var pAddress = jQuery("<dd/>", {
@@ -692,7 +494,7 @@ function renderItems(_hits) {
         } else {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            $.each(value._source.functionData.player_addrs, function(playerIndex, playerValue) {
+            $.each(value.functionData.player_addrs, function(playerIndex, playerValue) {
                 var pAddress = jQuery("<dd/>", {
                     text: "Player : " + playerValue
                 });
@@ -700,7 +502,7 @@ function renderItems(_hits) {
             });
         }
 
-        if (value._source.functionData.winner_addrs == undefined) {
+        if (value.functionData.winner_addrs == undefined) {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
             var wAddress = jQuery("<dd/>", {
@@ -710,7 +512,7 @@ function renderItems(_hits) {
         } else {
             var lineBreak = jQuery("<hr/>", {});
             lineBreak.appendTo(dl2);
-            $.each(value._source.functionData.winner_addrs, function(winnerIndex, winnerValue) {
+            $.each(value.functionData.winner_addrs, function(winnerIndex, winnerValue) {
                 var wAddress = jQuery("<dd/>", {
                     text: "Winner : " + winnerValue
                 });
