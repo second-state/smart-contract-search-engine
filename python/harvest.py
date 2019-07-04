@@ -707,7 +707,7 @@ class Harvest:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
-    parser.add_argument("-m", "--mode", help="[full|topup|state]", type=str, default="full")
+    parser.add_argument("-m", "--mode", help="[full|topup|state|tx|abi|bytecode|indexed]", type=str, default="full")
     args = parser.parse_args()
 
     harvester = Harvest()
