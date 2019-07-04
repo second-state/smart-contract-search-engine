@@ -40,6 +40,16 @@ def submit_abi():
         doc["response"] = 'Successfully indexed contract.'
         return jsonify(doc)
 
+@app.route("/api/process_single_transaction", methods=['GET', 'POST'])
+def process_single_transaction():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abi = json.loads(jsonRequestData["abi"])
+    txHash = str(jsonRequestData["tx"])
+    results = harvester.processSingleTransaction(abi, txHash)
+    print(results)
+    #return jsonify(results["results"])
+
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
 def es_quick_100_search():
     print(request)
