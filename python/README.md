@@ -19,3 +19,5 @@ Once called (as shown above) each mode repeats indefinitely.
 Each of the modes has a designated completion time. If code executes before this time is up it will sleep for the remainder of time.
 
 This product utilize Python multithreading to greatly improve any inevitable I/O bottlenecks.
+
+The [more detailed documentation of this entire product](https://github.com/second-state/smart-contract-search-engine/tree/master/documentation) is under heavy development. Please feel free to ask questions.
