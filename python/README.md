@@ -1,6 +1,6 @@
-Please put all settings into the config.in file
+Please put all of your settings (index names, blockchain RPC etc) into the config.in file
 
-The harvesy.py file can be run as follows
+The harvest.py file can be run as follows
 
 ```
 #!/bin/bash
