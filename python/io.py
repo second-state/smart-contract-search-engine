@@ -40,6 +40,17 @@ def submit_abi():
         doc["response"] = 'Successfully indexed contract.'
         return jsonify(doc)
 
+# START - New experimental endpoints for ES-SS.JS work
+######################################################
+@app.route("/api/sha_an_abi", methods=['GET', 'POST'])
+def sha_an_abi():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abi = json.loads(jsonRequestData["abi"])
+    results = harvester.shaAnAbi(abi)
+    print(results)
+    #return jsonify(results["results"])
+
 @app.route("/api/process_single_transaction", methods=['GET', 'POST'])
 def process_single_transaction():
     print(request)
@@ -49,6 +60,9 @@ def process_single_transaction():
     results = harvester.processSingleTransaction(abi, txHash)
     print(results)
     #return jsonify(results["results"])
+
+# END - New experimental endpoints for ES-SS.JS work
+####################################################
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
 def es_quick_100_search():
