@@ -46,7 +46,7 @@ def submit_abi():
 def sha_an_abi():
     print(request)
     jsonRequestData = json.loads(request.data)
-    abi = json.loads(jsonRequestData["abi"])
+    abi = jsonRequestData["abi"]
     results = harvester.shaAnAbi(abi)
     print(results)
     #return jsonify(results["results"])
@@ -55,7 +55,7 @@ def sha_an_abi():
 def process_single_transaction():
     print(request)
     jsonRequestData = json.loads(request.data)
-    abi = jsonRequestData["abi"]
+    abi = json.loads(jsonRequestData["abi"])
     txHash = str(jsonRequestData["tx"])
     results = harvester.processSingleTransaction(abi, txHash)
     print(results)
