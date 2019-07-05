@@ -47,9 +47,11 @@ def sha_an_abi():
     print(request)
     jsonRequestData = json.loads(request.data)
     abi = jsonRequestData["abi"]
-    results = harvester.shaAnAbi(abi)
-    print(results)
-    #return jsonify(results["results"])
+    abiHash = harvester.shaAnAbi(abi)
+    result = {}
+    result["abiSha3"] = abiHash
+    print(result)
+    return jsonify(result)
 
 @app.route("/api/process_single_transaction", methods=['GET', 'POST'])
 def process_single_transaction():
