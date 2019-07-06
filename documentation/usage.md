@@ -1,4 +1,5 @@
 # Usage
+*Update:* We now have a simple way to interact with the search engine via simple Javascript syntax. Please see our [es-ss.js library](https://github.com/second-state/es-ss.js) for more details.
 
 The search engine can be used, by end users, via their web browser. It can also provide data to users and machines via the public facing API.
 
