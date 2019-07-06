@@ -10,7 +10,6 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
-
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
@@ -39,6 +38,17 @@ def submit_abi():
         doc = {}
         doc["response"] = 'Successfully indexed contract.'
         return jsonify(doc)
+
+@app.route("/api/sha_an_abi", methods=['GET', 'POST'])
+def sha_an_abi():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abi = json.loads(jsonRequestData["abi"])
+    abiHash = harvester.shaAnAbi(abi)
+    result = {}
+    result["abiSha3"] = abiHash
+    print(result)
+    return jsonify(result)
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
 def es_quick_100_search():
