@@ -21,7 +21,7 @@ var blockExplorer = "";
 
 if (searchEngineNetwork == "19") {
     blockExplorer = "https://testnet.cmttracking.io/";
-    esIndexName = "testnet";
+    esIndexName = "testnetv2";
 }
 
 if (searchEngineNetwork == "18") {
@@ -39,6 +39,103 @@ function checkNetwork() {
         alert("Please select the correct network in your Venus Chrome extension!");
     }
 }
+
+$(document).ready(function() {
+    contractsQuery = JSON.stringify({
+        "query": {
+            "match_all": {}
+        },
+        "size": 0
+    })
+    var abi = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/abitestnetv2/_search";
+    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/alltestnetv2/_search";
+    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/testnetv2/_search";
+    var contracts = "";
+    var contractsWithAbis = "";
+
+    $(".overview").empty();
+
+    var overviewRow = jQuery("<div/>", {
+        class: "row",
+    });
+    overviewRow.appendTo(".overview");
+
+    var overviewDetails = jQuery("<div/>", {
+        class: "col-sm-12"
+    });
+    overviewDetails.appendTo(overviewRow);
+
+    var overviewText = jQuery("<div/>", {
+        text: "This demonstration, of the CyberMiles TestNet has:",
+        class: "centeredText",
+    });
+    overviewText.appendTo(overviewDetails);
+
+    var dlOverview = jQuery("<dl/>", {});
+    dlOverview.appendTo(overviewDetails);
+
+    $.ajax({
+        url: abi,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            abiAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + abiAmount);
+            abis = jQuery("<dt/>", {
+                text: " - " + abiAmount.toLocaleString() + " unique ABIs uploaded",
+                class: "centeredText",
+            });
+            abis.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+
+    $.ajax({
+        url: master,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            contractAmount = response["hits"]["total"];
+            console.log("Fetched contract amount: " + contractAmount);
+            contracts = jQuery("<dt/>", {
+                text: " - " + contractAmount.toLocaleString() + " contracts indexed",
+                class: "centeredText",
+            });
+            contracts.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+    $.ajax({
+        url: common,
+        type: "post",
+        data: contractsQuery,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            contractsWithAbisAmount = response["hits"]["total"];
+            console.log("Fetched contracts with ABI amount: " + contractsWithAbisAmount);
+            contractsWithAbis = jQuery("<dt/>", {
+                text: " - " + contractsWithAbisAmount.toLocaleString() + " contracts which adhere to ABIs",
+                class: "centeredText",
+            });
+            contractsWithAbis.appendTo(dlOverview);
+        },
+        error: function(xhr) {
+            console.log("Get amount failed");
+        }
+    });
+
+});
 
 $(document).ready(function() {
     window.addEventListener("load", function() {
