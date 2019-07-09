@@ -55,21 +55,21 @@ def es_get_abi_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getAbiCount()
-    return results
+    return jsonify(results)
 
 @app.route("/api/es_get_all_count", methods=['GET', 'POST'])
 def es_get_all_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getAllCount()
-    return results
+    return jsonify(results)
 
 @app.route("/api/es_get_contract_count", methods=['GET', 'POST'])
 def es_get_contract_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getContractCount()
-    return results
+    return jsonify(results)
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
 def es_quick_100_search():
