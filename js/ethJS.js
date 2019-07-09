@@ -35,15 +35,7 @@ function checkNetwork() {
 }
 
 $(document).ready(function() {
-    contractsQuery = JSON.stringify({
-        "query": {
-            "match_all": {}
-        },
-        "size": 0
-    })
-    var abi = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/abiercchecker/_search";
-    var master = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/allercchecker/_search";
-    var common = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/erccheckervtwo/_search";
+    
     var contracts = "";
     var contractsWithAbis = "";
 
@@ -71,7 +63,7 @@ $(document).ready(function() {
     $.ajax({
         url: abi,
         type: "post",
-        data: contractsQuery,
+        data: publicIp + "/api/get_abi_count",,
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -92,7 +84,7 @@ $(document).ready(function() {
     $.ajax({
         url: master,
         type: "post",
-        data: contractsQuery,
+        data: publicIp + "/api/get_contract_count",,
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -112,7 +104,7 @@ $(document).ready(function() {
     $.ajax({
         url: common,
         type: "post",
-        data: contractsQuery,
+        data: publicIp + "/api/get_all_count",
         dataType: "json",
         contentType: "application/json",
         success: function(response) {

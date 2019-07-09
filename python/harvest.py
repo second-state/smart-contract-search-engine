@@ -98,6 +98,24 @@ class Harvest:
         results = self.es.search(index=self.commonIndex, body=query)
         return results
 
+    def getAbiCount():
+        query = {"query":{"match_all":{}},"size": 0}
+        textQuery = json.dumps(query)
+        results = self.es.search(index=self.abiIndex, body=query)
+        return results
+
+    def getAllCount():
+        query = {"query":{"match_all":{}},"size": 0}
+        textQuery = json.dumps(query)
+        results = self.es.search(index=self.masterIndex, body=query)
+        return results
+
+    def getContractCount():
+        query = {"query":{"match_all":{}},"size": 0}
+        textQuery = json.dumps(query)
+        results = self.es.search(index=self.commonIndex, body=query)
+        return results
+
     def fetchAbiUsingHash(self, _esId):
         try:
             esReponseAbi = self.es.get(index=self.abiIndex , id=_esId)
