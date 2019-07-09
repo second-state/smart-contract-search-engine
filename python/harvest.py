@@ -98,19 +98,19 @@ class Harvest:
         results = self.es.search(index=self.commonIndex, body=query)
         return results
 
-    def getAbiCount():
+    def getAbiCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
         results = self.es.search(index=self.abiIndex, body=query)
         return results
 
-    def getAllCount():
+    def getAllCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
         results = self.es.search(index=self.masterIndex, body=query)
         return results
 
-    def getContractCount():
+    def getContractCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
         results = self.es.search(index=self.commonIndex, body=query)
