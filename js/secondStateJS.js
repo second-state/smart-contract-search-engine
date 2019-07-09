@@ -72,9 +72,9 @@ $(document).ready(function() {
     dlOverview.appendTo(overviewDetails);
 
     $.ajax({
-        url: abi,
+        url: publicIp + "/api/es_get_abi_count",
         type: "post",
-        data: publicIp + "/api/get_abi_count",
+        //data: {},
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -93,9 +93,9 @@ $(document).ready(function() {
 
 
     $.ajax({
-        url: master,
+        url: publicIp + "/api/es_get_all_count",
         type: "post",
-        data: publicIp + "/api/get_all_count",
+        //data: {},
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -113,9 +113,9 @@ $(document).ready(function() {
     });
 
     $.ajax({
-        url: common,
+        url: publicIp + "/api/es_get_contract_count",
         type: "post",
-        data: publicIp + "/api/get_contract_count",
+        //data: {},
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
