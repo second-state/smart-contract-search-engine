@@ -63,7 +63,7 @@ $(document).ready(function() {
     $.ajax({
         url: abi,
         type: "post",
-        data: publicIp + "/api/get_abi_count",,
+        data: publicIp + "/api/get_abi_count",
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -84,7 +84,7 @@ $(document).ready(function() {
     $.ajax({
         url: master,
         type: "post",
-        data: publicIp + "/api/get_contract_count",,
+        data: publicIp + "/api/get_all_count",
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
@@ -104,7 +104,7 @@ $(document).ready(function() {
     $.ajax({
         url: common,
         type: "post",
-        data: publicIp + "/api/get_all_count",
+        data: publicIp + "/api/get_contract_count",
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
