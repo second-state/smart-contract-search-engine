@@ -95,25 +95,25 @@ class Harvest:
     def getOnly100Records(self):
         query = {"query":{"match_all":{}},"size": 100}
         textQuery = json.dumps(query)
-        results = self.es.search(index=self.commonIndex, body=query)
+        results = self.es.search(index=self.commonIndex, body=textQuery)
         return results
 
     def getAbiCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
-        results = self.es.search(index=self.abiIndex, body=query)
+        results = self.es.search(index=self.abiIndex, body=textQuery)
         return results
 
     def getAllCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
-        results = self.es.search(index=self.masterIndex, body=query)
+        results = self.es.search(index=self.masterIndex, body=textQuery)
         return results
 
     def getContractCount(self):
         query = {"query":{"match_all":{}},"size": 0}
         textQuery = json.dumps(query)
-        results = self.es.search(index=self.commonIndex, body=query)
+        results = self.es.search(index=self.commonIndex, body=textQuery)
         return results
 
     def fetchAbiUsingHash(self, _esId):
