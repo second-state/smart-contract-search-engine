@@ -658,57 +658,60 @@ class Harvest:
                     stopAtBlock = 0
                 print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
-                print("\nProcessing block number %s" % blockNumber)
-                blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
-                if blockTransactionCount > 0:
-                    block = self.web3.eth.getBlock(blockNumber)
-                    for singleTransaction in block.transactions:
-                        singleTransactionHex = singleTransaction.hex()
-                        transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
-                        transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                        transactionContractAddress = transactionReceipt.contractAddress
-                        if transactionContractAddress != None:
-                            outerData = {}
-                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                            outerData['blockNumber'] = transactionReceipt.blockNumber
-                            outerData['contractAddress'] = transactionReceipt.contractAddress
-                            outerData['from'] = transactionReceipt['from']
-                            outerData["indexed"] = "false"
-                            itemId = transactionReceipt.contractAddress
-                            dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
-                            if dataStatus == False:
-                                singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
-                                if _topup == True:
-                                    bulkList.append(singleItem)
-                                    elasticsearch.helpers.bulk(self.es, bulkList)
-                                    bulkList = []
-                                    self.threadsAddNewItem = []
-                                    dMatchAllInner = {}
-                                    dMatchAll = {}
-                                    dMatchAll["match_all"] = dMatchAllInner
-                                    dQuery = {}
-                                    dQuery["query"] = dMatchAll
-                                    print("Querying ES " + json.dumps(dQuery))
-                                    esReponseAbi = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex , query=json.dumps(dQuery), preserve_order=True)
-                                    for item in esReponseAbi:
-                                        jsonAbi = json.loads(item["_source"]["abi"])
-                                        tAddNewItem = threading.Thread(target=self.processSingleTransaction, args=[jsonAbi , str(self.web3.toHex(transactionData.hash))])
-                                        tAddNewItem.daemon = True
-                                        tAddNewItem.start()
-                                        self.threadsAddNewItem.append(tAddNewItem)
-                                    for individualAddNewItemThread in self.threadsAddNewItem:
-                                        individualAddNewItemThread.join()
-                                else:
-                                    bulkList.append(singleItem)
-                                    print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                    if len(bulkList) == 50:
+                try:
+                    print("\nProcessing block number %s" % blockNumber)
+                    blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
+                    if blockTransactionCount > 0:
+                        block = self.web3.eth.getBlock(blockNumber)
+                        for singleTransaction in block.transactions:
+                            singleTransactionHex = singleTransaction.hex()
+                            transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
+                            transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
+                            transactionContractAddress = transactionReceipt.contractAddress
+                            if transactionContractAddress != None:
+                                outerData = {}
+                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                outerData['blockNumber'] = transactionReceipt.blockNumber
+                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                outerData['from'] = transactionReceipt['from']
+                                outerData["indexed"] = "false"
+                                itemId = transactionReceipt.contractAddress
+                                dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                if dataStatus == False:
+                                    singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                    if _topup == True:
+                                        bulkList.append(singleItem)
                                         elasticsearch.helpers.bulk(self.es, bulkList)
                                         bulkList = []
-                        else:
-                            continue
-                else:
-                    print("Skipping block number %s - No transactions found!" % blockNumber)
-                    continue
+                                        self.threadsAddNewItem = []
+                                        dMatchAllInner = {}
+                                        dMatchAll = {}
+                                        dMatchAll["match_all"] = dMatchAllInner
+                                        dQuery = {}
+                                        dQuery["query"] = dMatchAll
+                                        print("Querying ES " + json.dumps(dQuery))
+                                        esReponseAbi = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex , query=json.dumps(dQuery), preserve_order=True)
+                                        for item in esReponseAbi:
+                                            jsonAbi = json.loads(item["_source"]["abi"])
+                                            tAddNewItem = threading.Thread(target=self.processSingleTransaction, args=[jsonAbi , str(self.web3.toHex(transactionData.hash))])
+                                            tAddNewItem.daemon = True
+                                            tAddNewItem.start()
+                                            self.threadsAddNewItem.append(tAddNewItem)
+                                        for individualAddNewItemThread in self.threadsAddNewItem:
+                                            individualAddNewItemThread.join()
+                                    else:
+                                        bulkList.append(singleItem)
+                                        print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                        if len(bulkList) == 50:
+                                            elasticsearch.helpers.bulk(self.es, bulkList)
+                                            bulkList = []
+                            else:
+                                continue
+                    else:
+                        print("Skipping block number %s - No transactions found!" % blockNumber)
+                        continue
+                except:
+                    print("Problems at block height " + str(blockNumber))
             if len(bulkList) > 1:
                 print("Adding the last few items which were not bulk loaded already")
                 elasticsearch.helpers.bulk(self.es, bulkList)
