@@ -152,12 +152,12 @@ while true
 do
   STATUS=$(curl --max-time 30 -s -o /dev/null -w '%{http_code}' https://YOUR RPC NODE GOES HERE)
   if [ $STATUS -eq 200 ]; then
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m tx >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m abi >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
-    cd ~/smart-contract-search-engine/python && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m tx >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m abi >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m state >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
+    cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
     break
   else
     echo "Got $STATUS please wait"
