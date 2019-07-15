@@ -43,7 +43,7 @@ def submit_abi():
 def submit_many_abis():
     jsonRequestData = json.loads(request.data)
     transactionHash = jsonRequestData["hash"]
-    for k, v in jsonRequestData["abi"]:
+    for k, v in jsonRequestData["abis"]:
         jsonAbiObj = json.loads(v)
         theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
         cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
