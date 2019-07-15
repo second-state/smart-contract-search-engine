@@ -39,6 +39,33 @@ def submit_abi():
         doc["response"] = 'Successfully indexed contract.'
         return jsonify(doc)
 
+@app.route("/api/submit_many_abis", methods=['GET', 'POST'])
+def submit_many_abis():
+    jsonRequestData = json.loads(request.data)
+    transactionHash = jsonRequestData["hash"]
+    for k, v in jsonRequestData["abi"]:
+        jsonAbiObj = json.loads(v)
+        theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
+        cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
+        success = False
+        try:
+            # Try and index the contract instance directly into the common index
+            harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
+            success = True
+        except:
+            print("Unable to process that single transaction")
+        # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
+        if success == True:
+            data = {}
+            data['indexInProgress'] = "false"
+            data['epochOfLastUpdate'] = int(time.time())
+            data['abi'] = cleanedAndOrderedAbiText
+            harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
+            print("Index was a success")
+    doc = {}
+    doc["response"] = 'Completed ABI submissions'
+    return jsonify(doc)
+
 @app.route("/api/sha_an_abi", methods=['GET', 'POST'])
 def sha_an_abi():
     print(request)
