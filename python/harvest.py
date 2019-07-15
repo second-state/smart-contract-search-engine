@@ -179,7 +179,12 @@ class Harvest:
                     theFunctionData[str(callableFunction)] = innerDataDict
             else:
                 theFunctionData[str(callableFunction)] = self.performStringConversion(result)
-        return theFunctionData
+        # Check to see if all of the callable functions
+        if len(callableFunctions) == len(theFunctionData):
+            return theFunctionData
+        else:
+            theFunctionDataIsNotComplete = {}
+            return theFunctionDataIsNotComplete
 
     def getFunctionDataId(self, _theFunctionData):
         theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
