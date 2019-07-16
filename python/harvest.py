@@ -735,8 +735,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
     parser.add_argument("-m", "--mode", help="[full|topup|state|tx|abi|bytecode|indexed]", type=str, default="full")
     args = parser.parse_args()
-
     harvester = Harvest()
+    # Ensure that the ABI index exists (others are created programatically but ABI needs to exist up front)
+    if harvester.es.indices.exists(index=harvester.abiIndex) == False:
+        harvester.es.indices.create(index=harvester.abiIndex)
 
     if args.mode == "full":
         print("Performing full harvest")
