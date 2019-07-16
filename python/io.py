@@ -49,7 +49,7 @@ def submit_many_abis():
         cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
         success = False
         try:
-            # Try and index the contract instance directly into the common index
+            # Try and index the contract instance directly into the common index.
             harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
             success = True
         except:
