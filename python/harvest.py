@@ -739,7 +739,8 @@ if __name__ == "__main__":
     # Ensure that the ABI index exists (others are created programatically but ABI needs to exist up front)
     if harvester.es.indices.exists(index=harvester.abiIndex) == False:
         harvester.es.indices.create(index=harvester.abiIndex)
-
+    else:
+        print("Index already exists")
     if args.mode == "full":
         print("Performing full harvest")
         latestBlockNumber = harvester.web3.eth.getBlock('latest').number
