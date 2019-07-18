@@ -466,10 +466,14 @@ class Harvest:
             # Use the following if you want to query a subset of blocks
             #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
             esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
-            localTransactionList = []
-            for esTransactionSingle in esTransactions:
-                localTransactionList.append(esTransactionSingle['_source']['TxHash'])
             for localEsAbiSingle in localAbiList:
+                localTransactionList = []
+                abiHash = self.shaAnAbi(localEsAbiSingle)
+                for esTransactionSingle in esTransactions:
+                    uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['_source']['contractAddress'])
+                    uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                    if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
+                        localTransactionList.append(esTransactionSingle['_source']['TxHash'])
                 tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
                 tFullDriver2.daemon = True
                 tFullDriver2.start()
