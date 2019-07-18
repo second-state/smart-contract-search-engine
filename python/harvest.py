@@ -468,7 +468,7 @@ class Harvest:
             esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
             for localEsAbiSingle in localAbiList:
                 localTransactionList = []
-                abiHash = self.shaAnAbi(localEsAbiSingle)
+                abiHash = self.shaAnAbi(json.loads(localEsAbiSingle))
                 for esTransactionSingle in esTransactions:
                     uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['_source']['contractAddress'])
                     uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
