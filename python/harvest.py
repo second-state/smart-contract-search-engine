@@ -457,10 +457,10 @@ class Harvest:
         localTransactionList = []
         abiHash = self.shaAnAbi(json.loads(_localEsAbiSingle))
         for esTransactionSingle in _esTransactions:
-            uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['_source']['contractAddress'])
+            uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['contractAddress'])
             uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
             if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
-                localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+                localTransactionList.append(esTransactionSingle['TxHash'])
             else:
                 print("Ignoring " + uniqueAbiAndAddressHash + " because it is in the ignore index")
         self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
@@ -480,8 +480,14 @@ class Harvest:
             # Use the following if you want to query a subset of blocks
             #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
             esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
+            localTransactionListPre = []
+            for esTransactionSingle in esTransactions:
+                aDict = {}
+                aDict["TxHash"] = esTransactionSingle['_source']['TxHash']
+                aDict["contractAddress"] = esTransactionSingle['_source']['contractAddress']
+                localTransactionListPre.append(aDict)
             for localEsAbiSingle in localAbiList:
-                tFullDriver2 = threading.Thread(target=self.harvestTransactionsDriver2, args=[localEsAbiSingle, esTransactions])
+                tFullDriver2 = threading.Thread(target=self.harvestTransactionsDriver2, args=[localEsAbiSingle, localTransactionListPre])
                 tFullDriver2.daemon = True
                 tFullDriver2.start()
                 harvestTransactionsDriverThreads.append(tFullDriver2)
