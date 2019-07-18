@@ -461,9 +461,15 @@ class Harvest:
             uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
             if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
                 localTransactionList.append(esTransactionSingle['TxHash'])
+                if len(localTransactionList) == 10:
+                    print("Processing a batch of 10 items")
+                    self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
+                    localTransactionList = []
             else:
                 print("Ignoring " + uniqueAbiAndAddressHash + " because it is in the ignore index")
-        self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
+        if len(localTransactionList) > 0:
+            print("Processing the last few items")
+            self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
 
 
     def harvestTransactionsDriver(self):
