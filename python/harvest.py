@@ -456,12 +456,14 @@ class Harvest:
     def harvestTransactionsDriver2(self, _localEsAbiSingle, _esTransactions):
         localTransactionList = []
         abiHash = self.shaAnAbi(json.loads(_localEsAbiSingle))
-        for esTransactionSingle in _esTransactions:
+        txCount = len(_esTransactions)
+        for i in range(txCount):
+            esTransactionSingle = random.choice(_esTransactions)
             uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['contractAddress'])
             uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
             if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
                 localTransactionList.append(esTransactionSingle['TxHash'])
-                if len(localTransactionList) == 10:
+                if len(localTransactionList) == 15:
                     print("Processing a batch of 10 items")
                     self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
                     localTransactionList = []
