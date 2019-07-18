@@ -452,6 +452,20 @@ class Harvest:
         self.processMultipleTransactions(json.dumps(jsonAbi), localTransactionList)
 
 
+    # NEW Multi-thread
+    def harvestTransactionsDriver2(self, _localEsAbiSingle, _esTransactions):
+        localTransactionList = []
+        abiHash = self.shaAnAbi(json.loads(_localEsAbiSingle))
+        for esTransactionSingle in _esTransactions:
+            uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['_source']['contractAddress'])
+            uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+            if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
+                localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+            else:
+                print("Ignoring " + uniqueAbiAndAddressHash + " because it is in the ignore index")
+        self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
+
+
     def harvestTransactionsDriver(self):
         self.harvestTransactionsDriverTimer = time.time()
         while True:
@@ -467,16 +481,7 @@ class Harvest:
             #queryForTransactionIndex = {"query":{"range":{"blockNumber":{"gte" : 5000000,"lte" : 5572036}}}}
             esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
             for localEsAbiSingle in localAbiList:
-                localTransactionList = []
-                abiHash = self.shaAnAbi(json.loads(localEsAbiSingle))
-                for esTransactionSingle in esTransactions:
-                    uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['_source']['contractAddress'])
-                    uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-                    if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
-                        localTransactionList.append(esTransactionSingle['_source']['TxHash'])
-                    else:
-                        print("Ignoring " + uniqueAbiAndAddressHash + " because it is in the ignore index")
-                tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
+                tFullDriver2 = threading.Thread(target=self.harvestTransactionsDriver2, args=[localEsAbiSingle, esTransactions])
                 tFullDriver2.daemon = True
                 tFullDriver2.start()
                 harvestTransactionsDriverThreads.append(tFullDriver2)
