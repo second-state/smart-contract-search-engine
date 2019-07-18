@@ -474,6 +474,8 @@ class Harvest:
                     uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
                     if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
                         localTransactionList.append(esTransactionSingle['_source']['TxHash'])
+                    else:
+                        print("Ignoring " + uniqueAbiAndAddressHash + " because it is in the ignore index")
                 tFullDriver2 = threading.Thread(target=self.processMultipleTransactions, args=[localEsAbiSingle, localTransactionList])
                 tFullDriver2.daemon = True
                 tFullDriver2.start()
