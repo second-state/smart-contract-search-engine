@@ -43,6 +43,10 @@ class Harvest:
         self.bytecodeIndex = self.config['bytecodeindex']['bytecode']
         print("Bytecode index: %s" % self.bytecodeIndex)
 
+        # Ignore index
+        self.ignoreIndex = self.config['ignoreindex']['ignore']
+        print("Ignore index: %s" % self.ignoreIndex)
+
         # Blockchain RPC
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
@@ -349,6 +353,16 @@ class Harvest:
             else:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")
 
+    def addDataToIgnoreIndex(self, _contractAbiJSONData, _itemId):
+        # Add this abi and contract address to the ignore index because we don't want to waste time revisiting this combo
+        outerData = {}
+        outerData['contractAddress'] = _itemId
+        abiHash = self.shaAnAbi(_contractAbiJSONData)
+        outerData['abiSha3'] = abiHash
+        uniqueAbiAndAddressKey = str(abiHash) + str(_itemId)
+        uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+        ignoreIndexResult = self.loadDataIntoElastic(self.ignoreIndex, uniqueAbiAndAddressHash, json.dumps(outerData))
+
     def processSingleTransaction(self,_contractAbiJSONData, _transactionHex):
         transactionData = self.web3.eth.getTransaction(str(_transactionHex))
         transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
@@ -366,12 +380,14 @@ class Harvest:
                     contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
                 except:
                     print("Unable to instantiate web3 contract object")
-                    sys.exit() 
+                    addDataToIgnoreIndex(_contractAbiJSONData, itemId)
+                    sys.exit()
                 try:
                     functionData = self.fetchPureViewFunctionData(contractInstance)
                     functionDataId = self.getFunctionDataId(functionData)
                 except:
                     print("Got web3 object OK but no data match!")
+                    addDataToIgnoreIndex(_contractAbiJSONData, itemId)
                     sys.exit()
                 if len(functionData) > 0:
                     try:                
