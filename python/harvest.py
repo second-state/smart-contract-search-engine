@@ -361,6 +361,7 @@ class Harvest:
         outerData['abiSha3'] = abiHash
         uniqueAbiAndAddressKey = str(abiHash) + str(_itemId)
         uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+        print("Adding to ignore list!")
         ignoreIndexResult = self.loadDataIntoElastic(self.ignoreIndex, uniqueAbiAndAddressHash, json.dumps(outerData))
 
     def processSingleTransaction(self,_contractAbiJSONData, _transactionHex):
