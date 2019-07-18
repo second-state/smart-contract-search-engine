@@ -381,14 +381,14 @@ class Harvest:
                     contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
                 except:
                     print("Unable to instantiate web3 contract object")
-                    addDataToIgnoreIndex(_contractAbiJSONData, itemId)
+                    self.addDataToIgnoreIndex(_contractAbiJSONData, itemId)
                     sys.exit()
                 try:
                     functionData = self.fetchPureViewFunctionData(contractInstance)
                     functionDataId = self.getFunctionDataId(functionData)
                 except:
                     print("Got web3 object OK but no data match!")
-                    addDataToIgnoreIndex(_contractAbiJSONData, itemId)
+                    self.addDataToIgnoreIndex(_contractAbiJSONData, itemId)
                     sys.exit()
                 if len(functionData) > 0:
                     try:                
