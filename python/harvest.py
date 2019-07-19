@@ -707,7 +707,12 @@ class Harvest:
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
 
-    def stateOfRecentBlocksOnly(self, esIndex):
+    def stateOfRecentBlocksOnly(_abiData, _calledAddress):
+        contractInstance = self.web3.eth.contract(abi=_abiData, address=_calledAddress)
+        self.worker(contractInstance)
+
+
+    def stateOfRecentBlocksOnlyPre(self, esIndex):
         self.tstateOfRecentBlocksOnly = time.time()
         while True:
             self.threadsstateOfRecentBlocksOnly = []
@@ -728,8 +733,7 @@ class Harvest:
                             contractToProcess = self.es.get(index=esIndex, id=calledAddress)
                             for abiShaItem in contractToProcess["_source"]["abiShaList"]:
                                 abiData = self.fetchAbiUsingHash(abiShaItem)
-                                contractInstance = self.web3.eth.contract(abi=abiData, address=calledAddress)
-                                tData = threading.Thread(target=self.worker, args=[contractInstanceItem])
+                                tData = threading.Thread(target=self.stateOfRecentBlocksOnly, args=[abiData, calledAddress])
                                 tData.daemon = True
                                 tData.start()
                                 self.threadsstateOfRecentBlocksOnly.append(tData)
@@ -872,7 +876,7 @@ if __name__ == "__main__":
         harvester.updateStateDriverPre()
     elif args.mode == "faster_state":
         print("Performing fast state update of only the most recent blocks")
-        harvester.stateOfRecentBlocksOnly(harvester.commonIndex)
+        harvester.stateOfRecentBlocksOnlyPre(harvester.commonIndex)
     elif args.mode == "bytecode":
         print("Performing bytecode update")
         harvester.updateBytecode()
