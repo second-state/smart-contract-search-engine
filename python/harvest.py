@@ -736,6 +736,7 @@ class Harvest:
                                     self.threadsstateOfRecentBlocksOnly.append(tData)
                                 for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
                                     individualVersionlessThread.join()
+
             self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + 1
             if self.tstateOfRecentBlocksOnly > time.time():
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
@@ -888,6 +889,7 @@ if __name__ == "__main__":
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
+        print("harvest.py --mode faster_state")
         print("harvest.py --mode tx")
         print("harvest.py --mode bytecode")
         print("harvest.py --mode abi")
