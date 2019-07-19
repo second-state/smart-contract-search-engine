@@ -137,7 +137,7 @@ class Harvest:
 
     def updateDataInElastic(self, _theIndex, _theId, _thePayLoad):
         esReponseD = self.es.update(index=_theIndex, id=_theId, body=_thePayLoad)
-        print(esReponseD)
+        #print(esReponseD)
         return esReponseD
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
@@ -630,13 +630,31 @@ class Harvest:
                 else:
                     print("We already have that address")
             threadsupdateStateDriverPre = []
-            for contractInstanceItem in self.contractInstanceList:
+            # New random functionality
+            txCount = len(self.contractInstanceList)
+            counter = 0
+            maxThreads = 500
+            for i in range(txCount):
+                counter = counter + 1
+                contractInstanceItem = random.choice(self.contractInstanceList)
                 tupdateStateDriverPre = threading.Thread(target=self.worker, args=[contractInstanceItem])
                 tupdateStateDriverPre.daemon = True
                 tupdateStateDriverPre.start()
                 threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-            for updateStateThreads1 in threadsupdateStateDriverPre:
-                updateStateThreads1.join()
+                if counter == maxThreads:
+                    # Processing a batch 
+                    for updateStateThreads1 in threadsupdateStateDriverPre:
+                        updateStateThreads1.join()
+                        counter = 0
+                        threadsupdateStateDriverPre = []
+                # Process any left overs
+            if counter > 0:
+                # Processing a batch 
+                for updateStateThreads1 in threadsupdateStateDriverPre:
+                    updateStateThreads1.join()
+                    counter = 0
+                    threadsupdateStateDriverPre = []
+            # Sleep if task is performed before time is up
             print("Finished updateStateDriverPreTimer...")
             self.updateStateDriverPreTimer = self.updateStateDriverPreTimer + 10
             if self.updateStateDriverPreTimer > time.time():
