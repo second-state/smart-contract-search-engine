@@ -737,8 +737,8 @@ class Harvest:
                                 tData.daemon = True
                                 tData.start()
                                 self.threadsstateOfRecentBlocksOnly.append(tData)
-                            for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
-                                individualVersionlessThread.join()
+            for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
+                individualVersionlessThread.join()
             self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + 1
             if self.tstateOfRecentBlocksOnly > time.time():
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
