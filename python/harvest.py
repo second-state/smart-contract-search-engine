@@ -714,29 +714,27 @@ class Harvest:
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             stopAtBlock = latestBlockNumber - 5
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
-                try:
-                    print("\nProcessing block number %s" % blockNumber)
-                    blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
-                    if blockTransactionCount > 0:
-                        block = self.web3.eth.getBlock(blockNumber)
-                        for singleTransaction in block.transactions:
-                            singleTransactionHex = singleTransaction.hex()
-                            transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
-                            transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                            calledAddress = transactionReceipt['to']
-                            dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
-                            if dataStatus == True:
-                                contractToProcess = self.es.get(index=esIndex, id=calledAddress)
-                                for abiShaItem in contractToProcess["_source"]["abiShaList"]:
-                                    abiData = self.fetchAbiUsingHash(abiShaItem)
-                                    contractInstance = self.web3.eth.contract(abi=abiData, address=calledAddress)
-                                    tData = threading.Thread(target=self.worker, args=[contractInstanceItem])
-                                    tData.daemon = True
-                                    tData.start()
-                                    self.threadsstateOfRecentBlocksOnly.append(tData)
-                                for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
-                                    individualVersionlessThread.join()
-
+                print("\nProcessing block number %s" % blockNumber)
+                blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
+                if blockTransactionCount > 0:
+                    block = self.web3.eth.getBlock(blockNumber)
+                    for singleTransaction in block.transactions:
+                        singleTransactionHex = singleTransaction.hex()
+                        transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
+                        transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
+                        calledAddress = transactionReceipt['to']
+                        dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
+                        if dataStatus == True:
+                            contractToProcess = self.es.get(index=esIndex, id=calledAddress)
+                            for abiShaItem in contractToProcess["_source"]["abiShaList"]:
+                                abiData = self.fetchAbiUsingHash(abiShaItem)
+                                contractInstance = self.web3.eth.contract(abi=abiData, address=calledAddress)
+                                tData = threading.Thread(target=self.worker, args=[contractInstanceItem])
+                                tData.daemon = True
+                                tData.start()
+                                self.threadsstateOfRecentBlocksOnly.append(tData)
+                            for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
+                                individualVersionlessThread.join()
             self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + 1
             if self.tstateOfRecentBlocksOnly > time.time():
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
