@@ -871,6 +871,9 @@ if __name__ == "__main__":
     elif args.mode == "state":
         print("Performing state update")
         harvester.updateStateDriverPre()
+    elif args.mode == "faster_state":
+        print("Performing fast state update of only the most recent blocks")
+        harvester.stateOfRecentBlocksOnly(harvester.commonIndex)
     elif args.mode == "bytecode":
         print("Performing bytecode update")
         harvester.updateBytecode()
