@@ -10,6 +10,14 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
+
+@app.route("/api/describe_using_tx", methods=['GET', 'POST'])
+def describe_using_tx():
+    jsonRequestData = json.loads(request.data)
+    transactionHash = jsonRequestData["hash"]
+    rawData = harvester.getDataUsingTransactionHash(transactionHash)
+    return jsonify(rawData)
+
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
