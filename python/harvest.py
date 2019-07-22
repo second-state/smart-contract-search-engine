@@ -96,6 +96,11 @@ class Harvest:
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
+    def getDataUsingTransactionHash(self, _hash):
+        query = '''{"query":{"match":{"TxHash": "'''+ _hash +  '''"}}}'''
+        results = self.es.search(index=self.commonIndex, body=query)
+        return results
+
     def getOnly100Records(self):
         query = {"query":{"match_all":{}},"size": 100}
         textQuery = json.dumps(query)
