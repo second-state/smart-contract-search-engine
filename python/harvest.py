@@ -51,6 +51,14 @@ class Harvest:
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
+        # Blockchain RPC
+        self.secondsPerBlock = self.config['blockchain']['seconds_per_block']
+        print("Block time: %s" % self.secondsPerBlock)
+
+        # Blockchain RPC
+        self.maxThreads = self.config['system']['max_threads']
+        print("Max threads: %s" % self.maxThreads)
+
         # Elasticsearch endpoint
         self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
         print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
@@ -856,7 +864,7 @@ if __name__ == "__main__":
     if args.mode == "full":
         print("Performing full harvest")
         latestBlockNumber = harvester.web3.eth.getBlock('latest').number
-        threadsToUse = 654
+        threadsToUse = 500
         blocksPerThread = int(latestBlockNumber / threadsToUse)
         harvester.fastThreads = []
         for startingBlock in range(1, latestBlockNumber, blocksPerThread):
