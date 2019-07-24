@@ -470,15 +470,17 @@ class Harvest:
     def harvestTransactionsDriver2(self, _localEsAbiSingle, _esTransactions):
         localTransactionList = []
         abiHash = self.shaAnAbi(json.loads(_localEsAbiSingle))
+        print("Processing of " + abiHash + " has begun!")
         txCount = len(_esTransactions)
-        for i in range(txCount):
-            esTransactionSingle = random.choice(_esTransactions)
+        #for i in range(txCount):
+        for esTransactionSingle in _esTransactions:
+            #esTransactionSingle = random.choice(_esTransactions)
             uniqueAbiAndAddressKey = str(abiHash) + str(esTransactionSingle['contractAddress'])
             uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-            if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) == False:
+            if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) != True:
                 localTransactionList.append(esTransactionSingle['TxHash'])
                 if len(localTransactionList) == 15:
-                    print("Processing a batch of 10 items")
+                    print("Processing a batch of 15 items")
                     self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
                     localTransactionList = []
             else:
@@ -486,6 +488,7 @@ class Harvest:
         if len(localTransactionList) > 0:
             print("Processing the last few items")
             self.processMultipleTransactions(_localEsAbiSingle, localTransactionList)
+        print("Processing of " + abiHash + " is complete!")
 
 
     def harvestTransactionsDriver(self):
