@@ -158,6 +158,7 @@ do
     cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m bytecode >/dev/null 2>&1 &
     cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m full >/dev/null 2>&1 &
     cd /var/www/ethereum.search.secondstate.io/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m topup >/dev/null 2>&1 &
+    cd /var/www/search-engine.com/html/python && ulimit -n 10000 && nohup /usr/bin/python3.6 harvest.py -m indexed >/dev/null 2>&1 &
     break
   else
     echo "Got $STATUS please wait"
