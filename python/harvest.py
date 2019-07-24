@@ -3,6 +3,7 @@ import re
 import sys
 import time
 import json
+import math
 import boto3
 import queue
 import random
@@ -317,7 +318,7 @@ class Harvest:
             tabiCompatabilityUpdateDriverPre2.daemon = True
             tabiCompatabilityUpdateDriverPre2.start()
             txThreadList.append(tabiCompatabilityUpdateDriverPre2)
-            time.sleep(1)
+            time.sleep(math.floor(self.secondsPerBlock/10))
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
 
@@ -358,7 +359,7 @@ class Harvest:
                 abiThreadList.append(tabiCompatabilityUpdateDriverPre1)
             for abiCompatabilityUpdateDriverPre1Thread in abiThreadList:
                 abiCompatabilityUpdateDriverPre1Thread.join()
-            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + 300
+            self.abiCompatabilityUpdateDriverPre1Timer = self.abiCompatabilityUpdateDriverPre1Timer + math.floor(self.secondsPerBlock * 4)
             if self.abiCompatabilityUpdateDriverPre1Timer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
@@ -450,7 +451,7 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(5)
+            time.sleep(math.floor(self.secondsPerBlock / 2))
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
@@ -514,7 +515,7 @@ class Harvest:
                 harvestTransactionsDriverThreads.append(tFullDriver2)
             for harvestDriverThread2 in harvestTransactionsDriverThreads:
                 harvestDriverThread2.join()
-            self.harvestTransactionsDriverTimer = self.harvestTransactionsDriverTimer + 1800
+            self.harvestTransactionsDriverTimer = self.harvestTransactionsDriverTimer + time.sleep(math.floor(self.secondsPerBlock * 10))
             if self.harvestTransactionsDriverTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.harvestTransactionsDriverTimer - time.time())
@@ -565,7 +566,7 @@ class Harvest:
                 print("Processing " + str(address))
                 if address in indexedAddressesList:
                     theResponse = self.es.update(index=self.masterIndex, id=address, body=json.dumps(doc))
-            self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + 1800
+            self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + time.sleep(math.floor(self.secondsPerBlock * 10))
             if self.markMasterAsIndexedTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.markMasterAsIndexedTimer - time.time())
@@ -669,7 +670,7 @@ class Harvest:
                     threadsupdateStateDriverPre = []
             # Sleep if task is performed before time is up
             print("Finished updateStateDriverPreTimer...")
-            self.updateStateDriverPreTimer = self.updateStateDriverPreTimer + 10
+            self.updateStateDriverPreTimer = self.updateStateDriverPreTimer + self.secondsPerBlock
             if self.updateStateDriverPreTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.updateStateDriverPreTimer - time.time())
@@ -716,7 +717,7 @@ class Harvest:
             for individualVersionlessThread in self.threadsUpdateBytecode:
                 individualVersionlessThread.join()
             print("Finished")
-            self.tupdateBytecode = self.tupdateBytecode + 10
+            self.tupdateBytecode = self.tupdateBytecode + self.secondsPerBlock
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
 
@@ -752,7 +753,7 @@ class Harvest:
                                 self.threadsstateOfRecentBlocksOnly.append(tData)
             for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
                 individualVersionlessThread.join()
-            self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + 1
+            self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + self.secondsPerBlock
             if self.tstateOfRecentBlocksOnly > time.time():
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
 
@@ -831,7 +832,7 @@ class Harvest:
                 elasticsearch.helpers.bulk(self.es, bulkList)
                 bulkList = []
             if _topup == True and len(_argList) == 0:
-                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + 10
+                self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + self.secondsPerBlock
                 if self.upcomingCallTimeHarvest > time.time():
                     time.sleep(self.upcomingCallTimeHarvest - time.time())
             else:
