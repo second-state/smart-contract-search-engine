@@ -8,7 +8,8 @@ RUN apt-get update && \
         curl \
         python3 \
         python3-pip \
-        supervisor && \
+        supervisor \
+        vim && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install \
@@ -26,12 +27,12 @@ COPY css/ /var/www/html/css/
 COPY images/ /var/www/html/images/
 COPY js/ /var/www/html/js/
 COPY python/ /app
-COPY scripts/startup.sh /app/startup.sh
 
 RUN a2dissite 000-default.conf && \
     a2ensite search-engine.conf && \
     a2enmod proxy && \
     a2enmod proxy_http
 
+WORKDIR /app
 EXPOSE 80
 CMD supervisord
