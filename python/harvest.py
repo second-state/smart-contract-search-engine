@@ -515,7 +515,7 @@ class Harvest:
                 harvestTransactionsDriverThreads.append(tFullDriver2)
             for harvestDriverThread2 in harvestTransactionsDriverThreads:
                 harvestDriverThread2.join()
-            self.harvestTransactionsDriverTimer = self.harvestTransactionsDriverTimer + time.sleep(math.floor(int(self.secondsPerBlock) * 10))
+            self.harvestTransactionsDriverTimer = self.harvestTransactionsDriverTimer + math.floor(int(self.secondsPerBlock) * 10)
             if self.harvestTransactionsDriverTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.harvestTransactionsDriverTimer - time.time())
@@ -566,7 +566,7 @@ class Harvest:
                 print("Processing " + str(address))
                 if address in indexedAddressesList:
                     theResponse = self.es.update(index=self.masterIndex, id=address, body=json.dumps(doc))
-            self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + time.sleep(math.floor(int(self.secondsPerBlock) * 10))
+            self.markMasterAsIndexedTimer = self.markMasterAsIndexedTimer + math.floor(int(self.secondsPerBlock) * 10)
             if self.markMasterAsIndexedTimer > time.time():
                 print("Finished before time limit, will sleep now ...")
                 time.sleep(self.markMasterAsIndexedTimer - time.time())
