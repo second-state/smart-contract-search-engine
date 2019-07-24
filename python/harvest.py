@@ -765,7 +765,8 @@ class Harvest:
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
             if _topup == True and len(_argList) == 0:
-                stopAtBlock = latestBlockNumber - 24
+                # This takes time so therefore 10 second block time goes back 10 blocks, 1 second block time goes back 100 blocks etc.
+                stopAtBlock = latestBlockNumber - math.floor(100 / self.secondsPerBlock)
             if _topup == False and len(_argList) == 2:
                 latestBlockNumber = _argList[0]
                 stopAtBlock = latestBlockNumber - _argList[1]
