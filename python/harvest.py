@@ -524,7 +524,7 @@ class Harvest:
                 time.sleep(self.harvestTransactionsDriverTimer - time.time())
                 print("Back awake and ready to go ...")
             else:
-                print("It has been longer than the desired time, need to re-update the state immediately ...")
+                print("It has been longer than the desired time, need to re-update the tx immediately ...")
 
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
@@ -650,7 +650,7 @@ class Harvest:
             # New random functionality
             txCount = len(self.contractInstanceList)
             counter = 0
-            maxThreads = 500
+            maxThreads = self.maxThreads
             for i in range(txCount):
                 counter = counter + 1
                 contractInstanceItem = random.choice(self.contractInstanceList)
