@@ -31,6 +31,8 @@ COPY python/ /app
 RUN a2dissite 000-default.conf && \
     a2ensite search-engine.conf && \
     a2enmod proxy && \
+    a2enmod rewrite && \
+    a2enmod headers && \
     a2enmod proxy_http
 
 WORKDIR /app
