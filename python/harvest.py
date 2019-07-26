@@ -110,6 +110,11 @@ class Harvest:
         results = self.es.search(index=self.commonIndex, body=query)
         return results
 
+    def getDataUsingAddressHash(self, _hash):
+        query = '''{"query":{"match":{"contractAddress": "'''+ _hash +  '''"}}}'''
+        results = self.es.search(index=self.commonIndex, body=query)
+        return results
+
     def getOnly100Records(self):
         query = {"query":{"match_all":{}},"size": 100}
         textQuery = json.dumps(query)
@@ -760,7 +765,8 @@ class Harvest:
                             print("Searching for contract address of : " + calledAddress)
                             dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
                             if dataStatus == True:
-                                contractToProcess = self.es.get(index=esIndex, id=calledAddress)
+                                contractToProcess = self.getDataUsingAddressHash(id=calledAddress)
+                                print(contractToProcess)
                                 for abiShaItem in contractToProcess["_source"]["abiShaList"]:
                                     abiData = self.fetchAbiUsingHash(abiShaItem)
                                     tData = threading.Thread(target=self.stateOfRecentBlocksOnly, args=[abiData, calledAddress])
