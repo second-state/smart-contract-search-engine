@@ -365,7 +365,7 @@ class Harvest:
                 time.sleep(self.abiCompatabilityUpdateDriverPre1Timer - time.time())
                 print("Back awake and ready to go ...")
             else:
-                print("It has been longer than the desired time, need to re-update the state immediately ...")
+                print("It has been longer than the desired time, need to re-update the ABI immediately ...")
 
     def addDataToIgnoreIndex(self, _contractAbiJSONData, _itemId):
         # Add this abi and contract address to the ignore index because we don't want to waste time revisiting this combo
@@ -658,7 +658,7 @@ class Harvest:
                 tupdateStateDriverPre.daemon = True
                 tupdateStateDriverPre.start()
                 threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-                if counter == maxThreads:
+                if counter == math.floor(maxThreads / 4):
                     # Processing a batch 
                     for updateStateThreads1 in threadsupdateStateDriverPre:
                         updateStateThreads1.join()

@@ -60,16 +60,22 @@ def submit_many_abis():
             # Try and index the contract instance directly into the common index.
             harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
             success = True
+            print("Indexing of single transaction was a success")
         except:
             print("Unable to process that single transaction")
         # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
         if success == True:
+            # Adding this current ABI to the ABI index
             data = {}
             data['indexInProgress'] = "false"
             data['epochOfLastUpdate'] = int(time.time())
             data['abi'] = cleanedAndOrderedAbiText
             harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
-            print("Index was a success")
+            print("Index ABI was a success")
+            # Adding this current ABI to the abiShaList of the transaction which has already been indexed using one of its other ABIs
+            source = {}
+            source["TxHash"] = transactionHash
+            harvester.abiCompatabilityUpdate(jsonAbiObj, source)
     doc = {}
     doc["response"] = 'Completed ABI submissions'
     return jsonify(doc)
