@@ -767,7 +767,7 @@ class Harvest:
                             if dataStatus == True:
                                 contractToProcess = self.getDataUsingAddressHash(calledAddress)
                                 print(contractToProcess)
-                                for abiShaItem in contractToProcess["_source"]["abiShaList"]:
+                                for abiShaItem in contractToProcess["hits"]["hits"][0]["_source"]["abiShaList"]:
                                     abiData = self.fetchAbiUsingHash(abiShaItem)
                                     tData = threading.Thread(target=self.stateOfRecentBlocksOnly, args=[abiData, calledAddress])
                                     tData.daemon = True
