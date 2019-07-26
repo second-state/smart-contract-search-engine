@@ -748,6 +748,7 @@ class Harvest:
                 if blockTransactionCount > 0:
                     block = self.web3.eth.getBlock(blockNumber)
                     for singleTransaction in block.transactions:
+                        print("Processing transaction: " + singleTransaction)
                         singleTransactionHex = singleTransaction.hex()
                         transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
