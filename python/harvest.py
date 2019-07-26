@@ -731,10 +731,12 @@ class Harvest:
 
     def stateOfRecentBlocksOnlyPre(self, esIndex):
         self.tstateOfRecentBlocksOnly = time.time()
+        self.addressAndFunctionDataHashes = {}
         while True:
             self.threadsstateOfRecentBlocksOnly = []
             latestBlockNumber = self.web3.eth.getBlock('latest').number
-            stopAtBlock = latestBlockNumber - 5
+            # Allow this function to calculate how many blocks to go back based on config
+            stopAtBlock = latestBlockNumber - math.floor(100 / self.secondsPerBlock)
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
                 print("\nProcessing block number %s" % blockNumber)
                 blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
