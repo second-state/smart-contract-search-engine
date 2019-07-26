@@ -159,6 +159,7 @@ class Harvest:
         q = '{"query": {"term": {"_id": "'+ _esId +'" }}, "size": 0}'
         try:
             esResponse2 = self.es.search(index=_theIndex, body=q)
+            print(esResponse2)
             if int(esResponse2["hits"]["total"]) == 1:
                 returnVal = True
                 print("Item is already indexed.")
