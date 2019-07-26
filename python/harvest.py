@@ -403,7 +403,7 @@ class Harvest:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == False:
                 try:                                    
-                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=itemId)
+                    contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=self.web3.toChecksumAddress(itemId))
                 except:
                     print("Unable to instantiate web3 contract object")
                     self.addDataToIgnoreIndex(_contractAbiJSONData, itemId)
@@ -540,7 +540,7 @@ class Harvest:
 
     def fetchContractInstances(self, _contractAbiId, _contractAddress):
         jsonAbiDataForInstance = json.loads(self.fetchAbiUsingHash(_contractAbiId))
-        contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=_contractAddress)
+        contractInstance = self.web3.eth.contract(abi=jsonAbiDataForInstance, address=self.web3.toChecksumAddress(_contractAddress))
         self.contractInstanceList.append(contractInstance)
 
     def markMasterTest(self):
@@ -736,7 +736,7 @@ class Harvest:
                 time.sleep(self.tupdateBytecode - time.time())
 
     def stateOfRecentBlocksOnly(self, _abiData, _calledAddress):
-        contractInstance = self.web3.eth.contract(abi=_abiData, address=_calledAddress)
+        contractInstance = self.web3.eth.contract(abi=_abiData, address=self.web3.toChecksumAddress(_calledAddress))
         self.worker(contractInstance)
 
 
