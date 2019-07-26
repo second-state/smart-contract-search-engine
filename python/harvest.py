@@ -765,7 +765,7 @@ class Harvest:
                             print("Searching for contract address of : " + calledAddress)
                             dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
                             if dataStatus == True:
-                                contractToProcess = self.getDataUsingAddressHash(id=calledAddress)
+                                contractToProcess = self.getDataUsingAddressHash(calledAddress)
                                 print(contractToProcess)
                                 for abiShaItem in contractToProcess["_source"]["abiShaList"]:
                                     abiData = self.fetchAbiUsingHash(abiShaItem)
