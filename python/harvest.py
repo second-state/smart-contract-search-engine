@@ -735,7 +735,7 @@ class Harvest:
             if self.tupdateBytecode > time.time():
                 time.sleep(self.tupdateBytecode - time.time())
 
-    def stateOfRecentBlocksOnly(_abiData, _calledAddress):
+    def stateOfRecentBlocksOnly(self, _abiData, _calledAddress):
         contractInstance = self.web3.eth.contract(abi=_abiData, address=_calledAddress)
         self.worker(contractInstance)
 
