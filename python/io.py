@@ -51,18 +51,24 @@ def submit_abi():
 def submit_many_abis():
     jsonRequestData = json.loads(request.data)
     transactionHash = jsonRequestData["hash"]
+    firstPass = True
     for k, v in jsonRequestData["abis"].items():
         jsonAbiObj = json.loads(json.dumps(v["abi"]))
         theDeterministicHash = harvester.shaAnAbi(jsonAbiObj)
         cleanedAndOrderedAbiText = harvester.cleanAndConvertAbiToText(jsonAbiObj)
         success = False
-        try:
-            # Try and index the contract instance directly into the common index.
-            harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
-            success = True
-            print("Indexing of single transaction was a success")
-        except:
-            print("Unable to process that single transaction")
+        if success == False:
+            try:
+                # Try and index the contract instance directly into the common index.
+                harvester.processSingleTransaction(json.loads(cleanedAndOrderedAbiText), transactionHash)
+                success = True
+                if firstPass == True:
+                    # Allow Elasticsearch to respond
+                    time.sleep(2)
+                    firstPass = False
+                print("Indexing of single transaction was a success")
+            except:
+                print("Unable to process that single transaction")
         # If that succeded then it is safe to go ahead and permanently store the ABI in the abi index
         if success == True:
             # Adding this current ABI to the ABI index
@@ -73,7 +79,7 @@ def submit_many_abis():
             harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
             print("Index ABI was a success")
             # Adding this current ABI to the abiShaList of the transaction which has already been indexed using one of its other ABIs
-            time.sleep(1)
+            #time.sleep(1)
             source = harvester.getDataUsingTransactionHash(transactionHash)
             print(source)
             sourceDataObject = json.loads(json.dumps(source))
