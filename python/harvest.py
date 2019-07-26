@@ -158,6 +158,7 @@ class Harvest:
         returnVal = False
         try:
             esReponse2 = self.es.get(index=_theIndex, id=_esId, _source="false")
+            print(esReponse2)
             if esReponse2['found'] == True:
                 returnVal = True
                 print("Item is already indexed.")
