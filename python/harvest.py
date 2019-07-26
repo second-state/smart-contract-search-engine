@@ -748,10 +748,11 @@ class Harvest:
                 if blockTransactionCount > 0:
                     block = self.web3.eth.getBlock(blockNumber)
                     for singleTransaction in block.transactions:
-                        print("Processing transaction: " + singleTransaction)
                         singleTransactionHex = singleTransaction.hex()
+                        print("Processing transaction: " + singleTransactionHex)
                         transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
+                        print("Transaction receipt:\n" + transactionReceipt)
                         calledAddress = transactionReceipt['to']
                         print("Searching for contract address of : " + calledAddress)
                         dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
