@@ -73,9 +73,9 @@ def submit_many_abis():
             harvester.loadDataIntoElastic(harvester.abiIndex, theDeterministicHash, data)
             print("Index ABI was a success")
             # Adding this current ABI to the abiShaList of the transaction which has already been indexed using one of its other ABIs
-            source = {}
-            source["TxHash"] = transactionHash
-            harvester.abiCompatabilityUpdate(jsonAbiObj, source)
+            source = getDataUsingTransactionHash(transactionHash)
+            sourceDataObject = json.loads(json.dumps(source))
+            harvester.abiCompatabilityUpdate(jsonAbiObj, source["hits"]["hits"][0]["_source"])
     doc = {}
     doc["response"] = 'Completed ABI submissions'
     return jsonify(doc)
