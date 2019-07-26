@@ -755,16 +755,17 @@ class Harvest:
                         print("Transaction receipt:\n")
                         print(transactionReceipt)
                         calledAddress = transactionReceipt['to']
-                        print("Searching for contract address of : " + calledAddress)
-                        dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
-                        if dataStatus == True:
-                            contractToProcess = self.es.get(index=esIndex, id=calledAddress)
-                            for abiShaItem in contractToProcess["_source"]["abiShaList"]:
-                                abiData = self.fetchAbiUsingHash(abiShaItem)
-                                tData = threading.Thread(target=self.stateOfRecentBlocksOnly, args=[abiData, calledAddress])
-                                tData.daemon = True
-                                tData.start()
-                                self.threadsstateOfRecentBlocksOnly.append(tData)
+                        if calledAddress != None:
+                            print("Searching for contract address of : " + calledAddress)
+                            dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
+                            if dataStatus == True:
+                                contractToProcess = self.es.get(index=esIndex, id=calledAddress)
+                                for abiShaItem in contractToProcess["_source"]["abiShaList"]:
+                                    abiData = self.fetchAbiUsingHash(abiShaItem)
+                                    tData = threading.Thread(target=self.stateOfRecentBlocksOnly, args=[abiData, calledAddress])
+                                    tData.daemon = True
+                                    tData.start()
+                                    self.threadsstateOfRecentBlocksOnly.append(tData)
             for individualVersionlessThread in self.threadsstateOfRecentBlocksOnly:
                 individualVersionlessThread.join()
             self.tstateOfRecentBlocksOnly = self.tstateOfRecentBlocksOnly + int(self.secondsPerBlock)
