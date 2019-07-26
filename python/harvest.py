@@ -747,6 +747,7 @@ class Harvest:
                         transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
                         transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
                         calledAddress = transactionReceipt['to']
+                        print("Searching for contract address of : " + calledAddress)
                         dataStatus = self.hasDataBeenIndexed(esIndex, calledAddress)
                         if dataStatus == True:
                             contractToProcess = self.es.get(index=esIndex, id=calledAddress)
