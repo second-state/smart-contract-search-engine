@@ -156,14 +156,18 @@ class Harvest:
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
         returnVal = False
+        q = '{"query": {"term": {"_id": "'+ _esId +'" }}, "size": 0}'
         try:
-            esReponse2 = self.es.get(index=_theIndex, id=_esId, _source="false")
-            print(esReponse2)
-            if esReponse2['found'] == True:
+            esResponse2 = self.es.search(index=_theIndex, body=q)
+            if int(esResponse2["hits"]["total"]) == 1:
                 returnVal = True
                 print("Item is already indexed.")
+            else:
+                print("Item does not exist yet.")
+                returnVal = False
         except:
-            print("Item does not exist yet.")
+            print("Error, unable to test if item exists")
+            returnVal = False
         return returnVal
 
     def performStringConversion(self, _data):
