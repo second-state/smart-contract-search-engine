@@ -408,6 +408,7 @@ class Harvest:
                 if theAbiHash in indexedContractData["hits"]["hits"][0]["_source"]["abiShaList"]:
                     print("This ABI and address are already associated")
                 else:
+                    print("Performing associated ABI compatability update")
                     self.abiCompatabilityUpdate(_contractAbiJSONData, indexedContractData["hits"]["hits"][0]["_source"])
             if dataStatus == False:
                 try:                                    
