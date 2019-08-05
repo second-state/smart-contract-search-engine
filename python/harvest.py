@@ -401,6 +401,14 @@ class Harvest:
             sys.exit() 
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
+            if dataStatus == True:
+                # The contract address might be indexed, however this ABI may be associated with it so we need to check this 
+                theAbiHash = self.shaAnAbi(_contractAbiJSONData)
+                indexedContractData = self.getDataUsingAddressHash(itemId)
+                if theAbiHash in indexedContractData["hits"]["hits"][0]["_source"]["abiShaList"]:
+                    print("This ABI and address are already associated")
+                else:
+                    self.abiCompatabilityUpdate(_contractAbiJSONData, indexedContractData["hits"]["hits"][0]["_source"])
             if dataStatus == False:
                 try:                                    
                     contractInstance = self.web3.eth.contract(abi=_contractAbiJSONData, address=self.web3.toChecksumAddress(itemId))
