@@ -10,6 +10,10 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
+@app.route("/api/most_recent_indexed_block_number", methods=['GET', 'POST'])
+def most_recent_indexed_block_number():
+    mostRecentIndexedBlockNumber = harvester.mostRecentIndexedBlockNumber()
+    return jsonify(mostRecentIndexedBlockNumber)
 
 @app.route("/api/describe_using_tx", methods=['GET', 'POST'])
 def describe_using_tx():
