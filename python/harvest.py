@@ -106,7 +106,7 @@ class Harvest:
         return keccakHashes
 
     def mostRecentIndexedBlockNumber(self):
-        query = '''{"aggs":{"most_recent_block":{"max":{"field":"blockNumber"}}}}'''
+        query = '''{"aggs":{"most_recent_block":{"max":{"field":"blockNumber"}}}, "size":0}'''
         results = self.es.search(index=self.commonIndex, body=query)
         return results
 
