@@ -321,20 +321,29 @@ class Harvest:
                     doc["doc"] = outerData
                     self.updateDataInElastic(self.commonIndex, _source["contractAddress"], json.dumps(doc))
             else:
-                print("ABI not compatible")
+                print("ABI not compatible, ignoring this abi and address from now on")
+                self.addDataToIgnoreIndex(_esAbiSingle, _source["contractAddress"])
         else:
-            print("No keccak hashes to compare")
+            print("No keccak hashes to compare, ignoring this abi and address from now on")
+            self.addDataToIgnoreIndex(_esAbiSingle, _source["contractAddress"])
 
 
     def abiCompatabilityUpdateDriverPre2(self, _abi, _esTxs):
         txThreadList = []
         for i, doc2 in _esTxs.items():
             source = doc2['_source']
-            tabiCompatabilityUpdateDriverPre2 = threading.Thread(target=self.abiCompatabilityUpdate, args=[_abi, source])
-            tabiCompatabilityUpdateDriverPre2.daemon = True
-            tabiCompatabilityUpdateDriverPre2.start()
-            txThreadList.append(tabiCompatabilityUpdateDriverPre2)
-            time.sleep(math.floor(int(self.secondsPerBlock)/10))
+            abiHash = self.shaAnAbi(_abi)
+            uniqueAbiAndAddressKey = str(abiHash) + str(source['contractAddress'])
+            uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+            if self.hasDataBeenIndexed(self.ignoreIndex, uniqueAbiAndAddressHash) != True:
+                print("Item is NOT in the ignore index so we need to check it out ...")
+                tabiCompatabilityUpdateDriverPre2 = threading.Thread(target=self.abiCompatabilityUpdate, args=[_abi, source])
+                tabiCompatabilityUpdateDriverPre2.daemon = True
+                tabiCompatabilityUpdateDriverPre2.start()
+                txThreadList.append(tabiCompatabilityUpdateDriverPre2)
+                time.sleep(math.floor(int(self.secondsPerBlock)/10))
+            else:
+                print("This item is in the ignore index so we are moving on ...")
         for abiCompatabilityUpdateDriverPre2Thread in txThreadList:
             abiCompatabilityUpdateDriverPre2Thread.join()
 
