@@ -105,6 +105,11 @@ class Harvest:
                     keccakHashes.append(hashCreated)
         return keccakHashes
 
+    def getMostRecentIndexedBlock(self):
+        query = '''{"aggs":{"most_recent_block":{"max":{"field":"blockNumber"}}}}'''
+        results = self.es.search(index=self.commonIndex, body=query)
+        return results
+
     def getDataUsingTransactionHash(self, _hash):
         query = '''{"query":{"match":{"TxHash": "'''+ _hash +  '''"}}}'''
         results = self.es.search(index=self.commonIndex, body=query)
