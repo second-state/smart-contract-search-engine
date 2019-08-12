@@ -692,7 +692,7 @@ class Harvest:
                 tupdateStateDriverPre.daemon = True
                 tupdateStateDriverPre.start()
                 threadsupdateStateDriverPre.append(tupdateStateDriverPre)
-                if counter == math.floor(maxThreads / 4):
+                if counter == math.floor(int(maxThreads) / int(4)):
                     # Processing a batch 
                     for updateStateThreads1 in threadsupdateStateDriverPre:
                         updateStateThreads1.join()
