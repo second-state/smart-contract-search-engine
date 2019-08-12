@@ -909,21 +909,25 @@ if __name__ == "__main__":
     else:
         print("Index already exists")
     if args.mode == "full":
-        print("Performing full harvest")
-        latestBlockNumber = harvester.web3.eth.getBlock('latest').number
-        threadsToUse = harvester.maxThreads
-        blocksPerThread = int(latestBlockNumber / int(threadsToUse))
-        harvester.fastThreads = []
-        for startingBlock in range(1, latestBlockNumber, blocksPerThread):
-            argList = []
-            argList.append(startingBlock)
-            argList.append(blocksPerThread)
-            tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=[harvester.masterIndex, argList, False])
-            tFullDriver.daemon = True
-            tFullDriver.start()
-            harvester.fastThreads.append(tFullDriver)
-        for tt in harvester.fastThreads:
-            tt.join()
+        while True:
+            print("Performing full harvest")
+            latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+            threadsToUse = harvester.maxThreads
+            blocksPerThread = int(latestBlockNumber / int(threadsToUse))
+            harvester.fastThreads = []
+            for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+                argList = []
+                argList.append(startingBlock)
+                argList.append(blocksPerThread)
+                tFullDriver = threading.Thread(target=harvester.harvestAllContracts, args=[harvester.masterIndex, argList, False])
+                tFullDriver.daemon = True
+                tFullDriver.start()
+                harvester.fastThreads.append(tFullDriver)
+            for tt in harvester.fastThreads:
+                tt.join()
+            print("Full harvest has fully completed, sleeping for 5 seconds and then restarting again ...")
+            time.sleep(5)
+            print("Restarting now ...")
     elif args.mode == "topup":
         print("Performing topup")
         argsList = []
