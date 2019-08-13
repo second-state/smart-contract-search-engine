@@ -611,6 +611,43 @@ class Harvest:
             else:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")
 
+    def updateStateOfContractAddress(self, _abi, _address){
+        contractInstance = self.web3.eth.contract(abi=_abi, address=self.web3.toChecksumAddress(_address))
+        freshFunctionData = self.fetchPureViewFunctionData(contractInstance)
+        functionDataId = self.getFunctionDataId(freshFunctionData)
+        abiHash = self.shaAnAbi(contractInstance.abi)
+        uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
+        uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+        functionDataObjectOuter = {}
+        functionDataObjectInner = {}
+        functionDataObjectInner['functionDataId'] = functionDataId
+        functionDataObjectInner['functionData'] = freshFunctionData
+        functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
+        newList = []
+        found = False
+        newData = self.es.get(index=self.commonIndex, id=contractInstance.address)
+        if len(newData["_source"]["functionDataList"]["0"]) > 0:
+            for item in newData["_source"]["functionDataList"]["0"]:
+                for k, v in item.items():
+                    if k == "uniqueAbiAndAddressHash":
+                        if v == uniqueAbiAndAddressHash:
+                            newList.append(functionDataObjectInner)
+                            found = True
+                        else:
+                            newList.append(item)
+        else:
+            newList.append(functionDataObjectInner)
+            found = True
+        if found == False:
+            newList.append(functionDataObjectInner)
+        doc = {}
+        outerData = {}
+        functionDataObjectOuter["0"] = newList
+        outerData["functionDataList"] = functionDataObjectOuter
+        doc["doc"] = outerData
+        self.updateDataInElastic(self.commonIndex, contractInstance.address, json.dumps(doc))
+    }
+    
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
