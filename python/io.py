@@ -10,6 +10,18 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
+
+@app.route("/api/update_state_of_contract_address", methods=['GET', 'POST'])
+def update_state_of_contract_address():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abi = json.loads(jsonRequestData["abi"])
+    address = jsonRequestData["address"]
+    harvester.updateStateOfContractAddress(abi, address)
+    doc = {}
+    doc["response"] = 'Successfully updated contract.'
+    return jsonify(doc)
+
 @app.route("/api/most_recent_indexed_block_number", methods=['GET', 'POST'])
 def most_recent_indexed_block_number():
     mostRecentIndexedBlockNumber = harvester.mostRecentIndexedBlockNumber()
