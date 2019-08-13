@@ -646,6 +646,7 @@ class Harvest:
         outerData["functionDataList"] = functionDataObjectOuter
         doc["doc"] = outerData
         self.updateDataInElastic(self.commonIndex, contractInstance.address, json.dumps(doc))
+        return "Success"
 
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
