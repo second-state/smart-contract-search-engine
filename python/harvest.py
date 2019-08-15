@@ -60,6 +60,10 @@ class Harvest:
         self.maxThreads = self.config['system']['max_threads']
         print("Max threads: %s" % self.maxThreads)
 
+        # Initial ABI
+        self.initialAbiUrl = self.config['abi_code']['initial_abi_url']
+        print("Initial ABI is located at: %s" % self.initialAbiUrl)
+
         # Elasticsearch endpoint
         self.elasticSearchEndpoint = self.config['elasticSearch']['endpoint']
         print("ElasticSearch Endpoint: %s" % self.elasticSearchEndpoint)
@@ -922,30 +926,59 @@ class Harvest:
                 if _topup == False and len(_argList) == 2:
                     break
 
+    def initiate(self):
+        print("Checking to see if " + str(self.abiIndex) + " exists ...")
+        if self.es.indices.exists(index=self.abiIndex) == False:
+            print("Creating " + str(self.abiIndex))
+            self.es.indices.create(index=self.abiIndex)
+            print("Fetching ABI to load from " + str(self.initialAbiUrl))
+            abiData = requests.get(self.initialAbiUrl).content
+            abiDataJSON = json.loads(abiData)
+            theDeterministicHash = self.shaAnAbi(abiDataJSON)
+            cleanedAndOrderedAbiText = self.cleanAndConvertAbiToText(abiDataJSON)
+            data = {}
+            data['indexInProgress'] = "false"
+            data['epochOfLastUpdate'] = int(time.time())
+            data['abi'] = cleanedAndOrderedAbiText
+            print("Uploading ABI into the newly created ABI index")
+            self.es.index(index=self.abiIndex, id=theDeterministicHash, body=data)
+            print("Success")
+        else:
+            print(str(self.abiIndex) + ", index already exists")
+        print("Checking to see if " + str(self.masterIndex) + " exists ...")
+        if self.es.indices.exists(index=self.masterIndex) == False:
+            print("Creating " + str(self.masterIndex))
+            self.es.indices.create(index=self.masterIndex)
+        else:
+            print(str(self.masterIndex) + ", index already exists")
+        print("Checking to see if " + str(self.commonIndex) + " exists ...")
+        if self.es.indices.exists(index=self.commonIndex) == False:
+            print("Creating " + str(self.commonIndex))
+            self.es.indices.create(index=self.commonIndex)
+        else:
+            print(str(self.commonIndex) + ", index already exists")
+        print("Checking to see if " + str(self.bytecodeIndex) + " exists ...")
+        if self.es.indices.exists(index=self.bytecodeIndex) == False:
+            print("Creating " + str(self.bytecodeIndex))
+            self.es.indices.create(index=self.bytecodeIndex)
+        else:
+            print(str(self.bytecodeIndex) + ", index already exists")
+        print("Checking to see if " + str(self.ignoreIndex) + " exists ...")
+        if self.es.indices.exists(index=self.ignoreIndex) == False:
+            print("Creating " + str(self.ignoreIndex))
+            self.es.indices.create(index=self.ignoreIndex)
+        else:
+            print(str(self.ignoreIndex) + ", index already exists")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Harvester < https://github.com/second-state/smart-contract-search-engine >")
-    parser.add_argument("-m", "--mode", help="[full|topup|state|tx|abi|bytecode|indexed]", type=str, default="full")
+    parser.add_argument("-m", "--mode", help="[full|topup|state|faster_state|tx|abi|bytecode|indexed]", type=str, default="init")
     args = parser.parse_args()
     harvester = Harvest()
-    # Ensure that the ABI index exists (others are created programatically but ABI needs to exist up front)
-    if harvester.es.indices.exists(index=harvester.abiIndex) == False:
-        harvester.es.indices.create(index=harvester.abiIndex)
-        # Upload a single ABI so that the system does not error when started (requires at least one abi to function)
-        abiUrl1 = "https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/erc20_transfer_function_only_abi.txt"
-        abiData1 = requests.get(abiUrl1).content
-        abiData1JSON = json.loads(abiData1)
-        theDeterministicHash1 = harvester.shaAnAbi(abiData1JSON)
-        cleanedAndOrderedAbiText1 = harvester.cleanAndConvertAbiToText(abiData1JSON)
-        data1 = {}
-        data1['indexInProgress'] = "false"
-        data1['epochOfLastUpdate'] = int(time.time())
-        data1['abi'] = cleanedAndOrderedAbiText1
-        harvester.es.index(index=harvester.abiIndex, id=theDeterministicHash1, body=data1)
-    else:
-        print("Index already exists")
-    if args.mode == "full":
+    if args.mode == "init":
+        harvester.initiate()
+    elif args.mode == "full":
         while True:
             print("Performing full harvest")
             latestBlockNumber = harvester.web3.eth.getBlock('latest').number
@@ -989,6 +1022,7 @@ if __name__ == "__main__":
         harvester.markMasterAsIndexed()
     else:
         print("Invalid argument, please try any of the following")
+        print("harvest.py --mode init")
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
         print("harvest.py --mode state")
