@@ -969,6 +969,7 @@ class Harvest:
             self.es.indices.create(index=self.ignoreIndex)
         else:
             print(str(self.ignoreIndex) + ", index already exists")
+        print("Initialisation complete!")
 
 
 if __name__ == "__main__":
