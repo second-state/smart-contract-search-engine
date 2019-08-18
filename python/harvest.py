@@ -408,12 +408,12 @@ class Harvest:
         ignoreIndexResult = self.loadDataIntoElastic(self.ignoreIndex, uniqueAbiAndAddressHash, json.dumps(outerData))
 
     def confirmDeployment(self, _transactionHex):
-        timeoutValue = time.time() + (self.secondsPerBlock * 10)
+        timeoutValue = time.time() + (int(self.secondsPerBlock * 10))
         event = threading.Event()
         contractAddress = None
         while (event.is_set() == False):
             if timeoutValue >= time.time():
-                time.sleep(self.secondsPerBlock)
+                time.sleep(int(self.secondsPerBlock))
             try:
                 transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
                 if transactionReceipt.contractAddress == None:
