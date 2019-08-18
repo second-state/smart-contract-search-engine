@@ -11,6 +11,16 @@ harvester = Harvest()
 app = Flask(__name__)
 
 
+@app.route("/api/confirm_deployment", methods=['GET', 'POST'])
+def confirm_deployment():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    transactionHash = jsonRequestData["hash"]
+    returnValue = harvester.confirmDeployment(transactionHash)
+    doc = {}
+    doc["response"] = str(returnValue)
+    return jsonify(doc)
+
 @app.route("/api/update_state_of_contract_address", methods=['GET', 'POST'])
 def update_state_of_contract_address():
     print(request)
