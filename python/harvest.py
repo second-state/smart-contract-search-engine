@@ -407,6 +407,24 @@ class Harvest:
         print("Adding to ignore list!")
         ignoreIndexResult = self.loadDataIntoElastic(self.ignoreIndex, uniqueAbiAndAddressHash, json.dumps(outerData))
 
+    def confirmDeployment(self, _transactionHex):
+        timeoutValue = time.time() + (self.secondsPerBlock * 10)
+        event = threading.Event()
+        contractAddress = None
+        while (event.is_set() == False):
+            if timeoutValue >= time.time():
+                time.sleep(self.secondsPerBlock)
+            try:
+                transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
+                if transactionReceipt.contractAddress == None:
+                    event.set()
+                else:    
+                    contractAddress = self.web3.toChecksumAddress(transactionReceipt.contractAddress)
+                    event.set()
+            except:
+                pass
+        return contractAddress
+
     def processSingleTransaction(self,_contractAbiJSONData, _transactionHex):
         transactionData = self.web3.eth.getTransaction(str(_transactionHex))
         transactionReceipt = self.web3.eth.getTransactionReceipt(str(_transactionHex))
