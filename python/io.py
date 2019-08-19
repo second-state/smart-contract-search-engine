@@ -10,6 +10,10 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
+@app.route("/api/get_block_interval", methods=['GET', 'POST'])
+def get_block_interval():
+    blockInterval = harvester.getBlockInterval()
+    return jsonify(blockInterval)
 
 @app.route("/api/confirm_deployment", methods=['GET', 'POST'])
 def confirm_deployment():
