@@ -37,4 +37,6 @@ RUN a2dissite 000-default.conf && \
 
 WORKDIR /app
 EXPOSE 80
+
+ENTRYPOINT ["/usr/bin/python3.6", "harvest.py", "--mode", "init"]
 CMD supervisord
