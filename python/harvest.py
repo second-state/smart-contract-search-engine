@@ -52,11 +52,11 @@ class Harvest:
         self.blockchainRpc = self.config['blockchain']['rpc']
         print("Blockchain RPC: %s" % self.blockchainRpc)
 
-        # Blockchain RPC
+        # Blockchain, how many seconds per block?
         self.secondsPerBlock = self.config['blockchain']['seconds_per_block']
         print("Block time: %s" % self.secondsPerBlock)
 
-        # Blockchain RPC
+        # Amount of allowable threads on this PC/OS
         self.maxThreads = self.config['system']['max_threads']
         print("Max threads: %s" % self.maxThreads)
 
