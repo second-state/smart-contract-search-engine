@@ -78,6 +78,9 @@ class Harvest:
         self.auth = BotoAWSRequestsAuth(aws_host=self.elasticSearchEndpoint, aws_region=self.elasticSearchAwsRegion, aws_service='es')
         self.es = Elasticsearch(
             hosts=[{'host': self.elasticSearchEndpoint, 'port': 443}],
+            retry_on_timeout=True,
+            timeout=30,
+            max_retries=10,
             region=self.elasticSearchAwsRegion,
             use_ssl=True,
             verify_certs=True,
