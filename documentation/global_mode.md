@@ -163,6 +163,12 @@ It is important that the search engine is pointing to the correct RPC endpoint i
 rpc = https://testnet-rpc.cybermiles.io:8545
 ```
 
+It is also important that the search engine knows how fast the blocks are produced, this can be set in the seconds_per_block configuration setting as follows.
+
+```
+seconds_per_block = 10
+```
+
 **Elasticsearch**
 Please also put in your Elasticsearch URL and region.
 
