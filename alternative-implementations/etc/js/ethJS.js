@@ -308,6 +308,20 @@ $(document).ready(function() {
 
 
 $(document).ready(function() {
+    $("#abiInput2").click(function() {
+        $(".results").empty()
+        var theAbi = $("#searchAddressInput").val();
+        if ($.trim(theAbi.length) > "0") {
+            query = '{"query":{"bool":{"must":[{"match":{"abiShaList":"' + theAbi + '"}}]}}}';
+            getItemsUsingDataViaFlask(query);
+        } else {
+            getQuickItemsViaFlask(elasticSearchUrl);
+        }
+    });
+});
+
+
+$(document).ready(function() {
     $("#indexContractButton").click(function() {
         $(".results").empty()
         var abiLoadUrl = publicIp + "/api/submit_abi";
