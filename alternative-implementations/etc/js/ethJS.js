@@ -972,7 +972,7 @@ class ESSS {
     }
 }
 
-var esss = new ("https://ethereum-classic.search.secondstate.io");
+var esss = new ESSS("https://ethereum-classic.search.secondstate.io");
 
 /*
 
