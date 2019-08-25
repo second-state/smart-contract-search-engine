@@ -1,0 +1,108 @@
+body {
+	font-family: 'Open Sans Condensed', sans-serif;
+	background-color: #000;
+}
+
+#searchAddressInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
+#searchTextInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
+#searchAddressButton {
+	width: 30%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 4px;
+}
+
+#pageResetText {
+	font.size: 3px;
+}
+
+.bg-darktm {
+    background-color: #000!important;
+}
+
+.text-whitetm {
+    color: #FFF!important;
+}
+
+
+.wideInput {
+	width: 70%;
+	text-align: center;
+	padding: 1%;
+	margin: auto;
+	display: block;
+}
+
+.searchAddressButtons {
+	width: 70%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 8px;
+}
+
+.shaded {
+	padding: 1%;
+	background-color: #f9f9f9;
+}
+
+.centralHeading {
+	text-align: center;
+	padding: 1%;
+	text-shadow: 2px 1px #f9f9f9;
+}
+
+.centeredText {
+	text-align: center;
+	padding: 1%;
+}
+
+.expired {
+	color: red;
+}
+
+.current {
+	color: green;
+}
+
+.light {
+	text-align: center;
+	color: white;
+}
+
+.right{
+	text-align: right;
+	font-size: 0.25em;
+}
+
+.hr {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border-style: inset;
+	border-width: 1px;
+}
+
+.headerImg {
+    position: relative;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
