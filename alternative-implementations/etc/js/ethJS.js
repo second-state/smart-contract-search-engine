@@ -314,7 +314,9 @@ $(document).ready(function() {
         if ($.trim(theAbi.length) > "0") {
             esss.shaAbi(theAbi).then((shaResult) => {
                 var sha = JSON.parse(shaResult).abiSha3;
+                console.log(sha);
                 esss.searchUsingAbi(sha).then((searchResult) => {
+                    console.log(searchResult);
                     var items = JSON.parse(searchResult);
                     renderItems(items.hits.hits);
                 });
