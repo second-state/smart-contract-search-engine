@@ -298,21 +298,13 @@ $(document).ready(function() {
         $(".results").empty()
         var theAddress = $("#searchAddressInput").val();
         if ($.trim(theAddress.length) > "0") {
-            iQuery = {};
-            iQuery["query"] = theText;
-            iQueryString = {};
-            iQueryString["query_string"] = iQuery;
-            oQuery = {};
-            oQuery["query"] = iQueryString;
-            jsonString = JSON.stringify(oQuery);
+            query = '{"query":{"bool":{"must":[{"match":{"contractAddress":"' + theAddress + '"}}]}}}';
             getItemsUsingDataViaFlask(jsonString);
         } else {
             getQuickItemsViaFlask(elasticSearchUrl);
         }
     });
 });
-
-
 
 
 $(document).ready(function() {
@@ -398,6 +390,27 @@ function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
 function getItemsUsingDataViaFlask(_data) {
     theUrlForData1 = publicIp + "/api/es_search";
     console.log("getItemsUsingDataViaFlask");
+    console.log(theUrlForData1);
+    console.log(_data);
+    $.ajax({
+        url: theUrlForData1,
+        type: "POST",
+        data: _data,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response);
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+}
+
+function getItemsUsingAddressViaFlask(_data) {
+    theUrlForData1 = publicIp + "/api/describe_using_address";
+    console.log("getItemsUsingAddressViaFlask");
     console.log(theUrlForData1);
     console.log(_data);
     $.ajax({
