@@ -275,10 +275,29 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#searchAddressButton").click(function() {
+    $("#searchTextButton").click(function() {
         $(".results").empty()
         var theText = $("#searchTextInput").val();
         if ($.trim(theText.length) > "0") {
+            iQuery = {};
+            iQuery["query"] = theText;
+            iQueryString = {};
+            iQueryString["query_string"] = iQuery;
+            oQuery = {};
+            oQuery["query"] = iQueryString;
+            jsonString = JSON.stringify(oQuery);
+            getItemsUsingDataViaFlask(jsonString);
+        } else {
+            getQuickItemsViaFlask(elasticSearchUrl);
+        }
+    });
+});
+
+$(document).ready(function() {
+    $("#searchAddressButton").click(function() {
+        $(".results").empty()
+        var theAddress = $("#searchAddressInput").val();
+        if ($.trim(theAddress.length) > "0") {
             iQuery = {};
             iQuery["query"] = theText;
             iQueryString = {};
