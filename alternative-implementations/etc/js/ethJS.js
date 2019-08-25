@@ -318,6 +318,11 @@ $(document).ready(function() {
                 esss.searchUsingAbi(sha).then((searchResult) => {
                     console.log(searchResult);
                     var items = JSON.parse(searchResult);
+                    $("#sha").empty();
+                    var name = jQuery("<p/>", {
+                    text: "Results for sha: " + sha
+                    });
+                    name.appendTo("#sha");
                     renderItems(items);
                 });
             });
@@ -378,31 +383,6 @@ $(document).ready(function() {
 
     });
 });
-
-
-function shaAnAbi(_data) {
-    theUrlForData1 = publicIp + "/api/sha_an_abi";
-    console.log("shaAnAbi");
-    console.log(theUrlForData1);
-    console.log(_data);
-    _jsonData = {};
-    _jsonData["abi"] = _data;
-    var _dataString = JSON.stringify(_jsonData);
-    $.ajax({
-        url: theUrlForData1,
-        type: "POST",
-        data: _dataString,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(response) {
-            console.log(response);
-            return response;
-        },
-        error: function(xhr) {
-            console.log("Sha ABI failed");
-        }
-    });
-}
 
 function renderContractVariables(_result) {
     $(".results").empty();
