@@ -56,7 +56,15 @@
         <!-- Start collapsable advanced search section -->
         <br />
         <br />
-        <div class="row">
+             <div class="row">
+            <div class="col-sm-2"></div>
+            <div class="col-sm-8 centeredText">
+		    <p>If you paste in an ABI and its contract deployment TxHash, your contract will be indexed immediately.</p>
+		    <p>Alternatively, if you paste in an ABI and the current address of your contract, the indexing process may take an additional minute or two.</p>
+            </div>
+            <div class="col-sm-2"></div>
+        </div> 
+	<div class="row">
             <div class="col-sm-2"></div>
             <div class="col-sm-8">
                 <input class="wideInput" type="text" id="abiInput" placeholder="Paste valid ABI here">
@@ -68,7 +76,7 @@
         <div class="row">
             <div class="col-sm-2"></div>
             <div class="col-sm-8">
-                <input class="wideInput" type="text" id="hashInput" placeholder="Paste transactionHash here">
+                <input class="wideInput" type="text" id="hashInput" placeholder="Paste transactionHash(preferred), or address, here">
             </div>
             <div class="col-sm-2"></div>
 
