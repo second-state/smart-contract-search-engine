@@ -1,65 +1,83 @@
-<!doctype html>
-<html lang="en">
-
-<head>
-    <!-- Never cache -->
-    <meta charset="utf-8">
+<!doctype html><html lang="en"><head>
+<!-- Never cache -->
+<meta charset="utf-8">
     <meta http-equiv='cache-control' content='no-cache'>
-    <meta http-equiv='expires' content='0'>
-    <meta http-equiv='pragma' content='no-cache'>
-    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
-    <!-- Font CSS -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&display=swap" rel="stylesheet">
-    <!-- SecondState CSS -->
-    <link rel="stylesheet" href="../css/main.css" />
-    <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery-3.4.0.min.js"></script>
-    <!-- Custom SecondState functions -->
-    <script type="text/javascript" src="../js/ethJS.js"></script>
-    <!-- Web3 CMT -->
-    <script type="text/javascript" src="../js/web3-cmt.js"></script>
-    <title>ETC Search</title>
-</head>
-<body>
-       <div class="container rounded bg-darktm">
-        <br />
-        <div class="row">
-            <div class="col-sm-6"><a href="https://www.ethereum.org/" target="_blank"><img class="headerImg" width="130px" src="../images/Ethereum_Classic_Logo.svg"></a></div>
-            <div class="col-sm-6"><a href="https://www.secondstate.io/" target="_blank"><img class="headerImg" src="../images/second_state_logo.png"></a></div>
-        </div>
-        <br />
-    </div>
-    <div class="container rounded shaded">
-
-        <div class="row">
-            <div class="col-sm-4 centeredText"><a href="index.html">Search</a></div>
-            <div class="col-sm-4 centeredText"><a href="ethAbi.html">Upload ABI</a></div>
-            <div class="col-sm-4  centeredText"><a href="ethApi.html">Try API</a></div>
-        </div>
-    </div>
-    
-
-    <hr class="hr"></hr>
-    <div class="container rounded shaded">
-        <div class="overview"></div>
-    </div>
-    <hr class="hr"></hr>
-    <div class="container rounded shaded">
-        <div class="api">
-         <div class="col-sm-4"></div>
-            <div class="col-sm-8">
-                <h2>API via the browser</h2>
+        <meta http-equiv='expires' content='0'>
+            <meta http-equiv='pragma' content='no-cache'>
+                <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
+                    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+                        <!-- Required meta tags -->
+                        <meta charset="utf-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                                <!-- Bootstrap CSS -->
+                                <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+                                <!-- Font CSS -->
+                                <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&display=swap" rel="stylesheet">
+                                    <!-- SecondState CSS -->
+                                    <link rel="stylesheet" href="../css/main.css" />
+                                    <!-- JQuery -->
+                                    <script type="text/javascript" src="../js/jquery-3.4.0.min.js"></script>
+                                    <!-- Custom SecondState functions -->
+                                    <script type="text/javascript" src="../js/ethJS.js"></script>
+                                    <!-- Web3 CMT -->
+                                    <script type="text/javascript" src="../js/web3-cmt.js"></script>
+                                    <title>ETC Search</title>
+                                </head>
+                                <body>
+                                    <div class="container rounded bg-darktm">
+                                        <br />
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <a href="https://www.ethereum.org/" target="_blank">
+                                                    <img class="headerImg" width="130px" src="../images/Ethereum_Classic_Logo.svg">
+                                                    </a>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <a href="https://www.secondstate.io/" target="_blank">
+                                                        <img class="headerImg" src="../images/second_state_logo.png">
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <br />
+                                            </div>
+                                            <div class="container rounded shaded">
+                                                <div class="row">
+                                                    <div class="col-sm-4 centeredText">
+                                                        <a href="index.html">Search using Text</a>
+                                                    </div>
+                                                    <div class="col-sm-4 centeredText">
+                                                        <a href="index.html">Search using Address</a>
+                                                    </div>
+                                                    <div class="col-sm-4 centeredText">
+                                                        <a href="ethAbi2.html">Search using an ABI</a>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-sm-6 centeredText">
+                                                        <a href="ethAbi.html">Upload ABI</a>
+                                                    </div>
+                                                    <div class="col-sm-6  centeredText">
+                                                        <a href="ethApi.html">Try API</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <hr class="hr"></hr>
+                                            <div class="container rounded shaded">
+                                                <div class="overview"></div>
+                                            </div>
+                                            <hr class="hr"></hr>
+                                            <div class="container rounded shaded">
+                                                <div class="api">
+                                                    <div class="col-sm-4"></div>
+                                                    <div class="col-sm-8">
+                                                        <h2>API via the browser</h2>
                 Coming soon, a text box for you to paste your own ad-hoc queries into.
 
-                <h2>API via Javascript</h2>
+                
+                                                        <h2>API via Javascript</h2>
                 The API can be accessed programatically from within your DApp. The API will not throw any CORS errors. Here is a Javascript (JQuery) example.
-                <pre>
+                
+                                                        <pre>
                     _data = {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}
                     $.ajax({
                         url: "https://ethereum.search.secondstate.io/api/es_search",
@@ -76,7 +94,8 @@
                     });
                 </pre>
                 The above code (which fetches the Gemini (GUSD) token will return the following data)
-                <pre>
+                
+                                                        <pre>
                     TxHash: "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b"
                     abiShaList: Array(2)
                         0: "0x66c13023af2b102c70f7b2f0217ee22fa1d91ebf8e8c0b8c65525ced4725abfd"
@@ -95,17 +114,18 @@
                     functionDataId: "0x457d284f691b898cfd8c2d8cb22838dbcfbeb76262d2ee1a05f14b24eb046f76"
                     uniqueAbiAndAddressHash: "0xbf4975d6d9d20a2a8a300beac225c91d0b0029fce0a5045d6b6a0480886d4d5e"
                     </pre>
-
-                <h2>API via command line</h2>
-            	The API can be accessed from any command line using the following Curl syntax.
-            	<br />
-    <pre>
+                                                        <h2>API via command line</h2>
+                The API can be accessed from any command line using the following Curl syntax.
+                
+                                                        <br />
+                                                        <pre>
         curl -X GET "https://ethereum.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}'
     </pre>
-            	<br />
-            	The above code (which fetches the Gemini (GUSD) token will return the following data)
-            	<br />
-    <pre>
+                                                        <br />
+                The above code (which fetches the Gemini (GUSD) token will return the following data)
+                
+                                                        <br />
+                                                        <pre>
         [
           {
             "TxHash": "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b", 
@@ -130,21 +150,22 @@
           }
         ]
     </pre>
-            	<br />
-
-            </div>
-            <div class="col-sm-4"></div>
-        
-        <!-- Closing DIV of the page -->
-    </div>
-</div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <div class="row text-whitetm">
-        <div class="col-sm-12 centeredText">This is an <a target="_blank" href="https://github.com/second-state/smart-contract-search-engine">open source smart contract search engine and API.</a></div>
-    </div>
-    <br />
-    <p class="text-whitetm right"><a href="https://en.bitcoinwiki.org/wiki/File:Ethereum11.png">Logo by Artillar (CC-BY-SA)</a></p>
-</body>
-
-</html>
+                                                        <br />
+                                                    </div>
+                                                    <div class="col-sm-4"></div>
+                                                    <!-- Closing DIV of the page -->
+                                                </div>
+                                            </div>
+                                            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+                                            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+                                            <div class="row text-whitetm">
+                                                <div class="col-sm-12 centeredText">This is an 
+                                                    <a target="_blank" href="https://github.com/second-state/smart-contract-search-engine">open source smart contract search engine and API.</a>
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <p class="text-whitetm right">
+                                                <a href="https://en.bitcoinwiki.org/wiki/File:Ethereum11.png">Logo by Artillar (CC-BY-SA)</a>
+                                            </p>
+                                        </body>
+                                    </html>
