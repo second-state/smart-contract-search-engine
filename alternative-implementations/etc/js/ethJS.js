@@ -308,8 +308,9 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $("#searchABIButton").click(function() {
-        $(".results").empty()
+        console.log("Searching using an ABI");
         var theAbi = $("#abiInput2").val();
+        console.log(theAbi);
         if ($.trim(theAbi.length) > "0") {
             esss.shaAbi(theAbi).then((shaResult) => {
                 var sha = JSON.parse(shaResult).abiSha3;
