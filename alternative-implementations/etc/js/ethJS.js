@@ -299,7 +299,7 @@ $(document).ready(function() {
         var theAddress = $("#searchAddressInput").val();
         if ($.trim(theAddress.length) > "0") {
             query = '{"query":{"bool":{"must":[{"match":{"contractAddress":"' + theAddress + '"}}]}}}';
-            getItemsUsingDataViaFlask(jsonString);
+            getItemsUsingDataViaFlask(query);
         } else {
             getQuickItemsViaFlask(elasticSearchUrl);
         }
