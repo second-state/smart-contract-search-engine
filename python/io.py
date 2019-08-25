@@ -48,6 +48,13 @@ def describe_using_tx():
     rawData = harvester.getDataUsingTransactionHash(transactionHash)
     return jsonify(rawData)
 
+@app.route("/api/describe_using_address", methods=['GET', 'POST'])
+def describe_using_address():
+    jsonRequestData = json.loads(request.data)
+    address = jsonRequestData["address"]
+    rawData = harvester.getDataUsingAddressHash(address)
+    return jsonify(rawData)
+
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
 def submit_abi():
     jsonRequestData = json.loads(request.data)
