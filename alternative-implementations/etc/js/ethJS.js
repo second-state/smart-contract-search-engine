@@ -318,7 +318,7 @@ $(document).ready(function() {
                 esss.searchUsingAbi(sha).then((searchResult) => {
                     console.log(searchResult);
                     var items = JSON.parse(searchResult);
-                    renderItems(items.hits.hits);
+                    renderItems(items);
                 });
             });
         } else {
