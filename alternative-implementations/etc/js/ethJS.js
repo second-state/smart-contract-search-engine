@@ -307,9 +307,9 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#abiInput2").click(function() {
+    $("#searchABIButton").click(function() {
         $(".results").empty()
-        var theAbi = $("#searchAddressInput").val();
+        var theAbi = $("#abiInput2").val();
         if ($.trim(theAbi.length) > "0") {
             esss.shaAbi(theAbi).then((shaResult) => {
                 var sha = JSON.parse(shaResult).abiSha3;
