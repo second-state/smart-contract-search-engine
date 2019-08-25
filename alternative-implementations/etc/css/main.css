@@ -27,6 +27,14 @@ body {
 	border-radius: 4px;
 }
 
+#searchTextButton {
+	width: 30%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 4px;
+}
+
 #pageResetText {
 	font.size: 3px;
 }
@@ -49,6 +57,14 @@ body {
 }
 
 .searchAddressButtons {
+	width: 70%;
+	padding: 1%;
+	margin: auto;
+	display: block;
+	border-radius: 8px;
+}
+
+.searchTextButtons {
 	width: 70%;
 	padding: 1%;
 	margin: auto;
