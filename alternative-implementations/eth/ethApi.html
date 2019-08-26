@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-137134458-3"></script>
+<script>
+ window.dataLayer = window.dataLayer || [];
+ function gtag(){dataLayer.push(arguments);}
+ gtag('js', new Date());
+
+ gtag('config', 'UA-137134458-3');
+</script>
+	
+    <!-- Never cache -->
+    <meta charset="utf-8">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon-16x16.png">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <!-- Font CSS -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300&display=swap" rel="stylesheet">
+    <!-- SecondState CSS -->
+    <link rel="stylesheet" href="../css/main.css" />
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery-3.4.0.min.js"></script>
+    <!-- Custom SecondState functions -->
+    <script type="text/javascript" src="../js/ethJS.js"></script>
+    <!-- Web3 CMT -->
+    <script type="text/javascript" src="../js/web3-cmt.js"></script>
+    <title>Ethereum MainNet Search</title>
+</head>
+<body>
+    <div class="container rounded bg-darktm">
+        <br />
+        <div class="row">
+            <div class="col-sm-6"><a href="https://www.ethereum.org/" target="_blank"><img class="headerImg" src="../images/eth.png"></a></div>
+            <div class="col-sm-6"><a href="https://www.secondstate.io/" target="_blank"><img class="headerImg" src="../images/second_state_logo.png"></a></div>
+        </div>
+        <br />
+    </div>
+
+    <div class="container rounded shaded">
+
+        <div class="row">
+            <div class="col-sm-4 centeredText"><a href="ethIndex.html">Search</a></div>
+            <div class="col-sm-4 centeredText"><a href="ethAbi.html">Upload ABI</a></div>
+            <div class="col-sm-4  centeredText"><a href="ethApi.html">Try API</a></div>
+        </div>
+    </div>
+    
+
+    <hr class="hr"></hr>
+    <div class="container rounded shaded">
+        <div class="overview"></div>
+    </div>
+    <hr class="hr"></hr>
+    <div class="container rounded shaded">
+        <div class="api">
+         <div class="col-sm-4"></div>
+            <div class="col-sm-8">
+                <h2>NodeJS</h2>
+		<pre>
+		npm install es-ss.js
+                let esss = require("es-ss.js"); 
+                let ESSS = esss.ESSS;
+                let searchEngineProvider = new ESSS('https://ethereum.search.secondstate.io');
+		</pre>
+		<br />
+		<b>See <a href="https://github.com/second-state/es-ss.js" target="_blank"> this link </a> for syntax. Here is one quick example.</b>
+		<br />
+		<br />
+		<pre>
+                address = '0x1234...789';
+		var addressSearch = searchEngineProvider.searchUsingAddress(address);
+			addressSearch.then(function(result) {
+			console.log("Result is " + result);
+		})
+			.catch(function() {
+			console.log("Error");
+		});
+		</pre>
+		<h2>API via Javascript</h2>
+                The API can be accessed programatically from within your DApp. The API will not throw any CORS errors. Here is a Javascript (JQuery) example.
+                <pre>
+                    _data = {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}
+                    $.ajax({
+                        url: "https://ethereum.search.secondstate.io/api/es_search",
+                        type: "POST",
+                        data: _dataString,
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function(response) {
+                            console.log(response);
+                        },
+                        error: function(xhr) {
+                            console.log("Get items failed");
+                        }
+                    });
+                </pre>
+                The above code (which fetches the Gemini (GUSD) token will return the following data)
+                <pre>
+                    TxHash: "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b"
+                    abiShaList: Array(2)
+                        0: "0x66c13023af2b102c70f7b2f0217ee22fa1d91ebf8e8c0b8c65525ced4725abfd"
+                        1: "0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286"
+                    blockNumber: 6301780
+                    contractAddress: "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"
+                    creator: "0x4c2f150fc90fed3d8281114c2349f1906cde5346"
+                    functionData:
+                        custodian: "0x9A7b5F6e453d0cDa978163Cb4a9A88367250a52d"
+                        decimals: 2
+                        erc20Impl: "0x6704ba24b8640BCcEe6BF2fd276a6a1b8EdF4Ade"
+                        lockRequestCount: 7
+                        name: "Gemini dollar"
+                        symbol: "GUSD"
+                        totalSupply: 1974889093
+                    functionDataId: "0x457d284f691b898cfd8c2d8cb22838dbcfbeb76262d2ee1a05f14b24eb046f76"
+                    uniqueAbiAndAddressHash: "0xbf4975d6d9d20a2a8a300beac225c91d0b0029fce0a5045d6b6a0480886d4d5e"
+                    </pre>
+
+                <h2>API via command line</h2>
+            	The API can be accessed from any command line using the following Curl syntax.
+            	<br />
+    <pre>
+        curl -X GET "https://ethereum.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}'
+    </pre>
+            	<br />
+            	The above code (which fetches the Gemini (GUSD) token will return the following data)
+            	<br />
+    <pre>
+        [
+          {
+            "TxHash": "0xf51a232b0e5604aa3549f5d22fd470971a627d55536eb7477b39a80b5c38b01b", 
+            "abiShaList": [
+              "0x66c13023af2b102c70f7b2f0217ee22fa1d91ebf8e8c0b8c65525ced4725abfd", 
+              "0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286"
+            ], 
+            "blockNumber": 6301780, 
+            "contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd", 
+            "creator": "0x4c2f150fc90fed3d8281114c2349f1906cde5346", 
+            "functionData": {
+              "custodian": "0x9A7b5F6e453d0cDa978163Cb4a9A88367250a52d", 
+              "decimals": 2, 
+              "erc20Impl": "0x6704ba24b8640BCcEe6BF2fd276a6a1b8EdF4Ade", 
+              "lockRequestCount": 7, 
+              "name": "Gemini dollar", 
+              "symbol": "GUSD", 
+              "totalSupply": 1974889093
+            }, 
+            "functionDataId": "0x457d284f691b898cfd8c2d8cb22838dbcfbeb76262d2ee1a05f14b24eb046f76", 
+            "uniqueAbiAndAddressHash": "0xbf4975d6d9d20a2a8a300beac225c91d0b0029fce0a5045d6b6a0480886d4d5e"
+          }
+        ]
+    </pre>
+            	<br />
+
+            </div>
+            <div class="col-sm-4"></div>
+        
+        <!-- Closing DIV of the page -->
+    </div>
+</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <div class="row text-whitetm">
+        <div class="col-sm-12 centeredText">This is an <a target="_blank" href="https://github.com/second-state/smart-contract-search-engine">open source smart contract search engine and API.</a></div>
+    </div>
+    <br />
+    <p class="text-whitetm right"><a href="https://en.bitcoinwiki.org/wiki/File:Ethereum11.png">Logo by Artillar (CC-BY-SA)</a></p>
+</body>
+
+</html>
