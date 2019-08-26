@@ -938,7 +938,7 @@ class Harvest:
                         continue
                 except:
                     print("Problems at block height " + str(blockNumber))
-            if len(bulkList) > 1:
+            if len(bulkList) >= 1:
                 print("Adding the last few items which were not bulk loaded already")
                 elasticsearch.helpers.bulk(self.es, bulkList)
                 bulkList = []
