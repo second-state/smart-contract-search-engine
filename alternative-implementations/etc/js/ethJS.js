@@ -955,7 +955,7 @@ class ESSS {
     }
 }
 
-var esss = new ESSS("https://ethereum-classic.search.secondstate.io");
+var esss = new ESSS("https://etc.search.secondstate.io");
 
 /*
 
