@@ -70,7 +70,7 @@
 		npm install es-ss.js
                 let esss = require("es-ss.js"); 
                 let ESSS = esss.ESSS;
-                let searchEngineProvider = new ESSS('https://ethereum.search.secondstate.io');
+                let searchEngineProvider = new ESSS('https://eth.search.secondstate.io');
 		</pre>
 		<br />
 		<b>See <a href="https://github.com/second-state/es-ss.js" target="_blank"> this link </a> for syntax. Here is one quick example.</b>
@@ -91,7 +91,7 @@
                 <pre>
                     _data = {"query": {"match": {"contractAddress": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd"}}}
                     $.ajax({
-                        url: "https://ethereum.search.secondstate.io/api/es_search",
+                        url: "https://eth.search.secondstate.io/api/es_search",
                         type: "POST",
                         data: _dataString,
                         dataType: "json",
