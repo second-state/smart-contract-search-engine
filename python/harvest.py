@@ -868,9 +868,9 @@ class Harvest:
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
 
     def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
-        bulkList = []
         self.upcomingCallTimeHarvest = time.time()
         while True:
+            bulkList = []
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
