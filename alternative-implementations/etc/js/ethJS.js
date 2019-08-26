@@ -3,7 +3,7 @@
 //
 // Local single user vs global multiuser
 //var publicIp = ""; // This must be an empty string, unless you are hosting this on a public server
-var publicIp = "https://ethereum-classic.search.secondstate.io"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
+var publicIp = "https://etc.search.secondstate.io"; // If you are hosting this on a public server, this must be the IP address or Base Domain (including the protocol i.e. http://mysite.com or http://123.456.7.8)
 
 // Check blockchain network and accounts
 // This is used to confirm that the user"s chrome extension is set to the correct network i.e. testnet/mainnet The search engine will only ever be deployed for a single blockchain network
