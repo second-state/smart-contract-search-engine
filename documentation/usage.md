@@ -6,7 +6,7 @@ The search engine can be used, by end users, via their web browser. It can also 
 ## API usage - using curl at the command line
 
 ```bash
-curl -X GET "https://cmt-testnet.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x909350a510BCf568e66019E21F1598D8282be26C"}}}'
+curl -X GET "https://testnet.cmt.search.secondstate.io/api/es_search" -H 'Content-Type: application/json' -d' {"query": {"match": {"contractAddress": "0x909350a510BCf568e66019E21F1598D8282be26C"}}}'
 ```
 Returns
 ```bash
@@ -64,7 +64,7 @@ _data = {
 }
 var _dataString = JSON.stringify(_data);
 $.ajax({
-    url: "https://cmt-testnet.search.secondstate.io/api/es_search",
+    url: "https://testnet.cmt.search.secondstate.io/api/es_search",
     type: "POST",
     data: _dataString,
     dataType: "json",
