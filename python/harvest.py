@@ -1005,8 +1005,13 @@ if __name__ == "__main__":
         while True:
             print("Performing full harvest")
             latestBlockNumber = harvester.web3.eth.getBlock('latest').number
-            threadsToUse = harvester.maxThreads
-            blocksPerThread = int(latestBlockNumber / int(threadsToUse))
+            threadsFromConf = harvester.maxThreads
+            # Learned that there is a limitation in the number of bulk transactions which ES can process, have to throttle this here but threads can be used elsewhere i.e. state are which does not use bulk
+            if int(threadsFromConf) > 50:
+                threadsToUse = 50
+            else:
+                threadsToUse = int(threadsFromConf)
+            blocksPerThread = int(latestBlockNumber / threadsToUse)
             harvester.fastThreads = []
             for startingBlock in range(1, latestBlockNumber, blocksPerThread):
                 argList = []
