@@ -23,7 +23,7 @@ if (searchEngineNetwork == "1") {
 }
 
 //var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
-var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search";
+var elasticSearchUrl = "https://search-etcmainnet-ldsfx5rs5mgirgdqr3c2f2afhm.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search";
 // CONFIG END
 
 // CODE START
@@ -623,6 +623,43 @@ class ESSS {
     constructor(_searchEngineBaseUrl) {
         this.searchEngineBaseUrl = _searchEngineBaseUrl;
         console.log("Search Engine Base URL set to: " + this.searchEngineBaseUrl);
+        this.indexStatus = {};
+    }
+
+    setIndexStatusToTrue(_transactionHash){
+        this.indexStatus[_transactionHash] = true;
+    }
+
+    setIndexStatusToFalse(_transactionHash){
+        this.indexStatus[_transactionHash] = false;
+    }
+
+    getIndexStatus(_transactionHash){
+        return this.indexStatus[_transactionHash];
+    }
+
+    updateStateOfContractAddress(_abi, _address) {
+        var url = this.searchEngineBaseUrl + "/api/update_state_of_contract_address";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["abi"] = _abi;
+            data["address"] = _address;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify(data));
+        });
     }
 
     updateQualityScore(_contractAddress, _qualityScore) {
@@ -661,6 +698,24 @@ class ESSS {
                         var jsonResponse = JSON.parse(xhr.responseText);
                         var blockNumber = jsonResponse["aggregations"]["most_recent_block"]["value"]
                         resolve(blockNumber);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+    getBlockInterval() {
+        var url = this.searchEngineBaseUrl + "/api/get_block_interval";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
                     }
                 }
             };
@@ -732,19 +787,44 @@ class ESSS {
         });
     }
 
-    describeUsingTx(_transactionHash) {
-        let url = this.searchEngineBaseUrl + "/api/describe_using_tx";
+    confirmDeployment(_transactionHash) {
+        let url = this.searchEngineBaseUrl + "/api/confirm_deployment";
         return new Promise(function(resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader("Content-Type", "application/json");
-        //data
-        var data = {};
-        data["hash"] = _transactionHash;
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["hash"] = _transactionHash;
             xhr.onload = function(e) {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
                         resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    describeUsingTx(_transactionHash) {
+        let url = this.searchEngineBaseUrl + "/api/describe_using_tx";
+        return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["hash"] = _transactionHash;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allRecord = JSON.stringify(jsonResponse["hits"]["hits"][0]["_source"]);
+                        resolve(allRecord);
                     }
                 }
             };
@@ -844,7 +924,9 @@ class ESSS {
             xhr.onload = function(e) {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        resolve(xhr.responseText);
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allRecord = JSON.stringify(jsonResponse[0]);
+                        resolve(allRecord);
                     }
                 }
             };
