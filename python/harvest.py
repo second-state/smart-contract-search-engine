@@ -904,11 +904,8 @@ class Harvest:
                                 itemId = transactionReceipt.contractAddress
                                 dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
                                 if dataStatus == False:
-                                    singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
                                     if _topup == True:
-                                        bulkList.append(singleItem)
-                                        elasticsearch.helpers.bulk(self.es, bulkList)
-                                        bulkList = []
+                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
                                         self.threadsAddNewItem = []
                                         dMatchAllInner = {}
                                         dMatchAll = {}
@@ -926,6 +923,7 @@ class Harvest:
                                         for individualAddNewItemThread in self.threadsAddNewItem:
                                             individualAddNewItemThread.join()
                                     else:
+                                        singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
                                         bulkList.append(singleItem)
                                         print("Added item to BULK list, we now have " + str(len(bulkList)))
                                         if len(bulkList) == 50:
