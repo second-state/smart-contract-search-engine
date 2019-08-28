@@ -209,12 +209,15 @@ sudo chmod a+x /usr/sbin/certbot-auto
 ```
 sudo certbot-auto --apache -d search-engine.com  -d www.search-engine.com
 ```
-
-### Renew SSL HTTPS Certificate
-If the certificate ever expires, please run the following commands
+Run these commands to ensure that autorenew works in the future.
 ```
 sudo apt-get -y install python3-certbot-apache
 sudo apt-get -y install certbot
+```
+
+### Renew SSL HTTPS Certificate
+Whilst the certificates should auto-renew, if the certificate ever expires, please run the following command
+```
 sudo certbot renew
 ```
 If you get the following error during the renewal of the certificate
