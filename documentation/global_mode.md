@@ -210,6 +210,22 @@ sudo chmod a+x /usr/sbin/certbot-auto
 sudo certbot-auto --apache -d search-engine.com  -d www.search-engine.com
 ```
 
+### Renew SSL HTTPS Certificate
+If the certificate ever expires, please run the following commands
+```
+sudo apt-get -y install python3-certbot-apache
+sudo apt-get -y install certbot
+sudo certbot renew
+```
+If you get the following error during the renewal of the certificate
+```
+Unable to find a virtual host listening on port 80 which is currently needed for Certbot to prove to the CA that you control your domain
+```
+You will need to enable the original VirtualHost which resides on port 80 using the following command
+```
+sudo a2ensite search-engine.com.conf
+```
+
 ## Python
 **Please perform the steps in this [subsection of the harvesting documentation](https://github.com/second-state/smart-contract-search-engine/blob/master/documentation/harvesting.md#preparing-your-operating-system-for-harvesting---installing-the-necessary-libraries) to ensure that your system can run the Python code. Once that is done, you can continue with installing Flask (as shown directly below)**
 
