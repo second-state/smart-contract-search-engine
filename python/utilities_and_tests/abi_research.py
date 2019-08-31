@@ -289,15 +289,17 @@ def listAbiItemStateMutability(_abi):
 def getAbiHash(_abi):
     return str(harvester.web3.toHex(harvester.web3.sha3(text=_abi)))
 
+def compareAbiItems(_itemA, _itemB):
+    return 
 
 listAbiLength(erc20Abi)
 listWholeKeysAndValues(erc20Abi)
-listAbiItemNames(erc20Abi)
-listAbiItemTypes(erc20Abi)
-listAbiItemInputs(erc20Abi)
-listAbiItemOutputs(erc20Abi)
-listAbiItemPayable(erc20Abi)
-listAbiItemStateMutability(erc20Abi)
+#listAbiItemNames(erc20Abi)
+#listAbiItemTypes(erc20Abi)
+#listAbiItemInputs(erc20Abi)
+3listAbiItemOutputs(erc20Abi)
+#listAbiItemPayable(erc20Abi)
+#listAbiItemStateMutability(erc20Abi)
 # Original ABI string
 originalAbiString = json.dumps(erc20Abi)
 # Original ABI hash
