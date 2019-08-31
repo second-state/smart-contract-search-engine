@@ -269,7 +269,6 @@ class Harvest:
                 obj["contractAddress"] = item["_source"]["contractAddress"]
                 self.esAbiAddresses.append(json.dumps(obj))
 
-
     def sortInternalListsInJsonObject(self, _json):
         for listItem in _json:
             #print("List item")
@@ -293,6 +292,10 @@ class Harvest:
         theAbiAsString = self.cleanAndConvertAbiToText(_theAbi)
         theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
         return theAbiHash
+
+    def sanitizeString(self, _dirtyString):
+        cleanString = re.sub(r"[\n\t\s]*", "", theAbiAsString)
+        return cleanString
 
     def abiCompatabilityUpdate(self, _esAbiSingle, _source):
         print("Processing " + str(self.shaAnAbi(_esAbiSingle)))
