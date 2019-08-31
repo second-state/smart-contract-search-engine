@@ -329,6 +329,11 @@ def sort(_abi):
 abi = json.loads('''[{"type": "zulu", "name": "yankee", "inputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "outputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "anonymous": false, "payable": false, "stateMutability": "view", "constant": true}]''')
 listAbiLength(abi)
 listWholeKeysAndValues(abi)
+abiWithSortedInternals = harvester.sortInternalListsInJsonObject(abi)
+print(abiWithSortedInternals)
+# Need to internally sort the input and output lists of each item first
+
+# Then we can simply sort the outer type, name, inputs, outputs by string representation (because the internal inputs and outputs will already be correct)
 
 
 
