@@ -235,6 +235,7 @@ def listWholeKeysAndValues(_abi):
     for listItem in _abi:
         for k, v in listItem.items():
             print(str(k) + ": " + str(v))
+        print("\n")
     print("\n")
 
 # List types
