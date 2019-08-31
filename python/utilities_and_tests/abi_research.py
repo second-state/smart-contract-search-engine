@@ -326,7 +326,7 @@ def sort(_abi):
 # 
 
 # Simple Testing
-abi = json.loads('''[{"type": "zulu", "name": "yankee", "inputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "outputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "anonymous": false, payable: False, stateMutability: view, constant: True}]''')
+abi = json.loads('''[{"type": "zulu", "name": "yankee", "inputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "outputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "anonymous": false, "payable": false, "stateMutability": "view", "constant": true}]''')
 listAbiLength(abi)
 listWholeKeysAndValues(abi)
 
