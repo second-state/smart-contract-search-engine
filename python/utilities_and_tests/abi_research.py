@@ -290,11 +290,12 @@ def getAbiHash(_abi):
     return str(harvester.web3.toHex(harvester.web3.sha3(text=_abi)))
 
 def compareAbiItems(_itemA, _itemB):
-    return 
+    return ("TODO")
 
 def sort(_abi):
     for listItem in _abi:
         for k, v in listItem.items():
+            print(k)
 
 listAbiLength(erc20Abi)
 listWholeKeysAndValues(erc20Abi)
