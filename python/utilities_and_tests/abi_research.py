@@ -294,10 +294,6 @@ def compareAbiItems(_itemA, _itemB):
     return str(_itemA["type"]) < str(_itemB["type"]) or str(_itemA["type"]) == str(_itemB["type"]) and str(_itemA["name"]) < str(_itemB["name"]) or str(_itemA["name"]) == str(_itemB["name"]) and str(_itemA["inputs"]) < str(_itemB["inputs"]) or str(_itemA["inputs"]) == str(_itemB["inputs"]) and str(_itemA["outputs"]) < str(_itemB["outputs"])
 
 # DRAFT - to be completed and tested
-def compareInternalAbiItems(_itemA, _itemB):
-    return str(_itemA["name"]) < str(_itemB["name"])
-
-# DRAFT - to be completed and tested
 def sort(_abi):
     for listItem in _abi:
         for k, v in listItem.items():
