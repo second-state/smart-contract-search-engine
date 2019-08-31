@@ -297,7 +297,7 @@ listWholeKeysAndValues(erc20Abi)
 #listAbiItemNames(erc20Abi)
 #listAbiItemTypes(erc20Abi)
 #listAbiItemInputs(erc20Abi)
-3listAbiItemOutputs(erc20Abi)
+#listAbiItemOutputs(erc20Abi)
 #listAbiItemPayable(erc20Abi)
 #listAbiItemStateMutability(erc20Abi)
 # Original ABI string
