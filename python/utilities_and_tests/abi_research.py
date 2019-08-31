@@ -299,6 +299,7 @@ originalHash = getAbiHash(originalAbiString)
 print("Original ABI hash:\n" + str(originalHash))
 # Sanitized, yet unsorted ABI string
 sanitizedAbiString = harvester.sanitizeString(originalAbiString)
+print(sanitizedAbiString)
 # Sanitized, yet unsorted ABI hash
 sanitizedHash = getAbiHash(sanitizedAbiString);
 print("Sanitized ABI hash:\n" + str(sanitizedHash))
