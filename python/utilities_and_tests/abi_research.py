@@ -296,12 +296,12 @@ listAbiItemStateMutability(erc20Abi)
 originalAbiString = json.dumps(erc20Abi)
 # Original ABI hash
 originalHash = getAbiHash(originalAbiString)
-print("Original ABI hash" + str(originalHash))
+print("Original ABI hash:\n" + str(originalHash))
 # Sanitized, yet unsorted ABI string
 sanitizedAbiString = harvester.sanitizeString(originalAbiString)
 # Sanitized, yet unsorted ABI hash
 sanitizedHash = getAbiHash(sanitizedAbiString);
-print("Sanitized ABI hash" + str(sanitizedHash))
+print("Sanitized ABI hash:\n" + str(sanitizedHash))
 # 
 
 
