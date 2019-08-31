@@ -298,7 +298,7 @@ originalAbiString = json.dumps(erc20Abi)
 originalHash = getAbiHash(originalAbiString)
 print("Original ABI hash" + str(originalHash))
 # Sanitized, yet unsorted ABI string
-sanitizedAbiString = sanitizeString(originalAbiString)
+sanitizedAbiString = harvester.sanitizeString(originalAbiString)
 # Sanitized, yet unsorted ABI hash
 sanitizedHash = getAbiHash(sanitizedAbiString);
 print("Sanitized ABI hash" + str(sanitizedHash))
