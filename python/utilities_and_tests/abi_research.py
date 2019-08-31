@@ -303,8 +303,9 @@ def sort(_abi):
         for k, v in listItem.items():
             print(k)
 
-listAbiLength(erc20Abi)
-listWholeKeysAndValues(erc20Abi)
+# ERC20 Testing
+#listAbiLength(erc20Abi)
+#listWholeKeysAndValues(erc20Abi)
 #listAbiItemNames(erc20Abi)
 #listAbiItemTypes(erc20Abi)
 #listAbiItemInputs(erc20Abi)
@@ -312,19 +313,26 @@ listWholeKeysAndValues(erc20Abi)
 #listAbiItemPayable(erc20Abi)
 #listAbiItemStateMutability(erc20Abi)
 # Original ABI string
-originalAbiString = json.dumps(erc20Abi)
+#originalAbiString = json.dumps(erc20Abi)
 # Original ABI hash
-originalHash = getAbiHash(originalAbiString)
+#originalHash = getAbiHash(originalAbiString)
 #print("Original ABI hash:\n" + str(originalHash))
 # Sanitized, yet unsorted ABI string
-sanitizedAbiString = harvester.sanitizeString(originalAbiString)
+#sanitizedAbiString = harvester.sanitizeString(originalAbiString)
 #print(sanitizedAbiString)
 # Sanitized, yet unsorted ABI hash
-sanitizedHash = getAbiHash(sanitizedAbiString);
+#sanitizedHash = getAbiHash(sanitizedAbiString);
 #print("Sanitized ABI hash:\n" + str(sanitizedHash))
 # 
 
+# Simple Testing
+abi = json.loads('''[{"type": "zulu", "name": "yankee", "inputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "outputs": [{"name": "zulu", "type": "zulu"}, {"name": "yankee", "type": "yankee"}], "anonymous": false, payable: False, stateMutability: view, constant: True}]''')
+listAbiLength(abi)
+listWholeKeysAndValues(abi)
 
+
+
+# Background
 # https://github.com/ethereum/solidity/issues/2731
 # I suggest that we sort it deterministically as follows: lexicographic sorting by the values of the following keys:
 
