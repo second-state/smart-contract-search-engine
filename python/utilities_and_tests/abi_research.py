@@ -292,8 +292,18 @@ listAbiItemInputs(erc20Abi)
 listAbiItemOutputs(erc20Abi)
 listAbiItemPayable(erc20Abi)
 listAbiItemStateMutability(erc20Abi)
-originalHash = getAbiHash(erc20Abi);
-print(originalHash)
+# Original ABI string
+originalAbiString = json.dumps(erc20Abi)
+# Original ABI hash
+originalHash = getAbiHash(originalAbiString)
+print("Original ABI hash" + str(originalHash))
+# Sanitized, yet unsorted ABI string
+sanitizedAbiString = sanitizeString(originalAbiString)
+# Sanitized, yet unsorted ABI hash
+sanitizedHash = getAbiHash(sanitizedAbiString);
+print("Sanitized ABI hash" + str(sanitizedHash))
+# 
+
 
 # https://github.com/ethereum/solidity/issues/2731
 # I suggest that we sort it deterministically as follows: lexicographic sorting by the values of the following keys:
