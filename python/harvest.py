@@ -294,7 +294,7 @@ class Harvest:
         return theAbiHash
 
     def sanitizeString(self, _dirtyString):
-        cleanString = re.sub(r"[\n\t\s]*", "", theAbiAsString)
+        cleanString = re.sub(r"[\n\t\s]*", "", _dirtyString)
         return cleanString
 
     def abiCompatabilityUpdate(self, _esAbiSingle, _source):
