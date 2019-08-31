@@ -292,7 +292,7 @@ listAbiItemInputs(erc20Abi)
 listAbiItemOutputs(erc20Abi)
 listAbiItemPayable(erc20Abi)
 listAbiItemStateMutability(erc20Abi)
-originalHash = hashAbi(erc20Abi);
+originalHash = getAbiHash(erc20Abi);
 print(originalHash)
 
 # https://github.com/ethereum/solidity/issues/2731
