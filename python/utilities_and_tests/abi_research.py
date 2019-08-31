@@ -292,6 +292,10 @@ def getAbiHash(_abi):
 def compareAbiItems(_itemA, _itemB):
     return 
 
+def sort(_abi):
+    for listItem in _abi:
+        for k, v in listItem.items():
+
 listAbiLength(erc20Abi)
 listWholeKeysAndValues(erc20Abi)
 #listAbiItemNames(erc20Abi)
