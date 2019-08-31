@@ -230,6 +230,12 @@ def listAbiLength(_abi):
     print("The ABI has " + str(len(_abi)) + " items.")
     print("\n")
 
+# List outputs
+def listWholeKeysAndValues(_abi):
+    for listItem in _abi:
+        for k, v in listItem.items():
+            print(str(k) + ": " + str(v))
+    print("\n")
 
 # List types
 def listAbiItemTypes(_abi):
@@ -283,9 +289,8 @@ def getAbiHash(_abi):
     return str(harvester.web3.toHex(harvester.web3.sha3(text=_abi)))
 
 
-
-
 listAbiLength(erc20Abi)
+listWholeKeysAndValues(erc20Abi)
 listAbiItemNames(erc20Abi)
 listAbiItemTypes(erc20Abi)
 listAbiItemInputs(erc20Abi)
