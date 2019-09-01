@@ -343,7 +343,49 @@ abi = json.loads('''[{
     "payable": false,
     "stateMutability": "view",
     "constant": true
+},{
+    "type": "zulu",
+    "name": "yankee",
+    "inputs": [{
+        "name": "delta",
+        "type": "delta"
+    }, {
+        "name": "charlie",
+        "type": "charlie"
+    }],
+    "outputs": [{
+        "name": "zulu",
+        "type": "zulu"
+    }, {
+        "name": "yankee",
+        "type": "yankee"
+    }],
+    "anonymous": false,
+    "payable": false,
+    "stateMutability": "view",
+    "constant": true
 }, {
+    "type": "alpha",
+    "name": "beta",
+    "inputs": [{
+        "name": "beta",
+        "type": "beta"
+    }, {
+        "name": "alpha",
+        "type": "alpha"
+    }],
+    "outputs": [{
+        "name": "beta",
+        "type": "beta"
+    }, {
+        "name": "aplha",
+        "type": "alpha"
+    }],
+    "anonymous": false,
+    "payable": false,
+    "stateMutability": "view",
+    "constant": true
+}{
     "type": "yankee",
     "name": "xray",
     "inputs": [{
