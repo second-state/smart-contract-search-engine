@@ -407,12 +407,21 @@ abi = json.loads('''[{
     "stateMutability": "view",
     "constant": true
 }]''')
+
+# Initialization
 listAbiLength(abi)
-listWholeKeysAndValues(abi)
-print(abi)
-abiWithSortedInternals = harvester.sortInternalListsInJsonObject(abi)
-print(abiWithSortedInternals)
+# Print current order of inputs
+listAbiItemInputs(abi)
+# Print current order of outputs
+listAbiItemOutputs(abi)
 # Need to internally sort the input and output lists of each item first
+# Order internal lists (inputs and outputs by the value component of the "name" key)
+abiWithSortedInternals = harvester.sortInternalListsInJsonObject(abi)
+# Print newly ordered inputs
+listAbiItemInputs(abiWithSortedInternals)
+# Print newly ordered outputs
+listAbiItemOutputs(abiWithSortedInternals)
+
 
 # Then we can simply sort the outer type, name, inputs, outputs by string representation (because the internal inputs and outputs will already be correct)
 
