@@ -329,12 +329,12 @@ abi = json.loads('''[{
         "name": "zulu",
         "type": "zulu"
     }, {
-        "name": "yankee",
-        "type": "yankee"
+        "name": "oscar",
+        "type": "oscar"
     }],
     "outputs": [{
-        "name": "zulu",
-        "type": "zulu"
+        "name": "golf",
+        "type": "golf"
     }, {
         "name": "yankee",
         "type": "yankee"
@@ -396,8 +396,8 @@ abi = json.loads('''[{
         "type": "yankee"
     }],
     "outputs": [{
-        "name": "zulu",
-        "type": "zulu"
+        "name": "november",
+        "type": "november"
     }, {
         "name": "yankee",
         "type": "yankee"
