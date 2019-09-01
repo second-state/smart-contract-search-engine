@@ -411,15 +411,19 @@ abi = json.loads('''[{
 # Initialization
 listAbiLength(abi)
 # Print current order of inputs
+print("Unsorted inputs")
 listAbiItemInputs(abi)
 # Print current order of outputs
+print("Unsorted outputs")
 listAbiItemOutputs(abi)
 # Need to internally sort the input and output lists of each item first
 # Order internal lists (inputs and outputs by the value component of the "name" key)
 abiWithSortedInternals = harvester.sortInternalListsInJsonObject(abi)
 # Print newly ordered inputs
+print("Sorted inputs")
 listAbiItemInputs(abiWithSortedInternals)
 # Print newly ordered outputs
+print("Sorted outputs")
 listAbiItemOutputs(abiWithSortedInternals)
 
 
