@@ -392,6 +392,12 @@ abi = json.loads('''[{
     "type": "yankee",
     "name": "xray",
     "inputs": [{
+        "name": "",
+        "type": "uint256"
+    },{
+        "name": "",
+        "type": "address"
+    },{
         "name": "zulu",
         "type": "address"
     }, {
