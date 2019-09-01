@@ -385,7 +385,7 @@ abi = json.loads('''[{
     "payable": false,
     "stateMutability": "view",
     "constant": true
-}{
+},{
     "type": "yankee",
     "name": "xray",
     "inputs": [{
