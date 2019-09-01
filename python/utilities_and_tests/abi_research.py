@@ -327,14 +327,20 @@ abi = json.loads('''[{
     "name": "yankee",
     "inputs": [{
         "name": "oscar",
-        "type": "oscar"
+        "type": "uint256"
     }],
     "outputs": [{
         "name": "golf",
-        "type": "golf"
+        "type": "uint256"
     }, {
+        "name": "",
+        "type": "address"
+    },{
+        "name": "_golf",
+        "type": "address"
+    },{
         "name": "yankee",
-        "type": "yankee"
+        "type": "uint256"
     }],
     "anonymous": false,
     "payable": false,
@@ -345,17 +351,17 @@ abi = json.loads('''[{
     "name": "yankee",
     "inputs": [{
         "name": "delta",
-        "type": "delta"
+        "type": "uint256"
     }, {
         "name": "charlie",
-        "type": "charlie"
+        "type": "address"
     }],
     "outputs": [{
         "name": "zulu",
-        "type": "zulu"
+        "type": "address"
     }, {
         "name": "yankee",
-        "type": "yankee"
+        "type": "uint256"
     }],
     "anonymous": false,
     "payable": false,
@@ -366,17 +372,17 @@ abi = json.loads('''[{
     "name": "beta",
     "inputs": [{
         "name": "alpha",
-        "type": "alpha"
+        "type": "uint256"
     }, {
         "name": "beta",
-        "type": "beta"
+        "type": "address"
     }],
     "outputs": [{
         "name": "beta",
-        "type": "beta"
+        "type": "address"
     }, {
         "name": "aplha",
-        "type": "alpha"
+        "type": "address"
     }],
     "anonymous": false,
     "payable": false,
@@ -387,14 +393,14 @@ abi = json.loads('''[{
     "name": "xray",
     "inputs": [{
         "name": "zulu",
-        "type": "zulu"
+        "type": "address"
     }, {
         "name": "yankee",
-        "type": "yankee"
+        "type": "uint256"
     }],
     "outputs": [{
         "name": "november",
-        "type": "november"
+        "type": "address"
     }],
     "anonymous": false,
     "payable": false,
