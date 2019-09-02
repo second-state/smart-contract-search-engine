@@ -3,7 +3,7 @@ from harvest import Harvest
 harvester = Harvest()
 
 # ERC20 ABI
-erc20Abi = json.loads('''[
+abi = json.loads('''[
     {
         "constant": true,
         "inputs": [],
@@ -322,97 +322,97 @@ def sort(_abi):
 # 
 
 # Simple Testing
-abi = json.loads('''[{
-    "type": "zulu",
-    "name": "yankee",
-    "inputs": [{
-        "name": "oscar",
-        "type": "uint256"
-    }],
-    "outputs": [{
-        "name": "golf",
-        "type": "uint256"
-    }, {
-        "name": "",
-        "type": "address"
-    },{
-        "name": "_golf",
-        "type": "address"
-    },{
-        "name": "yankee",
-        "type": "uint256"
-    }],
-    "anonymous": false,
-    "payable": false,
-    "stateMutability": "view",
-    "constant": true
-},{
-    "type": "zulu",
-    "name": "yankee",
-    "inputs": [{
-        "name": "delta",
-        "type": "uint256"
-    }, {
-        "name": "charlie",
-        "type": "address"
-    }],
-    "outputs": [{
-        "name": "zulu",
-        "type": "address"
-    }, {
-        "name": "yankee",
-        "type": "uint256"
-    }],
-    "anonymous": false,
-    "payable": false,
-    "stateMutability": "view",
-    "constant": true
-}, {
-    "type": "alpha",
-    "name": "beta",
-    "inputs": [{
-        "name": "alpha",
-        "type": "uint256"
-    }, {
-        "name": "beta",
-        "type": "address"
-    }],
-    "outputs": [{
-        "name": "beta",
-        "type": "address"
-    }, {
-        "name": "aplha",
-        "type": "address"
-    }],
-    "anonymous": false,
-    "payable": false,
-    "stateMutability": "view",
-    "constant": true
-},{
-    "type": "yankee",
-    "name": "xray",
-    "inputs": [{
-        "name": "",
-        "type": "uint256"
-    },{
-        "name": "",
-        "type": "address"
-    },{
-        "name": "zulu",
-        "type": "address"
-    }, {
-        "name": "yankee",
-        "type": "uint256"
-    }],
-    "outputs": [{
-        "name": "november",
-        "type": "address"
-    }],
-    "anonymous": false,
-    "payable": false,
-    "stateMutability": "view",
-    "constant": true
-}]''')
+# abi = json.loads('''[{
+#     "type": "zulu",
+#     "name": "yankee",
+#     "inputs": [{
+#         "name": "oscar",
+#         "type": "uint256"
+#     }],
+#     "outputs": [{
+#         "name": "golf",
+#         "type": "uint256"
+#     }, {
+#         "name": "",
+#         "type": "address"
+#     },{
+#         "name": "_golf",
+#         "type": "address"
+#     },{
+#         "name": "yankee",
+#         "type": "uint256"
+#     }],
+#     "anonymous": false,
+#     "payable": false,
+#     "stateMutability": "view",
+#     "constant": true
+# },{
+#     "type": "zulu",
+#     "name": "yankee",
+#     "inputs": [{
+#         "name": "delta",
+#         "type": "uint256"
+#     }, {
+#         "name": "charlie",
+#         "type": "address"
+#     }],
+#     "outputs": [{
+#         "name": "zulu",
+#         "type": "address"
+#     }, {
+#         "name": "yankee",
+#         "type": "uint256"
+#     }],
+#     "anonymous": false,
+#     "payable": false,
+#     "stateMutability": "view",
+#     "constant": true
+# }, {
+#     "type": "alpha",
+#     "name": "beta",
+#     "inputs": [{
+#         "name": "alpha",
+#         "type": "uint256"
+#     }, {
+#         "name": "beta",
+#         "type": "address"
+#     }],
+#     "outputs": [{
+#         "name": "beta",
+#         "type": "address"
+#     }, {
+#         "name": "aplha",
+#         "type": "address"
+#     }],
+#     "anonymous": false,
+#     "payable": false,
+#     "stateMutability": "view",
+#     "constant": true
+# },{
+#     "type": "yankee",
+#     "name": "xray",
+#     "inputs": [{
+#         "name": "",
+#         "type": "uint256"
+#     },{
+#         "name": "",
+#         "type": "address"
+#     },{
+#         "name": "zulu",
+#         "type": "address"
+#     }, {
+#         "name": "yankee",
+#         "type": "uint256"
+#     }],
+#     "outputs": [{
+#         "name": "november",
+#         "type": "address"
+#     }],
+#     "anonymous": false,
+#     "payable": false,
+#     "stateMutability": "view",
+#     "constant": true
+# }]''')
 
 
 def sortInternalListsInJsonObject(_json):
