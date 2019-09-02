@@ -414,8 +414,25 @@ abi = json.loads('''[{
     "constant": true
 }]''')
 
-# Initialization
-listAbiLength(abi)
+
+def sortInternalListsInJsonObject(_json):
+    for listItem in _json:
+        for k, v in listItem.items():
+            if type(v) not in (str, bool, int) and len(v) > 1:
+                if type(v[0]) is dict:
+                    v.sort(key=itemgetter("name", "type"))
+                else:
+                    v.sort()
+    return _json
+
+def sortTopLevelInJsonObject(_json):
+    _json.sort(key=itemgetter("type", "name"))
+    return _json
+
+print("\Original ABI is as follows")
+print("-START-")
+print(abi)
+print("-END-\n")
 # Print current order of inputs
 print("Unsorted inputs")
 listAbiItemInputs(abi)
@@ -424,7 +441,7 @@ print("Unsorted outputs")
 listAbiItemOutputs(abi)
 # Need to internally sort the input and output lists of each item first
 # Order internal lists (inputs and outputs by the value component of the "name" key)
-abiWithSortedInternals = harvester.sortInternalListsInJsonObject(abi)
+abiWithSortedInternals = sortInternalListsInJsonObject(abi)
 # Print newly ordered inputs
 print("Sorted inputs")
 listAbiItemInputs(abiWithSortedInternals)
@@ -432,9 +449,13 @@ listAbiItemInputs(abiWithSortedInternals)
 print("Sorted outputs")
 listAbiItemOutputs(abiWithSortedInternals)
 # Sort outer items by type, then name
-sortedAbi = harvester.sortTopLevelInJsonObject(abiWithSortedInternals)
+sortedAbi = sortTopLevelInJsonObject(abiWithSortedInternals)
 print("Top level sort complete")
 listWholeKeysAndValues(sortedAbi)
+print("\nSorted ABI is as follows")
+print("-START-")
+print(sortedAbi)
+print("-END-\n")
 
 # Then we can simply sort the outer type, name, inputs, outputs by string representation (because the internal inputs and outputs will already be correct)
 
