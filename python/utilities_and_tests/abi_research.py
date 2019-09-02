@@ -1,5 +1,7 @@
 import re
 import json
+# sudo apt-get -y install python3-pip
+# python3.6 -m pip install py-evm --user
 from ethereum.utils import sha3
 
 # ERC20 ABI
