@@ -1,4 +1,6 @@
+import re
 import json
+from ethereum.utils import sha3
 
 # ERC20 ABI
 abi = json.loads('''[
@@ -325,6 +327,14 @@ def sortInternalListsInJsonObject(_json):
                 print(str(v) + " is not a list, moving on ...")
     return _json
 
+def sanitizeString(_originalString):
+    newString = re.sub(r"[\n\t\s]*", "", _originalString)
+    return newString
+
+def hashString(_string):
+    hashOfString = sha3(_string).hex()
+    return hashOfString
+
 def sortingReport(_abi):
     for listItem in _abi:
         typeOuter = ""
@@ -375,13 +385,13 @@ print("Top level sort complete")
 listWholeKeysAndValues(sortedAbi)
 print("\nSorted ABI is as follows")
 print("-START-")
-print(sortedAbi)
+print(json.dumps(sortedAbi))
 print("-END-\n")
 print("Breakdown of sorting")
 sortingReport(sortedAbi)
 
-listAbiLength(abi)
-listAbiLength(sortedAbi)
+sanitizedString = sanitizeString(json.dumps(sortedAbi))
+hashOfAbi = hashString(sanitizedString)
 
 
 
