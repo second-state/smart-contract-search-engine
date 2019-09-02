@@ -1,6 +1,5 @@
 import json
-from harvest import Harvest
-harvester = Harvest()
+from operator import itemgetter
 
 # ERC20 ABI
 abi = json.loads('''[
@@ -286,135 +285,6 @@ def listAbiItemStateMutability(_abi):
                 print(str(k) + ": " + str(v))
     print("\n")
 
-def getAbiHash(_abi):
-    return str(harvester.web3.toHex(harvester.web3.sha3(text=_abi)))
-
-# DRAFT - to be completed and tested
-def compareAbiItems(_itemA, _itemB):
-    return str(_itemA["type"]) < str(_itemB["type"]) or str(_itemA["type"]) == str(_itemB["type"]) and str(_itemA["name"]) < str(_itemB["name"]) or str(_itemA["name"]) == str(_itemB["name"]) and str(_itemA["inputs"]) < str(_itemB["inputs"]) or str(_itemA["inputs"]) == str(_itemB["inputs"]) and str(_itemA["outputs"]) < str(_itemB["outputs"])
-
-# DRAFT - to be completed and tested
-def sort(_abi):
-    for listItem in _abi:
-        for k, v in listItem.items():
-            print(k)
-
-# ERC20 Testing
-#listAbiLength(erc20Abi)
-#listWholeKeysAndValues(erc20Abi)
-#listAbiItemNames(erc20Abi)
-#listAbiItemTypes(erc20Abi)
-#listAbiItemInputs(erc20Abi)
-#listAbiItemOutputs(erc20Abi)
-#listAbiItemPayable(erc20Abi)
-#listAbiItemStateMutability(erc20Abi)
-# Original ABI string
-#originalAbiString = json.dumps(erc20Abi)
-# Original ABI hash
-#originalHash = getAbiHash(originalAbiString)
-#print("Original ABI hash:\n" + str(originalHash))
-# Sanitized, yet unsorted ABI string
-#sanitizedAbiString = harvester.sanitizeString(originalAbiString)
-#print(sanitizedAbiString)
-# Sanitized, yet unsorted ABI hash
-#sanitizedHash = getAbiHash(sanitizedAbiString);
-#print("Sanitized ABI hash:\n" + str(sanitizedHash))
-# 
-
-# Simple Testing
-# abi = json.loads('''[{
-#     "type": "zulu",
-#     "name": "yankee",
-#     "inputs": [{
-#         "name": "oscar",
-#         "type": "uint256"
-#     }],
-#     "outputs": [{
-#         "name": "golf",
-#         "type": "uint256"
-#     }, {
-#         "name": "",
-#         "type": "address"
-#     },{
-#         "name": "_golf",
-#         "type": "address"
-#     },{
-#         "name": "yankee",
-#         "type": "uint256"
-#     }],
-#     "anonymous": false,
-#     "payable": false,
-#     "stateMutability": "view",
-#     "constant": true
-# },{
-#     "type": "zulu",
-#     "name": "yankee",
-#     "inputs": [{
-#         "name": "delta",
-#         "type": "uint256"
-#     }, {
-#         "name": "charlie",
-#         "type": "address"
-#     }],
-#     "outputs": [{
-#         "name": "zulu",
-#         "type": "address"
-#     }, {
-#         "name": "yankee",
-#         "type": "uint256"
-#     }],
-#     "anonymous": false,
-#     "payable": false,
-#     "stateMutability": "view",
-#     "constant": true
-# }, {
-#     "type": "alpha",
-#     "name": "beta",
-#     "inputs": [{
-#         "name": "alpha",
-#         "type": "uint256"
-#     }, {
-#         "name": "beta",
-#         "type": "address"
-#     }],
-#     "outputs": [{
-#         "name": "beta",
-#         "type": "address"
-#     }, {
-#         "name": "aplha",
-#         "type": "address"
-#     }],
-#     "anonymous": false,
-#     "payable": false,
-#     "stateMutability": "view",
-#     "constant": true
-# },{
-#     "type": "yankee",
-#     "name": "xray",
-#     "inputs": [{
-#         "name": "",
-#         "type": "uint256"
-#     },{
-#         "name": "",
-#         "type": "address"
-#     },{
-#         "name": "zulu",
-#         "type": "address"
-#     }, {
-#         "name": "yankee",
-#         "type": "uint256"
-#     }],
-#     "outputs": [{
-#         "name": "november",
-#         "type": "address"
-#     }],
-#     "anonymous": false,
-#     "payable": false,
-#     "stateMutability": "view",
-#     "constant": true
-# }]''')
-
-
 def sortInternalListsInJsonObject(_json):
     for listItem in _json:
         for k, v in listItem.items():
@@ -429,7 +299,7 @@ def sortTopLevelInJsonObject(_json):
     _json.sort(key=itemgetter("type", "name"))
     return _json
 
-print("\Original ABI is as follows")
+print("\nOriginal ABI is as follows")
 print("-START-")
 print(abi)
 print("-END-\n")
@@ -456,24 +326,3 @@ print("\nSorted ABI is as follows")
 print("-START-")
 print(sortedAbi)
 print("-END-\n")
-
-# Then we can simply sort the outer type, name, inputs, outputs by string representation (because the internal inputs and outputs will already be correct)
-
-
-
-# Background
-# https://github.com/ethereum/solidity/issues/2731
-# I suggest that we sort it deterministically as follows: lexicographic sorting by the values of the following keys:
-
-# type
-# name
-# inputs
-# outputs
-# That means the usual order will be something like:
-
-# constructor
-# event(address, address)
-# event(uint, address)
-# fallback
-# function(address, address)
-# function(uint, address)
