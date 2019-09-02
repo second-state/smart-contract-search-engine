@@ -431,7 +431,10 @@ listAbiItemInputs(abiWithSortedInternals)
 # Print newly ordered outputs
 print("Sorted outputs")
 listAbiItemOutputs(abiWithSortedInternals)
-
+# Sort outer items by type, then name
+sortedAbi = harvester.sortTopLevelInJsonObject(abiWithSortedInternals)
+print("Top level sort complete")
+listWholeKeysAndValues(sortedAbi)
 
 # Then we can simply sort the outer type, name, inputs, outputs by string representation (because the internal inputs and outputs will already be correct)
 
