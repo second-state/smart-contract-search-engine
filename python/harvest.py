@@ -276,7 +276,8 @@ class Harvest:
             for k, v in listItem.items():
                 if type(v) not in (str, bool, int) and len(v) > 1:
                     if type(v[0]) is dict:
-                        v.sort(key=itemgetter("name"))
+                        # Trying native multi-level sort
+                        v.sort(key=itemgetter("name", "type"))
                     else:
                         v.sort()
         return _json
