@@ -283,7 +283,7 @@ class Harvest:
         return _json
 
     def sortTopLevelInJsonObject(self, _json):
-        _json.sort(key=itemgetter("type", "name", "inputs", "outputs"))
+        _json.sort(key=itemgetter("type", "name"))
         return _json
 
     def cleanAndConvertAbiToText(self, _theAbi):
