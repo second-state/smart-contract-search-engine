@@ -296,7 +296,8 @@ def sortInternalListsInJsonObject(_json):
     return _json
 
 def sortTopLevelInJsonObject(_json):
-    _json.sort(key=lambda x: x.get('type'), x.get('name'))
+    _json = sorted(_json, key = lambda x: (x['type'], x['name']))
+    #_json.sort(key=lambda x: x.get('type'), x.get('name'))
     #_json.sort(key=itemgetter("type", "name"))
     return _json
 
