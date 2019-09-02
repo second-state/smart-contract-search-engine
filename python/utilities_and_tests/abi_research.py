@@ -1,5 +1,4 @@
 import json
-from operator import itemgetter
 
 # ERC20 ABI
 abi = json.loads('''[
@@ -285,21 +284,71 @@ def listAbiItemStateMutability(_abi):
                 print(str(k) + ": " + str(v))
     print("\n")
 
+# Compare two items and return a bool
+def compareItems(a, b):
+    try:
+        if str(a['type']) > str(b['type']):
+            return True
+        if str(a['name']) > str(b['name']):
+            return True
+    except:
+        # Caters for cases where the name is not present i.e. a fallback function
+        if str(a['type']) > str(b['type']):
+            return True
+    return False
+
+# Sort a given json object
+def sort(_json):
+    for passnum in range(len(_json)-1,0,-1):
+        for item in range(len(_json) - 1):
+            if compareItems(_json[item], _json[item+1]) == True:
+                temp = _json[item]
+                _json[item] = _json[item+1]
+                _json[item+1] = temp
+    return _json
+
 def sortInternalListsInJsonObject(_json):
     for listItem in _json:
         for k, v in listItem.items():
-            if type(v) not in (str, bool, int) and len(v) > 1:
-                if type(v[0]) is dict:
-                    v.sort(key=itemgetter("name", "type"))
+            print("Processing " + str(v))
+            # Qualify the value as a list of JSON objects
+            if type(v) not in (str, bool, int):
+                # Qualify list as needing sorting (contains more than one item)
+                if len(v) > 1:
+                    # Qualify the sortable data is JSON
+                    if type(v[0]) is dict:
+                        print("Processing " + str(v))
+                        sort(v)
                 else:
-                    v.sort()
+                    print("Not enough items in the list to sort, moving on")
+            else:
+                print(str(v) + " is not a list, moving on ...")
     return _json
 
-def sortTopLevelInJsonObject(_json):
-    _json = sorted(_json, key = lambda x: (x['type'], x['name']))
-    #_json.sort(key=lambda x: x.get('type'), x.get('name'))
-    #_json.sort(key=itemgetter("type", "name"))
-    return _json
+def sortingReport(_abi):
+    for listItem in _abi:
+        typeOuter = ""
+        nameOuter = ""
+        inputs = ""
+        outputs = ""
+        for k, v in listItem.items():
+            if str(k) == "type":
+                typeOuter = str(v)
+            if str(k) == "name":
+                nameOuter = str(v)
+            if type(v) not in (str, bool, int):
+                if len(v) >=1:
+                    if type(v[0]) is dict:
+                        if str(k) == "inputs":
+                            inputs = str(v)
+                        if str(k) == "outputs":
+                            outputs = str(v)
+
+        print("Type: " + typeOuter)
+        print("Name: " + nameOuter)
+        print("Inputs" + inputs)
+        print("Outputs" + outputs)
+        print("\n")
 
 print("\nOriginal ABI is as follows")
 print("-START-")
@@ -321,10 +370,18 @@ listAbiItemInputs(abiWithSortedInternals)
 print("Sorted outputs")
 listAbiItemOutputs(abiWithSortedInternals)
 # Sort outer items by type, then name
-sortedAbi = sortTopLevelInJsonObject(abiWithSortedInternals)
+sortedAbi = sort(abiWithSortedInternals)
 print("Top level sort complete")
 listWholeKeysAndValues(sortedAbi)
 print("\nSorted ABI is as follows")
 print("-START-")
 print(sortedAbi)
 print("-END-\n")
+print("Breakdown of sorting")
+sortingReport(sortedAbi)
+
+listAbiLength(abi)
+listAbiLength(sortedAbi)
+
+
+
