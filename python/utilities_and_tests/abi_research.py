@@ -137,10 +137,10 @@ def sortingReport(_abi):
 # Test the sorting and hashing of all ABIs in the abiUrls list (please add any new oddly ordered ABIs to that list so that we can ensure this code is robust)
 for singleAbiUrl in abiUrls:
     singleAbiString = requests.get(singleAbiUrl).content
-    singleAbiJSON = json.loads(singleAbiData)
+    singleAbiJSON = json.loads(singleAbiString)
     abiWithSortedInternals = sortInternalListsInJsonObject(singleAbiJSON)
     abiFullySorted = sort(abiWithSortedInternals)
-    sanitizedString = harvester.sanitizeString(json.dumps(sortedAbi))
+    sanitizedString = harvester.sanitizeString(json.dumps(abiFullySorted))
     hashOfAbi = harvester.createHashFromString(sanitizedString)
     print(hashOfAbi)
 
