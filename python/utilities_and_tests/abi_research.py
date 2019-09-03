@@ -384,6 +384,7 @@ print("Breakdown of sorting")
 sortingReport(sortedAbi)
 # Sanitize string i.e. no additional characters aside from the keys, values and mandatory structural JSON characters like []{},; etc.
 sanitizedString = harvester.sanitizeString(json.dumps(sortedAbi))
+print(sanitizedString)
 # Create hash
 hashOfAbi = harvester.createHashFromString(sanitizedString)
 print(hashOfAbi)
