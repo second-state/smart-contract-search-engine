@@ -1,231 +1,12 @@
 import re
 import json
+import requests
 from harvest import Harvest
 harvester = Harvest()
 
-# ERC20 ABI
-abi = json.loads('''[
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "name",
-        "outputs": [
-            {
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_spender",
-                "type": "address"
-            },
-            {
-                "name": "_value",
-                "type": "uint256"
-            }
-        ],
-        "name": "approve",
-        "outputs": [
-            {
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "totalSupply",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_from",
-                "type": "address"
-            },
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_value",
-                "type": "uint256"
-            }
-        ],
-        "name": "transferFrom",
-        "outputs": [
-            {
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "_owner",
-                "type": "address"
-            }
-        ],
-        "name": "balanceOf",
-        "outputs": [
-            {
-                "name": "balance",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [],
-        "name": "symbol",
-        "outputs": [
-            {
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "name": "_to",
-                "type": "address"
-            },
-            {
-                "name": "_value",
-                "type": "uint256"
-            }
-        ],
-        "name": "transfer",
-        "outputs": [
-            {
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "constant": true,
-        "inputs": [
-            {
-                "name": "_owner",
-                "type": "address"
-            },
-            {
-                "name": "_spender",
-                "type": "address"
-            }
-        ],
-        "name": "allowance",
-        "outputs": [
-            {
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "payable": true,
-        "stateMutability": "payable",
-        "type": "fallback"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "name": "spender",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "Approval",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": true,
-                "name": "to",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "name": "value",
-                "type": "uint256"
-            }
-        ],
-        "name": "Transfer",
-        "type": "event"
-    }
-]''')
+# RAW text of ABIs for sorting and hashing
+abiUrls = []
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/erc20abi.txt")
 
 def listAbiLength(_abi):
     print("The ABI has " + str(len(_abi)) + " items.")
@@ -353,41 +134,16 @@ def sortingReport(_abi):
         print("Outputs" + outputs)
         print("\n")
 
-print("\nOriginal ABI is as follows")
-print("-START-")
-print(abi)
-print("-END-\n")
-# Print current order of inputs
-print("Unsorted inputs")
-listAbiItemInputs(abi)
-# Print current order of outputs
-print("Unsorted outputs")
-listAbiItemOutputs(abi)
-# Need to internally sort the input and output lists of each item first
-# Order internal lists (inputs and outputs by the value component of the "name" key)
-abiWithSortedInternals = sortInternalListsInJsonObject(abi)
-# Print newly ordered inputs
-print("Sorted inputs")
-listAbiItemInputs(abiWithSortedInternals)
-# Print newly ordered outputs
-print("Sorted outputs")
-listAbiItemOutputs(abiWithSortedInternals)
-# Sort outer items by type, then name
-sortedAbi = sort(abiWithSortedInternals)
-print("Top level sort complete")
-listWholeKeysAndValues(sortedAbi)
-print("\nSorted ABI is as follows")
-print("-START-")
-print(json.dumps(sortedAbi))
-print("-END-\n")
-print("Breakdown of sorting")
-sortingReport(sortedAbi)
-# Sanitize string i.e. no additional characters aside from the keys, values and mandatory structural JSON characters like []{},; etc.
-sanitizedString = harvester.sanitizeString(json.dumps(sortedAbi))
-print(sanitizedString)
-# Create hash
-hashOfAbi = harvester.createHashFromString(sanitizedString)
-print(hashOfAbi)
+# Test the sorting and hashing of all ABIs in the abiUrls list (please add any new oddly ordered ABIs to that list so that we can ensure this code is robust)
+for singleAbiUrl in abiUrls:
+    singleAbiString = requests.get(singleAbiUrl).content
+    singleAbiJSON = json.loads(singleAbiData)
+    abiWithSortedInternals = sortInternalListsInJsonObject(singleAbiJSON)
+    abiFullySorted = sort(abiWithSortedInternals)
+    sanitizedString = harvester.sanitizeString(json.dumps(sortedAbi))
+    hashOfAbi = harvester.createHashFromString(sanitizedString)
+    print(hashOfAbi)
+
 
 
 
