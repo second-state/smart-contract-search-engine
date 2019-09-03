@@ -92,6 +92,23 @@ def sort(_json):
                 _json[item+1] = temp
     return _json
 
+# Compare two items and return a bool
+def compareKeys(a, b):
+    if str(a) > str(b):
+        return True
+    return False
+
+# Sort a given json object
+def sortABIKeys(_json):
+    for listItem in _json:
+        for passnum in range(len(listItem)-1,0,-1):
+            for item in range(len(listItem) - 1):
+                if compareKeys(_json[item], _json[item+1]) == True:
+                    temp = _json[item]
+                    _json[item] = _json[item+1]
+                    _json[item+1] = temp
+    return _json
+
 def sortInternalListsInJsonObject(_json):
     for listItem in _json:
         for k, v in listItem.items():
@@ -141,7 +158,8 @@ for singleAbiUrl in abiUrls:
     singleAbiString = requests.get(singleAbiUrl).content
     singleAbiJSON = json.loads(singleAbiString)
     abiWithSortedInternals = sortInternalListsInJsonObject(singleAbiJSON)
-    abiFullySorted = sort(abiWithSortedInternals)
+    abiWithSortedKeys = sortABIKeys(abiWithSortedInternals)
+    abiFullySorted = sort(abiWithSortedKeys)
     sanitizedString = harvester.sanitizeString(json.dumps(abiFullySorted))
     print("ABI")
     print(sanitizedString)
