@@ -94,6 +94,7 @@ def sort(_json):
 
 # Compare two items and return a bool
 def compareKeys(a, b):
+    print("Comparing " + str(a) + " and " + str(b))
     if str(a) > str(b):
         return True
     return False
