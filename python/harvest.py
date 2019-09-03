@@ -293,6 +293,8 @@ class Harvest:
         theAbiAsString3 = re.sub(r"[\s]+", " ", theAbiAsString2)
         return theAbiAsString3
 
+    # Warning, this function allows for single spaces and therefore is not sanitized/normalized
+    # Use sanitizeString and createHashFromString to get full sanitized version of ABI
     def shaAnAbi(self, _theAbi):
         theAbiAsString = self.cleanAndConvertAbiToText(_theAbi)
         theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
@@ -301,6 +303,10 @@ class Harvest:
     def sanitizeString(self, _dirtyString):
         cleanString = re.sub(r"[\n\t\s]*", "", _dirtyString)
         return cleanString
+
+    def createHashFromString(self, _stringToHash):
+        hashedString = str(self.web3.toHex(self.web3.sha3(text=_stringToHash)))
+        return hashedString
 
     def abiCompatabilityUpdate(self, _esAbiSingle, _source):
         print("Processing " + str(self.shaAnAbi(_esAbiSingle)))
