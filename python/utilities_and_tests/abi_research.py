@@ -102,13 +102,14 @@ def compareKeys(a, b):
 # Sort a given json object
 def sortABIKeys(_json):
     for listItem in _json:
-        for passnum in range(len(listItem)-1,0,-1):
-            for item in range(len(listItem) - 1):
-                # Need to compare by key here
-                if compareKeys(listItem[item], listItem[item+1]) == True:
-                    temp = listItem[item]
-                    listItem[item] = listItem[item+1]
-                    listItem[item+1] = temp
+        listItem = sorted(listItem)
+        # for passnum in range(len(listItem)-1,0,-1):
+        #     for item in range(len(listItem) - 1):
+        #         # Need to compare by key here
+        #         if compareKeys(listItem[item], listItem[item+1]) == True:
+        #             temp = listItem[item]
+        #             listItem[item] = listItem[item+1]
+        #             listItem[item+1] = temp
     return _json
 
 def sortInternalListsInJsonObject(_json):
