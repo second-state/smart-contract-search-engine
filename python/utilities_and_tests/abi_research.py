@@ -143,6 +143,8 @@ for singleAbiUrl in abiUrls:
     abiWithSortedInternals = sortInternalListsInJsonObject(singleAbiJSON)
     abiFullySorted = sort(abiWithSortedInternals)
     sanitizedString = harvester.sanitizeString(json.dumps(abiFullySorted))
+    print("ABI")
+    print(sanitizedString)
     hashOfAbi = harvester.createHashFromString(sanitizedString)
     outputHashes.append(hashOfAbi)
 
