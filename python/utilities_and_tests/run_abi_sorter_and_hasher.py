@@ -7,8 +7,9 @@ harvester = Harvest()
 # RAW text of ABIs for sorting and hashing
 abiUrls = []
 abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/vanilla.txt")
-abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/extra_spaces.txt")
 abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/type_and_name_reversed.txt.txt")
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/anonymous_and_inputs_reversed.txt")
+
 
 outputHashes = []
 for singleAbiUrl in abiUrls:
