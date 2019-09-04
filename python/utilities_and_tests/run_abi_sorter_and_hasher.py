@@ -6,9 +6,9 @@ harvester = Harvest()
 
 # RAW text of ABIs for sorting and hashing
 abiUrls = []
-abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/erc20abi.txt")
-abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/erc20Abi2.txt")
-
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/vanilla.txt")
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/extra_spaces.txt")
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/type_and_name_reversed.txt.txt")
 
 outputHashes = []
 for singleAbiUrl in abiUrls:
