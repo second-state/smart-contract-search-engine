@@ -84,6 +84,8 @@ def compareItems(a, b):
 
 # Sort a given json object
 def sort(_json):
+    print("******************** with - 1")
+    print(_json)
     for passnum in range(len(_json)-1,0,-1):
         for item in range(len(_json) - 1):
             if compareItems(_json[item], _json[item+1]) == True:
@@ -111,6 +113,8 @@ def sortInternalListsInJsonObject(_abi):
     return _abi
 
 def sortABIKeys(_abi):
+    print("******************** NO -1")
+    print(_json)
     for item in range(len(_abi)):
         itemKeys = list(_abi[item])
         itemKeys.sort()
