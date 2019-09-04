@@ -112,12 +112,12 @@ def sortInternalListsInJsonObject(_abi):
 
 def sortABIKeys(_abi):
     for item in range(len(_abi)):
-        itemKeys = list(a[item])
+        itemKeys = list(_abi[item])
         itemKeys.sort()
         sortedDict = {}
         for key in itemKeys:
-            sortedDict[key] = a[item][key]
-        a[item] = sortedDict
+            sortedDict[key] = _abi[item][key]
+        _abi[item] = sortedDict
     return _abi
 
 
