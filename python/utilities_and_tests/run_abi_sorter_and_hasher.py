@@ -12,6 +12,7 @@ abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20
 abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/input_and_output_reversed.txt")
 abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/inputs_to_and_from_reversed.txt")
 abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/input_value_position_reversed.txt")
+abiUrls.append("https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/state_mutability_moved_to_top.txt")
 
 
 outputHashes = []
