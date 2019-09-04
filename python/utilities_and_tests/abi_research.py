@@ -85,35 +85,15 @@ def compareItems(a, b):
 # Sort a given json object
 def sort(_json):
     for passnum in range(len(_json)-1,0,-1):
-        for item in range(len(_json) - 1):
+        for item in range(len(_json)):
             if compareItems(_json[item], _json[item+1]) == True:
                 temp = _json[item]
                 _json[item] = _json[item+1]
                 _json[item+1] = temp
     return _json
 
-# Compare two items and return a bool
-def compareKeys(a, b):
-    print("Comparing " + str(a) + " and " + str(b))
-    if str(a) > str(b):
-        return True
-    return False
-
-# Sort a given json object
-def sortABIKeys(_json):
-    for listItem in _json:
-        listItem = sorted(listItem)
-        # for passnum in range(len(listItem)-1,0,-1):
-        #     for item in range(len(listItem) - 1):
-        #         # Need to compare by key here
-        #         if compareKeys(listItem[item], listItem[item+1]) == True:
-        #             temp = listItem[item]
-        #             listItem[item] = listItem[item+1]
-        #             listItem[item+1] = temp
-    return _json
-
-def sortInternalListsInJsonObject(_json):
-    for listItem in _json:
+def sortInternalListsInJsonObject(_abi):
+    for listItem in _abi:
         for k, v in listItem.items():
             print("Processing " + str(v))
             # Qualify the value as a list of JSON objects
@@ -128,7 +108,18 @@ def sortInternalListsInJsonObject(_json):
                     print("Not enough items in the list to sort, moving on")
             else:
                 print(str(v) + " is not a list, moving on ...")
-    return _json
+    return _abi
+
+def sortABIKeys(_abi):
+    for item in range(len(_abi)):
+        itemKeys = list(a[item])
+        itemKeys.sort()
+        sortedDict = {}
+        for key in itemKeys:
+            sortedDict[key] = a[item][key]
+        a[item] = sortedDict
+    return _abi
+
 
 def sortingReport(_abi):
     for listItem in _abi:
