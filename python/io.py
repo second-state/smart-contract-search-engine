@@ -136,6 +136,17 @@ def sha_an_abi():
     print(result)
     return jsonify(result)
 
+@app.route("/api/sort_an_abi", methods=['GET', 'POST'])
+def sort_an_abi():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abi = json.loads(jsonRequestData["abi"])
+    abiHash = harvester.cleanAndConvertAbiToText(abi)
+    result = {}
+    result["abiSorted"] = abiHash
+    print(result)
+    return jsonify(result)
+
 @app.route("/api/es_get_abi_count", methods=['GET', 'POST'])
 def es_get_abi_count():
     print(request)
