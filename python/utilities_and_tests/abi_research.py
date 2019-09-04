@@ -154,6 +154,7 @@ for singleAbiUrl in abiUrls:
     singleAbiJSON = json.loads(singleAbiString)
     abiWithSortedInternals = sortInternalListsInJsonObject(singleAbiJSON)
     abiWithSortedKeys = sortABIKeys(abiWithSortedInternals)
+
     abiFullySorted = sort(abiWithSortedKeys)
     sanitizedString = harvester.sanitizeString(json.dumps(abiFullySorted))
     print("ABI")

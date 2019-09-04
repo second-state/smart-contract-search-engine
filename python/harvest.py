@@ -269,44 +269,77 @@ class Harvest:
                 obj["contractAddress"] = item["_source"]["contractAddress"]
                 self.esAbiAddresses.append(json.dumps(obj))
 
-    def sortInternalListsInJsonObject(self, _json):
-        for listItem in _json:
-            #print("List item")
-            #print(listItem)
+    # Compare two items and return a bool
+    def compareItems(self, a, b):
+        try:
+            if str(a['type']) > str(b['type']):
+                return True
+            if str(a['name']) > str(b['name']):
+                return True
+        except:
+            # Caters for cases where the name is not present i.e. a fallback function
+            if str(a['type']) > str(b['type']):
+                return True
+        return False
+
+    # Sort a given json object
+    def sortJson(self, _json):
+        print(_json)
+        for passnum in range(len(_json)-1,0,-1):
+            for item in range(len(_json) - 1):
+                if self.compareItems(_json[item], _json[item+1]) == True:
+                    temp = _json[item]
+                    _json[item] = _json[item+1]
+                    _json[item+1] = temp
+        return _json
+
+    def sortABIKeys(self, _abi):
+        for item in range(len(_abi)):
+            itemKeys = list(_abi[item])
+            itemKeys.sort()
+            sortedDict = {}
+            for key in itemKeys:
+                sortedDict[key] = _abi[item][key]
+            _abi[item] = sortedDict
+        return _abi
+
+    def sortInternalListsInJsonObject(self, _abi):
+        for listItem in _abi:
             for k, v in listItem.items():
-                if type(v) not in (str, bool, int) and len(v) > 1:
-                    if type(v[0]) is dict:
-                        # Multi-level sort
-                        v.sort(key=itemgetter("name", "type"))
+                print("Processing " + str(v))
+                # Qualify the value as a list of JSON objects
+                if type(v) not in (str, bool, int):
+                    # Qualify list as needing sorting (contains more than one item)
+                    if len(v) > 1:
+                        # Qualify the sortable data is JSON
+                        if type(v[0]) is dict:
+                            print("Processing " + str(v))
+                            self.sortJson(v)
                     else:
-                        v.sort()
-        return _json
-
-    def sortTopLevelInJsonObject(self, _json):
-        _json.sort(key=itemgetter("type", "name"))
-        return _json
-
-    def cleanAndConvertAbiToText(self, _theAbi):
-        theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
-        theAbiAsString = json.dumps(theAbiWithSortedLists, sort_keys=True)
-        theAbiAsString2 = re.sub(r"[\n\t]*", "", theAbiAsString)
-        theAbiAsString3 = re.sub(r"[\s]+", " ", theAbiAsString2)
-        return theAbiAsString3
-
-    # Warning, this function allows for single spaces and therefore is not sanitized/normalized
-    # Use sanitizeString and createHashFromString to get full sanitized version of ABI
-    def shaAnAbi(self, _theAbi):
-        theAbiAsString = self.cleanAndConvertAbiToText(_theAbi)
-        theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
-        return theAbiHash
+                        print("Not enough items in the list to sort, moving on")
+                else:
+                    print(str(v) + " is not a list, moving on ...")
+        return _abi
 
     def sanitizeString(self, _dirtyString):
         cleanString = re.sub(r"[\n\t\s]*", "", _dirtyString)
         return cleanString
 
+    def cleanAndConvertAbiToText(self, _theAbi):
+        theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
+        theAbiWithSortedKeys = self.sortABIKeys(theAbiWithSortedLists)
+        theAbiFullySorted = self.sortJson(abiWithSortedKeys)
+        sanitizedAbiString = self.sanitizeString(json.dumps(theAbiFullySorted))
+        return sanitizedAbiString
+
     def createHashFromString(self, _stringToHash):
         hashedString = str(self.web3.toHex(self.web3.sha3(text=_stringToHash)))
         return hashedString
+
+    def shaAnAbi(self, _theAbi):
+        theAbiAsString = self.cleanAndConvertAbiToText(_theAbi)
+        theAbiHash = str(self.web3.toHex(self.web3.sha3(text=theAbiAsString)))
+        return theAbiHash
 
     def abiCompatabilityUpdate(self, _esAbiSingle, _source):
         print("Processing " + str(self.shaAnAbi(_esAbiSingle)))
