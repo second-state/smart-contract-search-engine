@@ -272,26 +272,26 @@ class Harvest:
     # Compare two items and return a bool
     def compareItems(self, a, b):
         try:
-            print("Comparing " + str(a['type']) + " and " + str(b['type']))
+            #print("Comparing " + str(a['type']) + " and " + str(b['type']))
             if str(a['type']) > str(b['type']) or str(a['type']) == str(b['type']) and str(a['name']) > str(b['name']) :
-                print("Returning True")
+                #print("Returning True")
                 return True
             else:
-                print("Returning False")
+                #print("Returning False")
                 return False
         except:
             # Caters for cases where the name is not present i.e. a fallback function
-            print("Comparing " + str(a['type']) + " and " + str(b['type']))
+            #print("Comparing " + str(a['type']) + " and " + str(b['type']))
             if str(a['type']) > str(b['type']):
-                print("Returning True")
+                #print("Returning True")
                 return True
             else:
-                print("Returning False")
+                #print("Returning False")
                 return False
 
     # Sort a given json object
     def sortJson(self, _json):
-        print(_json)
+        #print(_json)
         for passnum in range(len(_json)-1,0,-1):
             for item in range(len(_json) - 1):
                 if self.compareItems(_json[item], _json[item+1]) == True:
@@ -313,17 +313,17 @@ class Harvest:
     def sortInternalListsInJsonObject(self, _abi):
         for listItem in _abi:
             for k, v in listItem.items():
-                print("Processing " + str(v) +  " which has a type of " + str(type(v)))
+                #print("Processing " + str(v) +  " which has a type of " + str(type(v)))
                 # Qualify the value as a list of JSON objects
                 if type(v) not in (str, bool, int):
                     # Qualify list as needing sorting (contains more than one item)
                     if len(v) > 1:
-                        print("\nSORTING")
+                        #print("\nSORTING")
                         # Qualify the sortable data is JSON
                         if type(v[0]) is dict:
-                            print("Processing:" + str(v))
+                            #print("Processing:" + str(v))
                             v = self.sortJson(v)
-                            print("Sorted    :" + str(v) + "\n")
+                            #print("Sorted    :" + str(v) + "\n")
                     else:
                         print("Not enough items in the list to sort, moving on")
                 else:
