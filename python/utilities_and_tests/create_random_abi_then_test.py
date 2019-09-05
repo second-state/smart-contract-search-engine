@@ -92,8 +92,11 @@ for i in range(20):
 
 print("Hashes of random ABIs")
 for rItem in randomAbis:
+    print("Loading ABI")
     jsonAbi = json.loads(rItem)
+    print("Hashing ABI")
     hashToPrint = harvester.shaAnAbi(jsonAbi)
+    print("Printing hash")
     print(hashToPrint)
 
 outputHashes = []
