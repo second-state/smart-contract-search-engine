@@ -273,22 +273,22 @@ class Harvest:
     def compareItems(self, a, b):
         try:
             print("Comparing " + str(a['type']) + " and " + str(b['type']))
-            if str(a['type']) > str(b['type']):
-                print(str(a['type']) + " > " + str(b['type']))
+            if str(a['type']) > str(b['type']) or str(a['type']) == str(b['type']) and str(a['name']) > str(b['name']) :
+                print("Returning True")
                 return True
             else:
                 print("Returning False")
                 return False
-            if str(a['name']) > str(b['name']):
-                return True
-            else:
-                print("Returning False")
-                return False
+            # if str(a['name']) > str(b['name']):
+            #     return True
+            # else:
+            #     print("Returning False")
+            #     return False
         except:
             # Caters for cases where the name is not present i.e. a fallback function
             print("Comparing " + str(a['type']) + " and " + str(b['type']))
             if str(a['type']) > str(b['type']):
-                print(str(a['type']) + " > " + str(b['type']))
+                print("Returning True")
                 return True
             else:
                 print("Returning False")
