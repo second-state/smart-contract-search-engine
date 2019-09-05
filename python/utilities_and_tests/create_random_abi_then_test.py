@@ -89,7 +89,7 @@ singleAbiJSON = json.loads(singleAbiString)
 for i in range(20):
     string = randomizeAndConvertAbiToText(singleAbiJSON)
     randomAbis.append(string)
-    print(harvester.shaAnAbi(json.loads(string)))
+print(randomAbis)
 
 
 outputHashes = []
