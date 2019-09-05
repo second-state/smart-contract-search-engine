@@ -42,7 +42,7 @@ def sortJson(_json):
 def sortABIKeys(_abi):
     for item in range(len(_abi)):
         itemKeys = list(_abi[item])
-        itemKeys.sort()
+        random.shuffle(itemKeys)
         sortedDict = {}
         for key in itemKeys:
             sortedDict[key] = _abi[item][key]
