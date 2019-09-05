@@ -89,7 +89,8 @@ singleAbiJSON = json.loads(singleAbiString)
 for i in range(20):
     string = randomizeAndConvertAbiToText(singleAbiJSON)
     randomAbis.append(string)
-print(str(len(randomAbis)))
+
+print("LENGTH:" + str(len(randomAbis)) + ".")
 
 print("Hashes of random ABIs")
 for rItem in randomAbis:
