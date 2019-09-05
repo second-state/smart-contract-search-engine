@@ -314,9 +314,9 @@ class Harvest:
                         print("\nSORTING")
                         # Qualify the sortable data is JSON
                         if type(v[0]) is dict:
-                            print("Processing " + str(v))
+                            print("Processing:" + str(v))
                             v = self.sortJson(v)
-                            print("Sorted result = " + str(v) + "\n")
+                            print("Sorted    :" + str(v) + "\n")
                     else:
                         print("Not enough items in the list to sort, moving on")
                 else:
