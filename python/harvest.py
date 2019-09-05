@@ -231,7 +231,7 @@ class Harvest:
             return theFunctionDataIsNotComplete
 
     def getFunctionDataId(self, _theFunctionData):
-        theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData))))
+        theId = str(self.web3.toHex(self.web3.sha3(text=json.dumps(_theFunctionData, sort_keys=False))))
         return theId
 
     def fetchTxHashWithAbis(self, _not):
@@ -329,7 +329,7 @@ class Harvest:
         theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
         theAbiWithSortedKeys = self.sortABIKeys(theAbiWithSortedLists)
         theAbiFullySorted = self.sortJson(theAbiWithSortedKeys)
-        sanitizedAbiString = self.sanitizeString(json.dumps(theAbiFullySorted))
+        sanitizedAbiString = self.sanitizeString(json.dumps(theAbiFullySorted, sort_keys=False))
         return sanitizedAbiString
 
     def createHashFromString(self, _stringToHash):
