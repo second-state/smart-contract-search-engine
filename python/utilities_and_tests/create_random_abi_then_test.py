@@ -101,9 +101,11 @@ print("Output hashes are as follows, these should all be exactly the same")
 
 print("Hashes of random ABIs")
 for string in randomAbis:
-    print(harvester.shaAnAbi(json.loads(string)))
-    
-print("Hashes of sorted ABIs")
+    jsonAbi = json.loads(string)
+    hashToPrint = harvester.shaAnAbi(jsonAbi)
+    print(hashToPrint)
+
+print("Hashes of sorted ABIs ...")
 for singleHash in outputHashes:
     print(singleHash)
 
