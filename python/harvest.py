@@ -284,6 +284,7 @@ class Harvest:
             if str(a['type']) > str(b['type']):
                 print(str(a['type']) + " > " + str(b['type']))
                 return True
+        print("Returning False")
         return False
 
     # Sort a given json object
