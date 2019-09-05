@@ -90,22 +90,15 @@ for i in range(20):
     string = randomizeAndConvertAbiToText(singleAbiJSON)
     randomAbis.append(string)
 
-print("LENGTH:" + str(len(randomAbis)) + ".")
-
+outputHashes = []
 print("Hashes of random ABIs")
 for rItem in randomAbis:
-    print("Loading ABI")
-    jsonAbi = json.loads(rItem)
-    print("Hashing ABI")
-    hashToPrint = harvester.shaAnAbi(jsonAbi)
-    print("Printing hash")
+    hashToPrint = harvester.createHashFromString(rItem)
     print(hashToPrint)
-
-outputHashes = []
-for singleAbi in randomAbis:
-    singleAbiJSON = json.loads(singleAbi)
-    singleHash = harvester.shaAnAbi(singleAbiJSON)
+    jsonAbi = json.loads(rItem)
+    singleHash = harvester.shaAnAbi(jsonAbi)
     outputHashes.append(singleHash)
+
 print("Output hashes are as follows, these should all be exactly the same")
 
 print("Hashes of sorted ABIs ...")
