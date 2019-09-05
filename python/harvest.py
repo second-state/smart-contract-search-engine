@@ -272,13 +272,17 @@ class Harvest:
     # Compare two items and return a bool
     def compareItems(self, a, b):
         try:
+            print("Comparing " + str(a['type']) + " and " + str(b['type']))
             if str(a['type']) > str(b['type']):
+                print(str(a['type']) + " > " + str(b['type']))
                 return True
             if str(a['name']) > str(b['name']):
                 return True
         except:
             # Caters for cases where the name is not present i.e. a fallback function
+            print("Comparing " + str(a['type']) + " and " + str(b['type']))
             if str(a['type']) > str(b['type']):
+                print(str(a['type']) + " > " + str(b['type']))
                 return True
         return False
 
