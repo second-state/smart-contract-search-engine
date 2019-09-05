@@ -5,7 +5,6 @@ import requests
 from harvest import Harvest
 harvester = Harvest()
 
-
 def compareItems(a, b):
     list = []
     list.append(True)
@@ -27,7 +26,6 @@ def compareItems(a, b):
         else:
             #print("Returning ?")
             return random.choice(list)
-
 
 def sortJson(_json):
     #print(_json)
@@ -80,8 +78,6 @@ def randomizeAndConvertAbiToText(_theAbi):
     sanitizedAbiString = sanitizeString(json.dumps(theAbiFullySorted, sort_keys=False))
     return sanitizedAbiString
 
-
-
 randomAbis = []
 abiUrl = "https://raw.githubusercontent.com/tpmccallum/mixed_ordered_erc20_abis_for_testing/master/vanilla.txt"
 singleAbiString = requests.get(abiUrl).content
@@ -100,7 +96,6 @@ for rItem in randomAbis:
     outputHashes.append(singleHash)
 
 print("Output hashes are as follows, these should all be exactly the same")
-
 print("Hashes of sorted ABIs ...")
 for singleHash in outputHashes:
     print(singleHash)
