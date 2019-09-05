@@ -311,11 +311,12 @@ class Harvest:
                 if type(v) not in (str, bool, int):
                     # Qualify list as needing sorting (contains more than one item)
                     if len(v) > 1:
+                        print("\nSORTING")
                         # Qualify the sortable data is JSON
                         if type(v[0]) is dict:
                             print("Processing " + str(v))
                             v = self.sortJson(v)
-                            print("Sorted result = " + str(v))
+                            print("Sorted result = " + str(v) + "\n")
                     else:
                         print("Not enough items in the list to sort, moving on")
                 else:
