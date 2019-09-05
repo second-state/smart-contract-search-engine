@@ -306,7 +306,7 @@ class Harvest:
     def sortInternalListsInJsonObject(self, _abi):
         for listItem in _abi:
             for k, v in listItem.items():
-                print("Processing " + str(v) +  " which has a type of " + type(v))
+                print("Processing " + str(v) +  " which has a type of " + str(type(v)))
                 # Qualify the value as a list of JSON objects
                 if type(v) not in (str, bool, int):
                     # Qualify list as needing sorting (contains more than one item)
