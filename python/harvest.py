@@ -279,11 +279,6 @@ class Harvest:
             else:
                 print("Returning False")
                 return False
-            # if str(a['name']) > str(b['name']):
-            #     return True
-            # else:
-            #     print("Returning False")
-            #     return False
         except:
             # Caters for cases where the name is not present i.e. a fallback function
             print("Comparing " + str(a['type']) + " and " + str(b['type']))
