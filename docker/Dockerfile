@@ -36,5 +36,5 @@ RUN a2dissite 000-default.conf && \
     a2enmod proxy_http
 
 WORKDIR /app
-EXPOSE 80
+EXPOSE 80 443
 CMD supervisord
