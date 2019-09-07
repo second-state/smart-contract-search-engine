@@ -740,7 +740,7 @@ class Harvest:
                     for abiHash in contractItem["_source"]["abiShaList"]:
                         jsonAbi = self.fetchAbiUsingHash(abiHash)
                         updateStateOfSingleAbiAndContractAddressRelationship(jsonAbi, _address)
-            return True
+                return True
             else:
                 updateStateOfSingleAbiAndContractAddressRelationship(_abi, _address)
                 return True
