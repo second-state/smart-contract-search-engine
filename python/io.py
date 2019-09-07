@@ -29,7 +29,10 @@ def confirm_deployment():
 def update_state_of_contract_address():
     print(request)
     jsonRequestData = json.loads(request.data)
-    abi = json.loads(jsonRequestData["abi"])
+    if jsonRequestData["abi"] == "all"
+        abi = "all"
+    else:
+        abi = json.loads(jsonRequestData["abi"])
     address = jsonRequestData["address"]
     try:
         result = harvester.updateStateOfContractAddress(abi, address)
