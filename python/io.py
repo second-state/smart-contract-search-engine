@@ -29,7 +29,7 @@ def confirm_deployment():
 def update_state_of_contract_address():
     print(request)
     jsonRequestData = json.loads(request.data)
-    if jsonRequestData["abi"] == "all"
+    if jsonRequestData["abi"] == "all":
         abi = "all"
     else:
         abi = json.loads(jsonRequestData["abi"])
