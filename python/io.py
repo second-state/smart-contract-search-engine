@@ -31,10 +31,18 @@ def update_state_of_contract_address():
     jsonRequestData = json.loads(request.data)
     abi = json.loads(jsonRequestData["abi"])
     address = jsonRequestData["address"]
-    harvester.updateStateOfContractAddress(abi, address)
-    doc = {}
-    doc["response"] = 'Successfully updated contract.'
-    return jsonify(doc)
+    try:
+        result = harvester.updateStateOfContractAddress(abi, address)
+        doc = {}
+        if result == True:
+            doc["response"] = 'true'
+        elif result == False:
+            doc["response"] = 'false'
+        return jsonify(doc)
+    except:
+        doc = {}
+        doc["response"] = 'false'
+        return jsonify(doc)
 
 @app.route("/api/most_recent_indexed_block_number", methods=['GET', 'POST'])
 def most_recent_indexed_block_number():

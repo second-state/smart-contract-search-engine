@@ -695,7 +695,7 @@ class Harvest:
             else:
                 print("It has been longer than the desired time, need to re-update the state immediately ...")
 
-    def updateStateOfContractAddress(self, _abi, _address):
+    def updateStateOfSingleAbiAndContractAddressRelationship(self, _abi, _address):
         contractInstance = self.web3.eth.contract(abi=_abi, address=self.web3.toChecksumAddress(_address))
         freshFunctionData = self.fetchPureViewFunctionData(contractInstance)
         functionDataId = self.getFunctionDataId(freshFunctionData)
@@ -730,7 +730,22 @@ class Harvest:
         outerData["functionDataList"] = functionDataObjectOuter
         doc["doc"] = outerData
         self.updateDataInElastic(self.commonIndex, contractInstance.address, json.dumps(doc))
-        return "Success"
+
+
+    def updateStateOfContractAddress(self, _abi, _address):
+        try:
+            if _abi == "all":
+                contractItem = self.es.get(index=self.commonIndex, id=_address)
+                if len(contractItem["_source"]["abiShaList"]) > 0:
+                    for abiHash in contractItem["_source"]["abiShaList"]:
+                        jsonAbi = self.fetchAbiUsingHash(abiHash)
+                        updateStateOfSingleAbiAndContractAddressRelationship(jsonAbi, _address)
+            return True
+            else:
+                updateStateOfSingleAbiAndContractAddressRelationship(_abi, _address)
+                return True
+        except:
+            return False
 
     def worker(self, _instance):
         freshFunctionData = self.fetchPureViewFunctionData(_instance)
