@@ -416,8 +416,6 @@ class Harvest:
 
     def expressUpdateAbiShaList(self, _abiHash):
         jsonAbi = json.loads(self.fetchAbiUsingHash(_abiHash))
-        #print("JSON ABI")
-        #print(jsonAbi)
         queryForTXs = {"query":{"match":{"indexInProgress": "false"}}, "_source": ["TxHash", "contractAddress", "bytecodeSha3"]}
         esTxs = elasticsearch.helpers.scan(client=self.es, index=self.commonIndex, query=queryForTXs, preserve_order=True)
         TxObj = {}
