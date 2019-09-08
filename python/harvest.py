@@ -576,8 +576,12 @@ class Harvest:
 
     def expressHarvestAnAbi(self, _abiSha, _blockFloor):
         blockHeight = self.web3.eth.getBlock('latest').number
+        print("Block height: " + str(blockHeight))
+        print("ABI Hash: " + str(_abiSha))
         jsonAbi = self.fetchAbiUsingHash(_abiSha)
+        print("JSON ABI: " + json.dumps(jsonAbi))
         queryForTransactionIndex = '''{"query":{"bool":{"must":{"range":{"blockNumber":{"gte":"''' + str(_blockFloor) + '''","lte":"''' + str(blockHeight) + '''"}}}}}}'''
+        print("Query: " + str(queryForTransactionIndex))
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         localTransactionList = []
         for esTransactionSingle in esTransactions:
