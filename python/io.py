@@ -47,6 +47,26 @@ def update_state_of_contract_address():
         doc["response"] = 'false'
         return jsonify(doc)
 
+@app.route("/api/express_harvest_an_abi", methods=['GET', 'POST'])
+def express_harvest_an_abi():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    abiHash = json.loads(jsonRequestData["abiHash"])
+    blockFloor = jsonRequestData["blockFloor"]
+    try:
+        result = harvester.expressHarvestAnAbi(abiHash, blockFloor)
+        doc = {}
+        if result == True:
+            doc["response"] = 'true'
+        elif result == False:
+            doc["response"] = 'false'
+        return jsonify(doc)
+    except:
+        doc = {}
+        doc["response"] = 'false'
+        return jsonify(doc)
+
+
 @app.route("/api/most_recent_indexed_block_number", methods=['GET', 'POST'])
 def most_recent_indexed_block_number():
     mostRecentIndexedBlockNumber = harvester.mostRecentIndexedBlockNumber()
