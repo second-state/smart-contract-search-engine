@@ -582,6 +582,7 @@ class Harvest:
         for esTransactionSingle in esTransactions:
             localTransactionList.append(esTransactionSingle['_source']['TxHash'])
         self.processMultipleTransactions(json.dumps(jsonAbi), localTransactionList)
+        return True
 
 
     # NEW Multi-thread
