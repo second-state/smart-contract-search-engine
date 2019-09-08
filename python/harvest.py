@@ -575,8 +575,9 @@ class Harvest:
             harvestDriverThread3.join()
 
     def expressHarvestAnAbi(self, _abiSha, _blockFloor):
+        blockHeight = self.web3.eth.getBlock('latest').number
         jsonAbi = self.fetchAbiUsingHash(_abiSha)
-        queryForTransactionIndex = '''{"query":{"bool":{"must":{"term":{"indexed":"false"}},"must_not":{"range":{"blockNumber":{"gte":"0","lte": "''' + str(_blockFloor) + '''"}}}}}}'''
+        queryForTransactionIndex = '''{"query":{"bool":{"must":{"range":{"blockNumber":{"gte":"''' + str(_blockFloor) + '''","lte":"''' + str(blockHeight) + '''"}}}}}}'''
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         localTransactionList = []
         for esTransactionSingle in esTransactions:
