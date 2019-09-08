@@ -51,7 +51,7 @@ def update_state_of_contract_address():
 def express_harvest_an_abi():
     print(request)
     jsonRequestData = json.loads(request.data)
-    abiHash = json.loads(jsonRequestData["abiHash"])
+    abiHash = jsonRequestData["abiHash"]
     blockFloor = jsonRequestData["blockFloor"]
     try:
         result = harvester.expressHarvestAnAbi(abiHash, blockFloor)
