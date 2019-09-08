@@ -311,7 +311,9 @@ class Harvest:
         return _abi
 
     def sortInternalListsInJsonObject(self, _abi):
+        print("********** ABI " + str(_abi) + "****************")
         for listItem in _abi:
+            print("********** LIST ITEM " + str(listItem) + "****************")
             for k, v in listItem.items():
                 #print("Processing " + str(v) +  " which has a type of " + str(type(v)))
                 # Qualify the value as a list of JSON objects
