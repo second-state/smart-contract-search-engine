@@ -313,7 +313,6 @@ class Harvest:
     def sortInternalListsInJsonObject(self, _abi):
         print("********** ABI " + str(_abi) + "****************")
         for listItem in _abi:
-            print("********** LIST ITEM " + str(listItem) + "****************")
             for k, v in listItem.items():
                 #print("Processing " + str(v) +  " which has a type of " + str(type(v)))
                 # Qualify the value as a list of JSON objects
@@ -580,7 +579,7 @@ class Harvest:
         blockHeight = self.web3.eth.getBlock('latest').number
         print("Block height: " + str(blockHeight))
         print("ABI Hash: " + str(_abiSha))
-        jsonAbi = self.fetchAbiUsingHash(_abiSha)
+        jsonAbi = json.loads(self.fetchAbiUsingHash(_abiSha))
         print("JSON ABI: " + json.dumps(jsonAbi))
         queryForTransactionIndex = '''{"query":{"bool":{"must":{"range":{"blockNumber":{"gte":"''' + str(_blockFloor) + '''","lte":"''' + str(blockHeight) + '''"}}}}}}'''
         print("Query: " + str(queryForTransactionIndex))
