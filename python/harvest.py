@@ -568,19 +568,15 @@ class Harvest:
             tFullDriver3 = threading.Thread(target=self.processSingleTransaction, args=[contractAbiJSONData, transactionHash])
             tFullDriver3.daemon = True
             tFullDriver3.start()
-            time.sleep(math.floor(int(self.secondsPerBlock) / 5))
+            time.sleep(math.floor(int(self.secondsPerBlock) / 3))
             processMultipleTransactionsThreads.append(tFullDriver3)
         for harvestDriverThread3 in processMultipleTransactionsThreads:
             harvestDriverThread3.join()
 
     def expressHarvestAnAbi(self, _abiSha, _blockFloor):
         blockHeight = self.web3.eth.getBlock('latest').number
-        print("Block height: " + str(blockHeight))
-        print("ABI Hash: " + str(_abiSha))
         jsonAbi = json.loads(self.fetchAbiUsingHash(_abiSha))
-        print("JSON ABI: " + json.dumps(jsonAbi))
         queryForTransactionIndex = '''{"query":{"bool":{"must":{"range":{"blockNumber":{"gte":"''' + str(_blockFloor) + '''","lte":"''' + str(blockHeight) + '''"}}}}}}'''
-        print("Query: " + str(queryForTransactionIndex))
         esTransactions = elasticsearch.helpers.scan(client=self.es, index=self.masterIndex, query=queryForTransactionIndex, preserve_order=True)
         localTransactionList = []
         for esTransactionSingle in esTransactions:
