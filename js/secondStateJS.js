@@ -29,7 +29,7 @@ if (searchEngineNetwork == "18") {
     esIndexName = "cmtmainnetmultiabi";
 }
 
-var elasticSearchUrl = "https://search-cmtsearch-l72er2gp2gxdwazqb5wcs6tskq.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
+var elasticSearchUrl = "https://search-testnetcmt-eqmkqyszttt3qxijpzf6tf5acm.ap-southeast-2.es.amazonaws.com/" + esIndexName + "/_search/?size=100";
 // CONFIG END
 
 // CODE START
@@ -152,7 +152,6 @@ $(document).ready(function() {
         }
     })
 });
-
 $(document).ready(function() {
     $("#ICreated").click(function() {
         async function setUpAndProgress() {
@@ -169,7 +168,7 @@ $(document).ready(function() {
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
             var dFunctionDataOwner = {};
-            dFunctionDataOwner["functionDataList.0.functionData.owner"] = this.currentAccount;
+            dFunctionDataOwner["functionData.owner"] = this.currentAccount;
             var dMatchFunctionDataOwner = {};
             dMatchFunctionDataOwner["match"] = dFunctionDataOwner;
             var dMust = {};
@@ -208,10 +207,23 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.player_addrs.*"],"query":"' + this.currentAccount + '"}}}'
+            lShould = [];
+            for (i = 0; i < 50; i++) {
+                var dPTemp = {};
+                var dPTemp2 = {};
+                var fString = "functionData.player_addrs." + i;
+                dPTemp[fString] = this.currentAccount;
+                dPTemp2["match"] = dPTemp;
+                lShould.push(dPTemp2);
+            }
+            var dMust = {};
+            dMust["should"] = lShould;
+            var dBool = {};
+            dBool["bool"] = dMust;
+            var dQuery = {};
+            dQuery["query"] = dBool;
             $("#pbc").hide("slow");
-            var jsonString = dQuery;
-            console.log(jsonString)
+            var jsonString = JSON.stringify(dQuery);
 
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
@@ -241,9 +253,23 @@ $(document).ready(function() {
             $("#pb.progress-bar").attr("style", "width:100%");
             await new Promise((resolve, reject) => setTimeout(resolve, 1500));
             checkNetwork();
-            dQuery = '{"query":{"query_string":{"fields":["functionDataList.0.functionData.winner_addrs.*"],"query":"' + this.currentAccount + '"}}}'
+            lShould = [];
+            for (i = 0; i < 50; i++) {
+                var dPTemp = {};
+                var dPTemp2 = {};
+                var fString = "functionData.winner_addrs." + i;
+                dPTemp[fString] = this.currentAccount;
+                dPTemp2["match"] = dPTemp;
+                lShould.push(dPTemp2);
+            }
+            var dMust = {};
+            dMust["should"] = lShould;
+            var dBool = {};
+            dBool["bool"] = dMust;
+            var dQuery = {};
+            dQuery["query"] = dBool;
             $("#pbc").hide("slow");
-            var jsonString = dQuery;
+            var jsonString = JSON.stringify(dQuery);
             // If this is a public website then we need to call ES using Flask
             if (publicIp) {
                 var itemArray = getItemsUsingDataViaFlask(jsonString);
@@ -258,27 +284,128 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#searchAddressButton").click(function() {
+    $("#searchTextButton").click(function() {
         $(".results").empty()
         var theText = $("#searchTextInput").val();
-        if ($.trim(theText.length) == "0") {
-            //console.log("Address and text are both blank, fetching all results without a filter");
-            if (publicIp) {
-                getItemsViaFlask(elasticSearchUrl);
-            } else {
-                getItems(elasticSearchUrl);
-            }
-        } else if ($.trim(theText.length) > "0") {
-            var jsonString = '{"query":{"multi_match":{"fields":["functionDataList.0.functionData.info.1","functionDataList.0.functionData.info.2"],"query":"' + theText + '"}}}'
-            if (publicIp) {
-                var itemArray = getItemsUsingDataViaFlask(jsonString);
-            } else {
-                var itemArray = getItemsUsingData(elasticSearchUrl, "post", jsonString, "json", "application/json");
+        if ($.trim(theText.length) > "0") {
+            iQuery = {};
+            iQuery["query"] = theText;
+            iQueryString = {};
+            iQueryString["query_string"] = iQuery;
+            oQuery = {};
+            oQuery["query"] = iQueryString;
+            jsonString = JSON.stringify(oQuery);
+            getItemsUsingDataViaFlask(jsonString);
+        } else {
+            getQuickItemsViaFlask(elasticSearchUrl);
+        }
+    });
+});
+
+$(document).ready(function() {
+    $("#searchAddressButton").click(function() {
+        $(".results").empty()
+        var theAddress = $("#searchAddressInput").val();
+        if ($.trim(theAddress.length) > "0") {
+            query = '{"query":{"bool":{"must":[{"match":{"contractAddress":"' + theAddress + '"}}]}}}';
+            getItemsUsingDataViaFlask(query);
+        } else {
+            getQuickItemsViaFlask(elasticSearchUrl);
+        }
+    });
+});
+
+$(document).ready(function() {
+    $("#searchABIButton").click(function() {
+        console.log("Searching using an ABI");
+        var theAbi = $("#abiInput2").val();
+        console.log(theAbi);
+        if ($.trim(theAbi.length) > "0") {
+            esss.shaAbi(theAbi).then((shaResult) => {
+                var sha = JSON.parse(shaResult).abiSha3;
+                console.log(sha);
+                esss.searchUsingAbi(sha).then((searchResult) => {
+                    console.log(searchResult);
+                    var items = JSON.parse(searchResult);
+                    $("#sha").empty();
+                    var name = jQuery("<p/>", {
+                    text: "Results for sha: " + sha
+                    });
+                    name.appendTo("#sha");
+                    renderItems(items);
+                });
+            });
+        } else {
+            console.log("Error searching with ABI");
+        }
+    });
+});
+
+
+
+$(document).ready(function() {
+    $("#indexContractButton").click(function() {
+        $(".results").empty()
+        var abiLoadUrl = publicIp + "/api/submit_abi";
+        var theAbi = $("#abiInput").val();
+        var theHash = $("#hashInput").val();
+        console.log(theAbi)
+        console.log(theHash)
+        var hashLength = $.trim(theHash.length)
+        if (hashLength == 66) {
+            data = {};
+            data["abi"] = theAbi;
+            data["hash"] = theHash;
+            dataString = JSON.stringify(data);
+            $.ajax({
+                url: abiLoadUrl,
+                type: "POST",
+                data: dataString,
+                dataType: "json",
+                contentType: "application/json",
+                success: function(response) {
+                    console.log(response);
+                    $(".abi").empty();
+                    var row = jQuery("<div/>", {
+                        class: "row",
+                    });
+                    row.appendTo(".abi");
+
+                    var details = jQuery("<div/>", {
+                        class: "col-sm-12",
+                        text: "Congratulations, we have indexed the smart contract and its assocated ABI!",
+                    });
+                    details.appendTo(row);
+                },
+                error: function(xhr) {
+                    console.log("Index failed");
+                }
+            });
+            //Index using Transaction Hash
+        } else {
+            if (hashLength == 42) {
+                console.log("We can upload the ABI and your contract will appear after some time")
+                console.log("If you use a transaction hash (instead of an address) your contract will be permanently indexed in real time.")
+                //Index using Address
             }
         }
 
     });
 });
+
+function renderContractVariables(_result) {
+    $(".results").empty();
+    var row = jQuery("<div/>", {
+        class: "row",
+    });
+    row.appendTo(".results");
+
+    var details = jQuery("<div/>", {
+        class: "col-sm-12",
+        text: _result,
+    });
+    details.appendTo(row);
+}
 
 function getItemsUsingData(_url, _type, _data, _dataType, _contentType) {
     $.ajax({
@@ -308,7 +435,28 @@ function getItemsUsingDataViaFlask(_data) {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
-            console.log(response);
+            //console.log(response);
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+}
+
+function getItemsUsingAddressViaFlask(_data) {
+    theUrlForData1 = publicIp + "/api/describe_using_address";
+    console.log("getItemsUsingAddressViaFlask");
+    console.log(theUrlForData1);
+    console.log(_data);
+    $.ajax({
+        url: theUrlForData1,
+        type: "POST",
+        data: _data,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response);
             renderItems(response);
         },
         error: function(xhr) {
@@ -324,16 +472,13 @@ function getItems(_url) {
     });
 }
 
-function getItemsViaFlask() {
-    theUrlForData2 = publicIp + "/api/es_search";
-    console.log("getItemsViaFlask");
-    console.log(theUrlForData2);
-    console.log("POST");
+function getQuickItemsViaFlask() {
+    theUrlForData2 = publicIp + "/api/es_quick_100_search";
     _data = {
         "query": {
-                "match_all": {}
+            "match_all": {}
         }
-    }
+    };
     var _dataString = JSON.stringify(_data);
     $.ajax({
         url: theUrlForData2,
@@ -342,6 +487,7 @@ function getItemsViaFlask() {
         dataType: "json",
         contentType: "application/json",
         success: function(response) {
+            //console.log(response)
             renderItems(response);
         },
         error: function(xhr) {
@@ -351,8 +497,37 @@ function getItemsViaFlask() {
 
 }
 
+function getItemsViaFlask() {
+    theUrlForData2 = publicIp + "/api/es_search";
+    console.log("getItemsViaFlask");
+    console.log(theUrlForData2);
+    console.log("POST");
+    _data = {
+        "query": {
+            "match_all": {}
+        }
+    };
+    var _dataString = JSON.stringify(_data);
+    $.ajax({
+        url: theUrlForData2,
+        type: "POST",
+        data: _dataString,
+        dataType: "json",
+        contentType: "application/json",
+        success: function(response) {
+            //console.log(response)
+            renderItems(response);
+        },
+        error: function(xhr) {
+            console.log("Get items failed");
+        }
+    });
+
+}
+
+
+
 function renderItems(_hits) {
-    console.log(_hits)
     $(".results").empty();
     $.each(_hits, function(index, value) {
 
@@ -361,260 +536,592 @@ function renderItems(_hits) {
         });
         row.appendTo(".results");
 
-        var imageContainer = jQuery("<div/>", {
-            class: "col-sm-4"
-        });
-        imageContainer.appendTo(row);
-
-        var image = jQuery("<img/>", {
-            class: "img-thumbnail",
-            src: value.functionData.info[3],
-            alt: "giveaway"
-        });
-        image.appendTo(imageContainer);
-
         var details = jQuery("<div/>", {
-            class: "col-sm-8"
+            class: "col-sm-12"
         });
         details.appendTo(row);
 
         var dl = jQuery("<dl/>", {});
         dl.appendTo(details);
 
-        var title = jQuery("<dt/>", {
-            text: "Title: " + value.functionData.info[1]
+        var address = jQuery("<dt/>", {
+            text: "Address: " + value.contractAddress
         });
-        title.appendTo(dl);
+        address.appendTo(dl);
 
-        var description = jQuery("<dd/>", {
-            text: "Description: " + value.functionData.info[2]
+        var block = jQuery("<dt/>", {
+            text: "Block: " + value.blockNumber
         });
-        description.appendTo(dl);
+        block.appendTo(dl);
 
-        var winners = jQuery("<dd/>", {
-            text: "Number of potential winners: " + value.functionData.info[4]
+        var transaction = jQuery("<dt/>", {
+            text: "Transaction: " + value.TxHash
         });
-        winners.appendTo(dl);
+        transaction.appendTo(dl);
 
-        var textStatus = "";
-        if (value.functionData.status == "0") {
-            textStatus = "Winners have not been declared as yet";
-            var status = jQuery("<dd/>", {
-                text: textStatus,
-                // Optional color change?
-                // class: "current"
-            });
-            status.appendTo(dl);
-
-        } else if (value.functionData.status == "1") {
-            textStatus = "Winners have been declared";
-            var status = jQuery("<dd/>", {
-                text: textStatus,
-                // Optional color change?
-                // class: "expired"
-            });
-            status.appendTo(dl);
-        }
-
-        // Expiry time
-        var epochRepresentation = value.functionData.info[5];
-        if (epochRepresentation.toString().length == 10) {
-            var endDate = new Date(epochRepresentation * 1000);
-        } else if (epochRepresentation.toString().length == 13) {
-            var endDate = new Date(epochRepresentation);
-        }
-
-        // Setting Dapp Version
-        if (value.abiShaList.includes("0xb8a37479196c0f9d8ab647141f1f22863305d3ad86c4dd88f25304c01bff0eb6")){
-                dappVersion = "v1";
-            }
-            else if (value.abiShaList.includes("0xe49f0c6abcbe2ab8264670478d7767df62be6b264d7fc8b067e9767dacf61c99")) {
-                dappVersion = "v2";
-            }
-
-        // Current time
-        var currentDate = new Date();
-
-        if (currentDate > endDate) {
-            var time = jQuery("<dd/>", {
-                text: "End date: " + endDate,
-                class: "expired"
-            });
-            time.appendTo(dl);
-            // Allow user to VIEW this giveaway
-            var view = jQuery("<dd/>", {
-
-            });
-            
-            var viewUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
-            var viewButton = jQuery("<a/>", {
-                href: viewUrl,
-                class: "btn btn-info",
-                role: "button",
-                target: "_blank",
-                text: "View"
-            });
-            viewButton.appendTo(view);
-            view.appendTo(dl);
-        } else if (currentDate < endDate) {
-            var time = jQuery("<dd/>", {
-                text: "End date: " + endDate,
-                class: "current"
-            });
-            time.appendTo(dl);
-            // Allow user to play this giveaway
-            var play = jQuery("<dd/>", {
-
-            });
-            var playUrl = "https://cybermiles.github.io/smart_contracts/FairPlay/" + dappVersion + "/dapp/play.html?contract=" + value.contractAddress;
-            var playButton = jQuery("<a/>", {
-                href: playUrl,
-                class: "btn btn-success",
-                role: "button",
-                target: "_blank",
-                text: "Play"
-            });
-            playButton.appendTo(play);
-            play.appendTo(dl);
-
-        }
-
-        var version = jQuery("<dd/>", {
-            text: "DApp version: " + dappVersion
+        var creator = jQuery("<dt/>", {
+            text: "Creator: " + value.creator
         });
-        version.appendTo(dl);
+        creator.appendTo(dl);
 
-        //https://cybermiles.github.io/smart_contracts/FairPlay/dapp/play.html?contract=0x
-
-        /* More details */
-        var pGroup = jQuery("<div/>", {
-            class: "panel-group"
-        });
-        pGroup.appendTo(details);
-
-        var pDefault = jQuery("<div/>", {
-            class: "panel panel-default"
-        });
-        pDefault.appendTo(pGroup);
-
-        var pHeading = jQuery("<div/>", {
-            class: "panel-heading"
-        });
-        pHeading.appendTo(pDefault);
-
-        var pTitle = jQuery("<p/>", {
-            class: "panel-title"
-        });
-        pTitle.appendTo(pHeading);
-
-        var pToggle = jQuery("<a/>", {
-            "data-toggle": "collapse",
-            href: "#collapse1",
-            text: "Show/Hide Details"
-        });
-        pToggle.appendTo(pTitle);
-
-        var pCollapse = jQuery("<div/>", {
-            id: "collapse1",
-            class: "panel-collapse collapse"
-        });
-        pCollapse.appendTo(pDefault);
-
-        var pBody = jQuery("<div/>", {
-            class: "panel-body"
-        });
-        pBody.appendTo(pCollapse);
-
-        var dl2 = jQuery("<dl/>", {});
-        dl2.appendTo(pBody);
-
-        var blockNumber = jQuery("<dd/>", {
-
-        });
-        blockNumber.appendTo(dl2);
-
-        var blockNumberA = jQuery("<a/>", {
-            text: "- Block " + value.blockNumber,
-            href: blockExplorer + "block/" + value.blockNumber,
-            target: "_blank"
-        });
-        blockNumberA.appendTo(blockNumber);
-
-        if (value.TxHash !== undefined) {
-            var txHash = jQuery("<dd/>", {
-
-            });
-            txHash.appendTo(dl2);
-
-            var txHashA = jQuery("<a/>", {
-                text: "- Transaction " + value.TxHash,
-                href: blockExplorer + "tx/" + value.TxHash,
-                target: "_blank"
-            });
-            txHashA.appendTo(txHash);
-        }
-
-        var cOwner = jQuery("<dd/>", {
-
-        });
-        cOwner.appendTo(dl2);
-
-        var cOwnerA = jQuery("<a/>", {
-            text: "- Contract owner " + value.functionData.owner,
-            href: blockExplorer + "address/" + value.functionData.owner,
-            target: "_blank"
-        });
-        cOwnerA.appendTo(cOwner);
-
-        var cAddress = jQuery("<dd/>", {
-
-        });
-        cAddress.appendTo(dl2);
-
-        var cAddressA = jQuery("<a/>", {
-            text: "- Contract address " + value.contractAddress,
-            href: blockExplorer + "address/" + value.contractAddress,
-            target: "_blank"
-        });
-        cAddressA.appendTo(cAddress);
-
-        if (value.functionData.player_addrs == undefined){
-            var lineBreak = jQuery("<hr/>", {});
-            lineBreak.appendTo(dl2);
-            var pAddress = jQuery("<dd/>", {
-                text: "Players: There are no players yet!"
-            });
-            pAddress.appendTo(dl2);
-        } else {
-            var lineBreak = jQuery("<hr/>", {});
-            lineBreak.appendTo(dl2);
-            $.each(value.functionData.player_addrs, function(playerIndex, playerValue) {
-                var pAddress = jQuery("<dd/>", {
-                    text: "Player : " + playerValue
-                });
-                pAddress.appendTo(dl2);
-            });
-        }
-
-        if (value.functionData.winner_addrs == undefined) {
-            var lineBreak = jQuery("<hr/>", {});
-            lineBreak.appendTo(dl2);
-            var wAddress = jQuery("<dd/>", {
-                text: "Winners: There are no winners yet!"
-            });
-            wAddress.appendTo(dl2);
-        } else {
-            var lineBreak = jQuery("<hr/>", {});
-            lineBreak.appendTo(dl2);
-            $.each(value.functionData.winner_addrs, function(winnerIndex, winnerValue) {
-                var wAddress = jQuery("<dd/>", {
-                    text: "Winner : " + winnerValue
-                });
-                wAddress.appendTo(dl2);
-            });
-        }
         var lineBreak = jQuery("<hr/>", {});
         lineBreak.appendTo(".results");
+
+        var shaList = value.abiShaList;
+        if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286")) {
+            var type = jQuery("<dt/>", {
+                text: "Type: ERC20"
+            });
+            type.appendTo(dl);
+
+            var name = jQuery("<dt/>", {
+                text: "ERC20 Name: " + value.functionData.name
+            });
+            name.appendTo(dl);
+
+            var symbol = jQuery("<dt/>", {
+                text: "ERC20 Symbol: " + value.functionData.symbol
+            });
+            symbol.appendTo(dl);
+
+            var supply = jQuery("<dt/>", {
+                text: "ERC20 Supply: " + value.functionData.totalSupply
+            });
+            supply.appendTo(dl);
+
+            var decimals = jQuery("<dt/>", {
+                text: "ERC20 Decimals: " + value.functionData.decimals
+            });
+            decimals.appendTo(dl);
+
+        } else {
+            $.each(value.functionData, function(key, value) {
+                var theUnknownData = jQuery("<dt/>", {
+                    text: key + ": " + value
+                });
+                theUnknownData.appendTo(dl);
+            });
+        }
+
+        var breaker = jQuery("<br />", {});
+        breaker.appendTo(dl);
+
+        if (shaList.includes("0x2b5710e2cf7eb7c9bd50bfac8e89070bdfed6eb58f0c26915f034595e5443286") || shaList.includes("0x7f63f9caca226af6ac1e87fee18b638da04cfbb980f202e8f17855a6d4617a69")) {
+            var etherscan = jQuery("<dd/>", {
+
+            });
+
+            var etherscanUrl = "https://gastracker.io/addr/" + value.contractAddress;
+            var etherscanButton = jQuery("<a/>", {
+                href: etherscanUrl,
+                class: "btn btn-primary btn-sm",
+                role: "button",
+                target: "_blank",
+                text: "View on GasTracker.io"
+            });
+            etherscanButton.appendTo(etherscan);
+            etherscan.appendTo(dl);
+        }
+
     });
 }
-// CODE END
+
+class ESSS {
+    // Search Engine Base URL (Please include protocol. Please do not include trailing slash)
+    // Example: https://search-engine.com
+    constructor(_searchEngineBaseUrl) {
+        this.searchEngineBaseUrl = _searchEngineBaseUrl;
+        console.log("Search Engine Base URL set to: " + this.searchEngineBaseUrl);
+        this.indexStatus = {};
+    }
+
+    setIndexStatusToTrue(_transactionHash){
+        this.indexStatus[_transactionHash] = true;
+    }
+
+    setIndexStatusToFalse(_transactionHash){
+        this.indexStatus[_transactionHash] = false;
+    }
+
+    getIndexStatus(_transactionHash){
+        return this.indexStatus[_transactionHash];
+    }
+
+    queryUsingDsl(_query) {
+        var url = this.searchEngineBaseUrl + "/api/es_search";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify(_query));
+        });
+    }
+
+    expressHarvestAnAbi(_abiHash, _blockFloor) {
+        var url = this.searchEngineBaseUrl + "/api/express_harvest_an_abi";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["abiHash"] = _abiHash;
+            data["blockFloor"] = _blockFloor;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    updateStateOfContractAddress(_abi, _address) {
+        var url = this.searchEngineBaseUrl + "/api/update_state_of_contract_address";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["abi"] = _abi;
+            data["address"] = _address;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    updateQualityScore(_contractAddress, _qualityScore) {
+        var url = this.searchEngineBaseUrl + "/api/es_update_quality";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["contractAddress"] = _contractAddress;
+            data["qualityScore"] = _qualityScore;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    getMostRecentIndexedBlockNumber() {
+        var url = this.searchEngineBaseUrl + "/api/most_recent_indexed_block_number";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var blockNumber = jsonResponse["aggregations"]["most_recent_block"]["value"]
+                        resolve(blockNumber);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+    getBlockInterval() {
+        var url = this.searchEngineBaseUrl + "/api/get_block_interval";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+    getAbiCount() {
+        var url = this.searchEngineBaseUrl + "/api/es_get_abi_count";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var abiCount = jsonResponse["hits"]["total"]
+                        resolve(abiCount);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+    getAllCount() {
+        var url = this.searchEngineBaseUrl + "/api/es_get_all_count";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allCount = jsonResponse["hits"]["total"]
+                        resolve(allCount);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+
+    getContractCount() {
+        var url = this.searchEngineBaseUrl + "/api/es_get_contract_count";
+        return new Promise(function(resolve, reject) {
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allCount = jsonResponse["hits"]["total"]
+                        resolve(allCount);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.send(JSON.stringify());
+        });
+    }
+
+    confirmDeployment(_transactionHash) {
+        let url = this.searchEngineBaseUrl + "/api/confirm_deployment";
+        return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["hash"] = _transactionHash;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    describeUsingTx(_transactionHash) {
+        let url = this.searchEngineBaseUrl + "/api/describe_using_tx";
+        return new Promise(function(resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["hash"] = _transactionHash;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allRecord = JSON.stringify(jsonResponse["hits"]["hits"][0]["_source"]);
+                        resolve(allRecord);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    submitAbi(_abi, _transactionHash) {
+        var url = this.searchEngineBaseUrl + "/api/submit_abi";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["abi"] = _abi;
+            data["hash"] = _transactionHash;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    submitManyAbis(_abis, _transactionHash) {
+        var url = this.searchEngineBaseUrl + "/api/submit_many_abis";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = {};
+            data["abis"] = _abis;
+            data["hash"] = _transactionHash;
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+
+    shaAbi(_abi) {
+        var url = this.searchEngineBaseUrl + "/api/sha_an_abi";
+        return new Promise(function(resolve, reject) {
+            //data
+            var data = {};
+            data["abi"] = _abi;
+            var xhr = new XMLHttpRequest();
+
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    sortAbi(_abi) {
+        var url = this.searchEngineBaseUrl + "/api/sort_an_abi";
+        return new Promise(function(resolve, reject) {
+            //data
+            var data = {};
+            data["abi"] = _abi;
+            var xhr = new XMLHttpRequest();
+
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(data));
+        });
+    }
+
+    searchUsingAddress(_address) {
+        var url = this.searchEngineBaseUrl + "/api/es_search";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = '{"query":{"bool":{"must":[{"match":{"contractAddress":"' + _address + '"}}]}}}'
+            //execution
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var allRecord = JSON.stringify(jsonResponse[0]);
+                        resolve(allRecord);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(data);
+        });
+    }
+
+    searchUsingAbi(_abiHash) {
+        var url = this.searchEngineBaseUrl + "/api/es_search";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var data = '{"query":{"bool":{"must":[{"match":{"abiShaList":"' + _abiHash + '"}}]}}}'
+            //execution
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(data);
+        });
+    }
+
+    searchUsingKeywords(_keywords) {
+        var url = this.searchEngineBaseUrl + "/api/es_search";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var listOfKeywords = _keywords["keywords"];
+            var string = "";
+            var i;
+            for (i = 0; i < listOfKeywords.length; i++) {
+                if (string.length == 0) {
+                    string = string + '"' + listOfKeywords[i];
+                } else {
+                    string = string + "," + listOfKeywords[i];
+                }
+            }
+            string = string + '"'
+            var data = '{"query":{"query_string":{"query":' + string + '}}}';
+            console.log(data);
+            //execution
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(JSON.parse(data)));
+        });
+    }
+
+    searchUsingKeywordsAndAbi(_abiHash, _keywords) {
+        var url = this.searchEngineBaseUrl + "/api/es_search";
+        return new Promise(function(resolve, reject) {
+            // request initialisation
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            //data
+            var listOfKeywords = _keywords["keywords"];
+            var string = "";
+            var i;
+            for (i = 0; i < listOfKeywords.length; i++) {
+                if (string.length == 0) {
+                    string = string + '"' + listOfKeywords[i];
+                } else {
+                    string = string + "," + listOfKeywords[i];
+                }
+            }
+            string = string + '"'
+            var data = '{"query":{"bool":{"must":[{"match":{"abiShaList":"' + _abiHash + '"}},{"query_string":{"query":' + string + '}}]}}}';
+            console.log(data);
+            //execution
+            xhr.onload = function(e) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        resolve(xhr.responseText);
+                    }
+                }
+            };
+            xhr.onerror = reject;
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.send(JSON.stringify(JSON.parse(data)));
+        });
+    }
+}
+
+var esss = new ESSS("http://http://13.211.174.139");
+
+/*
+
+esss.shaAbi(JSON.stringify(abi)).then((shaResult) => {
+    var sha = JSON.parse(shaResult).abiSha3;
+    esss.searchUsingAbi(sha).then((searchResult) => {
+        var items = JSON.parse(searchResult);
+
+    });
+});
+
+*/
