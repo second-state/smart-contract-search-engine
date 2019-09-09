@@ -176,7 +176,7 @@ class Harvest:
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
         returnVal = False
-        q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _esId +'"}}]}}}'
+        q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _esId +'"}}]}}, "size": 0}'
         try:
             esResponse2 = self.es.search(index=_theIndex, body=q)
             print(esResponse2)
