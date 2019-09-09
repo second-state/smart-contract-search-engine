@@ -49,7 +49,7 @@ def update_state_of_contract_address():
 
 @app.route("/api/express_harvest_an_abi", methods=['GET', 'POST'])
 def express_harvest_an_abi():
-    print(request)
+    #print(request)
     jsonRequestData = json.loads(request.data)
     abiHash = jsonRequestData["abiHash"]
     blockFloor = jsonRequestData["blockFloor"]
