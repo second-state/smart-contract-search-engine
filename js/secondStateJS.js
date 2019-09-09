@@ -1112,7 +1112,7 @@ class ESSS {
     }
 }
 
-var esss = new ESSS("http://http://13.211.174.139");
+var esss = new ESSS(publicIp);
 
 /*
 
