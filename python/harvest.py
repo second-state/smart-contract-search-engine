@@ -176,7 +176,7 @@ class Harvest:
 
     def hasDataBeenIndexed(self, _theIndex, _esId):
         returnVal = False
-        q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _esId +'"}}]}}, "size": 0}'
+        q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _esId +'"}}]}}}'
         try:
             esResponse2 = self.es.search(index=_theIndex, body=q)
             print(esResponse2)
@@ -367,9 +367,12 @@ class Harvest:
                 newAbiSha = self.shaAnAbi(_esAbiSingle)
                 newList = []
                 found = False
-                newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
-                if len(newData["_source"]["abiShaList"]) > 0:
-                    for item in newData["_source"]["abiShaList"]:
+                q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _source["contractAddress"] +'"}}]}}}'
+                newData = self.es.search(index=self.commonIndex, body=q)
+                # es.get does not work on the common index reliably and as such we are replacing it with a better call
+                #newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
+                if len(newData["hits"]["hits"][0]["_source"]["abiShaList"]) > 0:
+                    for item in newData["hits"]["hits"][0]["_source"]["abiShaList"]:
                         if item == newAbiSha:
                             found = True
                             break
@@ -710,9 +713,12 @@ class Harvest:
         functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
         newList = []
         found = False
-        newData = self.es.get(index=self.commonIndex, id=contractInstance.address)
-        if len(newData["_source"]["functionDataList"]["0"]) > 0:
-            for item in newData["_source"]["functionDataList"]["0"]:
+        q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ contractInstance.address +'"}}]}}}'
+        newData = self.es.search(index=self.commonIndex, body=q)
+        # es.get does not work on the common index reliably and as such we are replacing it with a better call
+        #newData = self.es.get(index=self.commonIndex, id=contractInstance.address)
+        if len(newData["hits"]["hits"][0]["_source"]["functionDataList"]["0"]) > 0:
+            for item in newData["hits"]["hits"][0]["_source"]["functionDataList"]["0"]:
                 for k, v in item.items():
                     if k == "uniqueAbiAndAddressHash":
                         if v == uniqueAbiAndAddressHash:
@@ -736,9 +742,13 @@ class Harvest:
     def updateStateOfContractAddress(self, _abi, _address):
         try:
             if _abi == "all":
-                contractItem = self.es.get(index=self.commonIndex, id=_address)
-                if len(contractItem["_source"]["abiShaList"]) > 0:
-                    for abiHash in contractItem["_source"]["abiShaList"]:
+                q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _address +'"}}]}}}'
+                print(q)
+                contractItem = self.es.search(index=self.commonIndex, body=q)
+                print(contractItem)
+                if len( contractItem["hits"]["hits"][0]["_source"]["abiShaList"]) > 0:
+                    for abiHash in  contractItem["hits"]["hits"][0]["_source"]["abiShaList"]:
+                        print("Processing ABI hash: ")
                         jsonAbi = self.fetchAbiUsingHash(abiHash)
                         self.updateStateOfSingleAbiAndContractAddressRelationship(jsonAbi, _address)
                 return True
@@ -765,9 +775,12 @@ class Harvest:
             self.addressAndFunctionDataHashes[uniqueAbiAndAddressHash] = functionDataId
             newList = []
             found = False
-            newData = self.es.get(index=self.commonIndex, id=_instance.address)
-            if len(newData["_source"]["functionDataList"]["0"]) > 0:
-                for item in newData["_source"]["functionDataList"]["0"]:
+            q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _instance.address +'"}}]}}}'
+            newData = self.es.search(index=self.commonIndex, body=q)
+            # es.get does not work on the common index reliably and as such we are replacing it with a better call
+            #newData = self.es.get(index=self.commonIndex, id=_instance.address)
+            if len(newData["hits"]["hits"][0]["_source"]["functionDataList"]["0"]) > 0:
+                for item in newData["hits"]["hits"][0]["_source"]["functionDataList"]["0"]:
                     for k, v in item.items():
                         if k == "uniqueAbiAndAddressHash":
                             if v == uniqueAbiAndAddressHash:
