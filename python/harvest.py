@@ -311,20 +311,12 @@ class Harvest:
         return _abi
 
     def sortInternalListsInJsonObject(self, _abi):
-        print("********** ABI " + str(_abi) + "****************")
         for listItem in _abi:
             for k, v in listItem.items():
-                #print("Processing " + str(v) +  " which has a type of " + str(type(v)))
-                # Qualify the value as a list of JSON objects
                 if type(v) not in (str, bool, int):
-                    # Qualify list as needing sorting (contains more than one item)
                     if len(v) > 1:
-                        #print("\nSORTING")
-                        # Qualify the sortable data is JSON
                         if type(v[0]) is dict:
-                            #print("Processing:" + str(v))
                             v = self.sortJson(v)
-                            #print("Sorted    :" + str(v) + "\n")
                     else:
                         print("Not enough items in the list to sort, moving on")
                 else:
@@ -369,8 +361,6 @@ class Harvest:
                 found = False
                 q = '{"query":{"bool":{"must":[{"match":{"contractAddress":"'+ _source["contractAddress"] +'"}}]}}}'
                 newData = self.es.search(index=self.commonIndex, body=q)
-                # es.get does not work on the common index reliably and as such we are replacing it with a better call
-                #newData = self.es.get(index=self.commonIndex, id=_source["contractAddress"])
                 if len(newData["hits"]["hits"][0]["_source"]["abiShaList"]) > 0:
                     for item in newData["hits"]["hits"][0]["_source"]["abiShaList"]:
                         if item == newAbiSha:
@@ -461,7 +451,6 @@ class Harvest:
                 print("It has been longer than the desired time, need to re-update the ABI immediately ...")
 
     def addDataToIgnoreIndex(self, _contractAbiJSONData, _itemId):
-        # Add this abi and contract address to the ignore index because we don't want to waste time revisiting this combo
         outerData = {}
         outerData['contractAddress'] = _itemId
         abiHash = self.shaAnAbi(_contractAbiJSONData)
@@ -502,7 +491,6 @@ class Harvest:
         if itemId != None:
             dataStatus = self.hasDataBeenIndexed(self.commonIndex, itemId)
             if dataStatus == True:
-                # The contract address might be indexed, however this ABI may be associated with it so we need to check this 
                 theAbiHash = self.shaAnAbi(_contractAbiJSONData)
                 indexedContractData = self.getDataUsingAddressHash(itemId)
                 if theAbiHash in indexedContractData["hits"]["hits"][0]["_source"]["abiShaList"]:
@@ -554,11 +542,8 @@ class Harvest:
                         print("Got Data OK but no ES index!")
                         sys.exit()
                 else:
-                    # This is required because if a minimalistic ABI is in place it will still instantiate a web3 object and add the ABI to the abiShaList which is incorrect. 
-                    # In order to index this item we need to know that the web3 object can talk to the functions of the contract. 
                     print("There is no function data so we will do an ABI compatibility update")
                     indexedContractData = self.getDataUsingAddressHash(itemId)
-                    #self.abiCompatabilityUpdate(_contractAbiJSONData, indexedContractData["hits"]["hits"][0]["_source"])
                     listOfKeccakHashes = self.createUniqueAbiComparisons(_contractAbiJSONData)
                     if len(listOfKeccakHashes) > 0:
                         count = 0
@@ -580,13 +565,6 @@ class Harvest:
                                 outerData['creator'] = transactionReceipt['from']
                                 outerData['contractAddress'] = itemId
                                 functionDataList = []
-                                # functionDataObjectInner = {}
-                                # functionDataObjectInner['functionDataId'] = functionDataId
-                                # functionDataObjectInner['functionData'] = functionData
-                                # uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
-                                # uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
-                                # functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
-                                # functionDataList.append(functionDataObjectInner)
                                 functionDataObjectOuter = {}
                                 functionDataObjectOuter["0"] = functionDataList
                                 outerData['functionDataList'] = functionDataObjectOuter
