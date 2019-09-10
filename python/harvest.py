@@ -556,7 +556,47 @@ class Harvest:
                 else:
                     # This is required because if a minimalistic ABI is in place it will still instantiate a web3 object and add the ABI to the abiShaList which is incorrect. 
                     # In order to index this item we need to know that the web3 object can talk to the functions of the contract. 
-                    print("There is no function data so moving on")
+                    print("There is no function data so we will do an ABI compatibility update")
+                    indexedContractData = self.getDataUsingAddressHash(itemId)
+                    #self.abiCompatabilityUpdate(_contractAbiJSONData, indexedContractData["hits"]["hits"][0]["_source"])
+                    listOfKeccakHashes = self.createUniqueAbiComparisons(_contractAbiJSONData)
+                    if len(listOfKeccakHashes) > 0:
+                        count = 0
+                        for individualHash in listOfKeccakHashes:
+                            if individualHash in transactionData.input:
+                                count += 1
+                            else:
+                                print("Hash not found, so move on quickly")
+                                break
+                        if count == len(listOfKeccakHashes):
+                            try:                
+                                outerData = {}
+                                outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                abiList = []
+                                abiHash = self.shaAnAbi(_contractAbiJSONData)
+                                abiList.append(abiHash)
+                                outerData['abiShaList'] = abiList
+                                outerData['blockNumber'] = transactionReceipt.blockNumber
+                                outerData['creator'] = transactionReceipt['from']
+                                outerData['contractAddress'] = itemId
+                                functionDataList = []
+                                # functionDataObjectInner = {}
+                                # functionDataObjectInner['functionDataId'] = functionDataId
+                                # functionDataObjectInner['functionData'] = functionData
+                                # uniqueAbiAndAddressKey = str(abiHash) + str(contractInstance.address)
+                                # uniqueAbiAndAddressHash = str(self.web3.toHex(self.web3.sha3(text=uniqueAbiAndAddressKey)))
+                                # functionDataObjectInner['uniqueAbiAndAddressHash'] = uniqueAbiAndAddressHash
+                                # functionDataList.append(functionDataObjectInner)
+                                functionDataObjectOuter = {}
+                                functionDataObjectOuter["0"] = functionDataList
+                                outerData['functionDataList'] = functionDataObjectOuter
+                                outerData["requiresUpdating"] = "yes"
+                                outerData['quality'] = "50"
+                                outerData['indexInProgress'] = "false"
+                                indexResult = self.loadDataIntoElastic(self.commonIndex, itemId, json.dumps(outerData))
+                            except:
+                                print("Got Data OK but no ES index!")
+                                sys.exit()
             else:
                 print("Item is already indexed")
         else:
