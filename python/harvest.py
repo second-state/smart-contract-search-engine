@@ -328,8 +328,8 @@ class Harvest:
         return cleanString
 
     def cleanAndConvertAbiToText(self, _theAbi):
-        theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
-        theAbiWithSortedKeys = self.sortABIKeys(theAbiWithSortedLists)
+        #theAbiWithSortedLists = self.sortInternalListsInJsonObject(_theAbi)
+        theAbiWithSortedKeys = self.sortABIKeys(_theAbi)
         theAbiFullySorted = self.sortJson(theAbiWithSortedKeys)
         sanitizedAbiString = self.sanitizeString(json.dumps(theAbiFullySorted, sort_keys=False))
         return sanitizedAbiString
