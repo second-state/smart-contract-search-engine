@@ -992,73 +992,73 @@ class Harvest:
                     stopAtBlock = 0
                 print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for blockNumber in reversed(range(stopAtBlock, latestBlockNumber)):
-                #try:
-                print("\nProcessing block number %s" % blockNumber)
-                blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
-                if blockTransactionCount > 0:
-                    block = self.web3.eth.getBlock(blockNumber)
-                    for singleTransaction in block.transactions:
-                        singleTransactionHex = singleTransaction.hex()
-                        transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
-                        transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
-                        transactionContractAddress = transactionReceipt.contractAddress
-                        if transactionContractAddress != None:
-                            outerData = {}
-                            outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                            outerData['blockNumber'] = transactionReceipt.blockNumber
-                            outerData['contractAddress'] = transactionReceipt.contractAddress
-                            outerData['from'] = transactionReceipt['from']
-                            outerData['to'] = transactionReceipt['to']
-                            outerData["indexed"] = "false"
-                            itemId = transactionReceipt.contractAddress
-                            dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
-                            if dataStatus == False:
-                                if _topup == True:
-                                    indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
-                                    self.threadsAddNewItem = []
-                                    dMatchAllInner = {}
-                                    dMatchAll = {}
-                                    dMatchAll["match_all"] = dMatchAllInner
-                                    dQuery = {}
-                                    dQuery["query"] = dMatchAll
-                                    print("Querying ES " + json.dumps(dQuery))
-                                    esReponseAbi = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex , query=json.dumps(dQuery), preserve_order=True)
-                                    for item in esReponseAbi:
-                                        jsonAbi = json.loads(item["_source"]["abi"])
-                                        tAddNewItem = threading.Thread(target=self.processSingleTransaction, args=[jsonAbi , str(self.web3.toHex(transactionData.hash))])
-                                        tAddNewItem.daemon = True
-                                        tAddNewItem.start()
-                                        self.threadsAddNewItem.append(tAddNewItem)
-                                    for individualAddNewItemThread in self.threadsAddNewItem:
-                                        individualAddNewItemThread.join()
-                                else:
-                                    singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
-                                    bulkList.append(singleItem)
-                                    print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                    if len(bulkList) == 50:
-                                        elasticsearch.helpers.bulk(self.es, bulkList)
-                                        bulkList = []
-                        else:
-                            dataStatus = self.hasDataBeenIndexed(self.activityIndex, str(self.web3.toHex(transactionData.hash)))
-                            print("Indexing transaction activity because this one is not contract related")
-                            if dataStatus == False:
+                try:
+                    print("\nProcessing block number %s" % blockNumber)
+                    blockTransactionCount = self.web3.eth.getBlockTransactionCount(blockNumber)
+                    if blockTransactionCount > 0:
+                        block = self.web3.eth.getBlock(blockNumber)
+                        for singleTransaction in block.transactions:
+                            singleTransactionHex = singleTransaction.hex()
+                            transactionData = self.web3.eth.getTransaction(str(singleTransactionHex))
+                            transactionReceipt = self.web3.eth.getTransactionReceipt(str(singleTransactionHex))
+                            transactionContractAddress = transactionReceipt.contractAddress
+                            if transactionContractAddress != None:
                                 outerData = {}
-                                outerData['timestamp'] = block['timestamp']
                                 outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
-                                outerData['blockNumber'] = transactionData['blockNumber']
-                                outerData['from'] = transactionData['from']
-                                outerData['to'] = transactionData['to']
-                                outerData['valueWei'] = str(transactionData['value'])
-                                outerData['valueEth'] = float(round(self.web3.fromWei(transactionData['value'], 'ether'), 6))
-                                outerData['gasUsed'] = transactionReceipt.gasUsed
-                                #singleItem = {"_index":str(self.activityIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
-                                indexResult = self.loadDataIntoElastic(self.activityIndex, str(self.web3.toHex(transactionData.hash)), json.dumps(outerData))
+                                outerData['blockNumber'] = transactionReceipt.blockNumber
+                                outerData['contractAddress'] = transactionReceipt.contractAddress
+                                outerData['from'] = transactionReceipt['from']
+                                outerData['to'] = transactionReceipt['to']
+                                outerData["indexed"] = "false"
+                                itemId = transactionReceipt.contractAddress
+                                dataStatus = self.hasDataBeenIndexed(esIndex, itemId)
+                                if dataStatus == False:
+                                    if _topup == True:
+                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
+                                        self.threadsAddNewItem = []
+                                        dMatchAllInner = {}
+                                        dMatchAll = {}
+                                        dMatchAll["match_all"] = dMatchAllInner
+                                        dQuery = {}
+                                        dQuery["query"] = dMatchAll
+                                        print("Querying ES " + json.dumps(dQuery))
+                                        esReponseAbi = elasticsearch.helpers.scan(client=self.es, index=self.abiIndex , query=json.dumps(dQuery), preserve_order=True)
+                                        for item in esReponseAbi:
+                                            jsonAbi = json.loads(item["_source"]["abi"])
+                                            tAddNewItem = threading.Thread(target=self.processSingleTransaction, args=[jsonAbi , str(self.web3.toHex(transactionData.hash))])
+                                            tAddNewItem.daemon = True
+                                            tAddNewItem.start()
+                                            self.threadsAddNewItem.append(tAddNewItem)
+                                        for individualAddNewItemThread in self.threadsAddNewItem:
+                                            individualAddNewItemThread.join()
+                                    else:
+                                        singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                        bulkList.append(singleItem)
+                                        print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                        if len(bulkList) == 50:
+                                            elasticsearch.helpers.bulk(self.es, bulkList)
+                                            bulkList = []
                             else:
-                                print("We already have this transaction: " + str(self.web3.toHex(transactionData.hash)))
-                else:
-                    print("Skipping block number %s - No transactions found!" % blockNumber)
-                    continue
-                #except:
+                                dataStatus = self.hasDataBeenIndexed(self.activityIndex, str(self.web3.toHex(transactionData.hash)))
+                                print("Indexing transaction activity because this one is not contract related")
+                                if dataStatus == False:
+                                    outerData = {}
+                                    outerData['timestamp'] = block['timestamp']
+                                    outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
+                                    outerData['blockNumber'] = transactionData['blockNumber']
+                                    outerData['from'] = transactionData['from']
+                                    outerData['to'] = transactionData['to']
+                                    outerData['valueWei'] = str(transactionData['value'])
+                                    outerData['valueEth'] = float(round(self.web3.fromWei(transactionData['value'], 'ether'), 6))
+                                    outerData['gasUsed'] = transactionReceipt.gasUsed
+                                    #singleItem = {"_index":str(self.activityIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                    indexResult = self.loadDataIntoElastic(self.activityIndex, str(self.web3.toHex(transactionData.hash)), json.dumps(outerData))
+                                else:
+                                    print("We already have this transaction: " + str(self.web3.toHex(transactionData.hash)))
+                    else:
+                        print("Skipping block number %s - No transactions found!" % blockNumber)
+                        continue
+                except:
                     print("Problems at block height " + str(blockNumber))
             if len(bulkList) >= 1:
                 print("Adding the last few items which were not bulk loaded already")
