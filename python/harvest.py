@@ -11,6 +11,7 @@ import argparse
 import requests
 import threading
 import configparser
+from decimal import Decimal
 import elasticsearch.helpers
 from operator import itemgetter
 from web3 import Web3, HTTPProvider
@@ -1047,7 +1048,7 @@ class Harvest:
                                 outerData['from'] = transactionData['from']
                                 outerData['to'] = transactionData['to']
                                 outerData['valueWei'] = transactionData['value']
-                                outerData['valueEth'] = round(self.web3.fromWei(transactionData['value'], 'ether'), 6)
+                                outerData['valueEth'] = float(round(self.web3.fromWei(transactionData['value'], 'ether'), 6))
                                 outerData['gasUsed'] = transactionReceipt.gasUsed
                                 singleItem = {"_index":str(self.ignoreIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
                             else:
