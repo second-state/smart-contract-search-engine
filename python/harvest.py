@@ -1039,6 +1039,7 @@ class Harvest:
                                         elasticsearch.helpers.bulk(self.es, bulkList)
                                         bulkList = []
                         else:
+                            print("Indexing transaction activity because this one is not contract related")
                             dataStatus = self.hasDataBeenIndexed(self.ignoreIndex, str(self.web3.toHex(transactionData.hash)))
                             if dataStatus == False:
                                 outerData = {}
