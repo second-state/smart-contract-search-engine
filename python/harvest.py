@@ -1041,6 +1041,7 @@ class Harvest:
                                 dataStatus = self.hasDataBeenIndexed(self.ignoreIndex, str(self.web3.toHex(transactionData.hash)))
                                 if dataStatus == False:
                                     outerData = {}
+                                    outerData['timestamp'] = block['timestamp']
                                     outerData['TxHash'] = str(self.web3.toHex(transactionData.hash))
                                     outerData['blockNumber'] = transactionData['blockNumber']
                                     outerData['from'] = transactionData['from']
