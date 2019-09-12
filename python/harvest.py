@@ -1048,7 +1048,7 @@ class Harvest:
                                 outerData['blockNumber'] = transactionData['blockNumber']
                                 outerData['from'] = transactionData['from']
                                 outerData['to'] = transactionData['to']
-                                outerData['valueWei'] = transactionData['value']
+                                outerData['valueWei'] = str(transactionData['value'])
                                 outerData['valueEth'] = float(round(self.web3.fromWei(transactionData['value'], 'ether'), 6))
                                 outerData['gasUsed'] = transactionReceipt.gasUsed
                                 #singleItem = {"_index":str(self.activityIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
