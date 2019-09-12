@@ -1039,8 +1039,8 @@ class Harvest:
                                         elasticsearch.helpers.bulk(self.es, bulkList)
                                         bulkList = []
                         else:
+                            dataStatus = self.hasDataBeenIndexed(self.activityIndex, str(self.web3.toHex(transactionData.hash)))
                             print("Indexing transaction activity because this one is not contract related")
-                            dataStatus = self.hasDataBeenIndexed(self.ignoreIndex, str(self.web3.toHex(transactionData.hash)))
                             if dataStatus == False:
                                 outerData = {}
                                 outerData['timestamp'] = block['timestamp']
@@ -1051,7 +1051,8 @@ class Harvest:
                                 outerData['valueWei'] = transactionData['value']
                                 outerData['valueEth'] = float(round(self.web3.fromWei(transactionData['value'], 'ether'), 6))
                                 outerData['gasUsed'] = transactionReceipt.gasUsed
-                                singleItem = {"_index":str(self.ignoreIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                #singleItem = {"_index":str(self.activityIndex), "_id": str(self.web3.toHex(transactionData.hash)), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                indexResult = self.loadDataIntoElastic(self.activityIndex, str(self.web3.toHex(transactionData.hash)), json.dumps(outerData))
                             else:
                                 print("We already have this transaction: " + str(self.web3.toHex(transactionData.hash)))
                 else:
