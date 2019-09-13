@@ -267,8 +267,15 @@ def es_tx_search():
     print(request)
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.activityIndex, query=jsonRequestData)
+    outerList = []
+    for returnedItem in results:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                uniqueDict["_source"] = rValue
+                outerList.append(uniqueDict)
     resultsDict = {}
-    resultsDict["results"] = results
+    resultsDict["results"] = outerList
     #print(resultsDict)
     return jsonify(resultsDict["results"])
 
