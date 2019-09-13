@@ -262,6 +262,16 @@ def es_search():
     #print(resultsDict)
     return jsonify(resultsDict["results"])
 
+@app.route("/api/es_tx_search", methods=['GET', 'POST'])
+def es_tx_search():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.activityIndex, query=jsonRequestData)
+    resultsDict = {}
+    resultsDict["results"] = results["hits"]["hits"][0]
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
+
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
     matchAll = {}
