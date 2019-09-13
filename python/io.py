@@ -268,7 +268,7 @@ def es_tx_search():
     jsonRequestData = json.loads(request.data)
     results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.activityIndex, query=jsonRequestData)
     resultsDict = {}
-    resultsDict["results"] = results["hits"]["hits"][0]
+    resultsDict["results"] = results
     #print(resultsDict)
     return jsonify(resultsDict["results"])
 
