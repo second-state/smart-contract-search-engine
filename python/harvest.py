@@ -978,7 +978,7 @@ class Harvest:
     def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         while True:
-            bulkList = []
+            #bulkList = []
             latestBlockNumber = self.web3.eth.getBlock('latest').number
             print("Latest block is %s" % latestBlockNumber)
             stopAtBlock = 0
@@ -1032,12 +1032,13 @@ class Harvest:
                                         for individualAddNewItemThread in self.threadsAddNewItem:
                                             individualAddNewItemThread.join()
                                     else:
-                                        singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
-                                        bulkList.append(singleItem)
-                                        print("Added item to BULK list, we now have " + str(len(bulkList)))
-                                        if len(bulkList) == 50:
-                                            elasticsearch.helpers.bulk(self.es, bulkList)
-                                            bulkList = []
+                                        indexResult = self.loadDataIntoElastic(esIndex, itemId, json.dumps(outerData))
+                                        #singleItem = {"_index":str(esIndex), "_id": str(itemId), "_type": "_doc", "_op_type": "index", "_source": json.dumps(outerData)}
+                                        #bulkList.append(singleItem)
+                                        #print("Added item to BULK list, we now have " + str(len(bulkList)))
+                                        #if len(bulkList) == 50:
+                                        #    elasticsearch.helpers.bulk(self.es, bulkList)
+                                        #    bulkList = []
                             else:
                                 dataStatus = self.hasDataBeenIndexed(self.activityIndex, str(self.web3.toHex(transactionData.hash)))
                                 print("Indexing transaction activity because this one is not contract related")
@@ -1060,10 +1061,10 @@ class Harvest:
                         continue
                 except:
                     print("Problems at block height " + str(blockNumber))
-            if len(bulkList) >= 1:
-                print("Adding the last few items which were not bulk loaded already")
-                elasticsearch.helpers.bulk(self.es, bulkList)
-                bulkList = []
+            #if len(bulkList) >= 1:
+            #    print("Adding the last few items which were not bulk loaded already")
+            #    elasticsearch.helpers.bulk(self.es, bulkList)
+            #    bulkList = []
             if _topup == True and len(_argList) == 0:
                 self.upcomingCallTimeHarvest = self.upcomingCallTimeHarvest + int(self.secondsPerBlock)
                 if self.upcomingCallTimeHarvest > time.time():
