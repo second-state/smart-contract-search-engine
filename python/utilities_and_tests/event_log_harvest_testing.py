@@ -69,8 +69,9 @@ if(transactionCount >= 1):
                                 eventDict["from"] = sentFrom
                                 eventDict["inputs"] = inputDict
                                 contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress))
-                                eventLogDataObject = contractInstance.eventFilter(str(name))
-                                print(str(eventLogDataObject))
+                                eventLogDataObject = contractInstance.eventFilter(str(name), {"filter": {"_from": sentFrom}})
+                                print("OOOOOOOOOOOOOOOOO")
+                                print(str(eventLogDataObject.get_new_entries()))
             else:
                 print("This contract's ABIs are not known/indexed so we can not read the event names")
         else:
