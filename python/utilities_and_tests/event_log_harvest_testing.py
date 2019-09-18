@@ -10,11 +10,12 @@ latestBlockNumber = harvester.web3.eth.getBlock('latest').number
 
 # Iterate through the individual blocks looking for a transaction which involves event log emit
 # TESTING SINGLE EVENT AT BLOCK 6328976
-#for b in range(latestBlockNumber - 1, latestBlockNumber):
+#for b in range(latestBlockNumber - 1, latestBlockNumber):8485195  6328976
 transactionCount = harvester.web3.eth.getBlockTransactionCount(6328976)
 if(transactionCount >= 1):
     for singleTransactionInt in range(0, transactionCount):
-        transaction = harvester.web3.eth.getTransactionByBlock(b, singleTransactionInt)
+        # transaction = harvester.web3.eth.getTransactionByBlock(b, singleTransactionInt)
+        transaction = harvester.web3.eth.getTransactionByBlock(6328976, singleTransactionInt)
         transactionHash = transaction.hash
         transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
         transactionLogs = transactionReceipt.logs
@@ -40,16 +41,25 @@ if(transactionCount >= 1):
                                 if value == "event":
                                     isEvent = True
                         if isEvent is True and name is not "":
+                            eventDict = {}
+                            # Create a selector hash
+                            selectorHash = str(name) + "("
                             print("\nEvent Log Name:" + name)
                             print(str(key))
                             print(str(value))
                             ## Make sure that this goes into the distinctEventList if it is not there already
                             inputCounter = 1
-                            for input in inputs:
+                            for input in range(0, len(inputs)):
                                 print("\t" + "Input" + str(inputCounter))
-                                for inputKey, inputValue in input.items():
+                                for inputKey, inputValue in inputs[input].items():
+                                    if str(inputKey) == "type":
+                                        if input == len(inputs) - 1:
+                                            selectorHash = selectorHash + str(inputValue) + ")"
+                                        else:
+                                            selectorHash = selectorHash + str(inputValue) + ","
                                     print("\t\t" + str(inputKey) + ":" + str(inputValue))
                                 inputCounter = inputCounter + 1
+                            print("Selector hash: " + selectorHash)
             else:
                 print("This contract's ABIs are not known/indexed so we can not read the event names")
         else:
