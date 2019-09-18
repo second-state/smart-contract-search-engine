@@ -1142,6 +1142,12 @@ class Harvest:
             self.es.indices.create(index=self.ignoreIndex)
         else:
             print(str(self.ignoreIndex) + ", index already exists")
+        print("Checking to see if " + str(self.eventIndex) + " exists ...")
+        if self.es.indices.exists(index=self.eventIndex) == False:
+            print("Creating " + str(self.eventIndex))
+            self.es.indices.create(index=self.eventIndex)
+        else:
+            print(str(self.eventIndex) + ", index already exists")
         print("Checking to see if " + str(self.activityIndex) + " exists ...")
         if self.es.indices.exists(index=self.activityIndex) == False:
             print("Creating " + str(self.activityIndex))
