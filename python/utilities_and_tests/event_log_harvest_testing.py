@@ -42,35 +42,32 @@ if(transactionCount >= 1):
                                     isEvent = True
                         if isEvent is True and name is not "":
                             eventDict = {}
-                            eventDict["name"] = str(name)
-                            eventDict["contractAddress"] = contractAddress
-                            eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
-                            eventDict["blockNumber"] = blockNumber
-                            eventDict["from"] = sentFrom
                             # Create a selector hash
                             selectorText = str(name) + "("
-                            print("\nEvent Log Name:" + name)
-                            print(str(key))
-                            print(str(value))
-                            ## Make sure that this goes into the distinctEventList if it is not there already
                             inputCounter = 1
                             inputDict = {}
                             for input in range(0, len(inputs)):
                                 for inputKey, inputValue in inputs[input].items():
                                     inputDict[str(inputKey)] = str(inputValue)
+                                    # Specifically build the selector string if the input key is type
                                     if str(inputKey) == "type":
                                         if input == len(inputs) - 1:
                                             selectorText = selectorText + str(inputValue) + ")"
                                         else:
                                             selectorText = selectorText + str(inputValue) + ","
-                                    print("\t\t" + str(inputKey) + ":" + str(inputValue))
+                                    # Perform all other operations including if the input key is type
+                                    # 
                                 inputCounter = inputCounter + 1
-                            print("Selector text: " + selectorText)
                             selectorHash = "0x" + str(harvester.web3.toHex(harvester.web3.sha3(text=selectorText)))[2:10]
-                            eventDict["id"] = str(selectorHash)
-                            print("Selector hash: " + selectorHash)
-                            eventDict["inputs"] = inputDict
-                            print(str(eventDict))
+                            if str(selectorHash) not in distinctEventList:
+                                distinctEventList.append(str(selectorHash))
+                                eventDict["id"] = str(selectorHash)
+                                eventDict["name"] = str(name)
+                                eventDict["contractAddress"] = contractAddress
+                                eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
+                                eventDict["blockNumber"] = blockNumber
+                                eventDict["from"] = sentFrom
+                                eventDict["inputs"] = inputDict
             else:
                 print("This contract's ABIs are not known/indexed so we can not read the event names")
         else:
@@ -79,7 +76,7 @@ else:
     print("Transaction count is 0")
 
 # TODO
-# use the selectorHash to create the distinct list (of selector hashes) per contract adress (summary of all of the ABIs)
+# use the selectorHash to create the distinct list (of selector hashes) per contract address (summary of all of the ABIs)
 # once you have the distinct list then see if the data has beein indexed as yet (in relation to that specific transaction hash)
 # hasDataBeenIndexed(_eventLogIndex, _esId)
 # create an ES item for the _eventLogIndex which has an id of harvester.web3.toHex(transaction.hash)
