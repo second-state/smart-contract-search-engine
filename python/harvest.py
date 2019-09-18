@@ -73,6 +73,10 @@ class Harvest:
         self.activityIndex = self.config['activityindex']['activity']
         print("Activity index: %s" % self.activityIndex)
 
+        # Event index
+        self.eventIndex = self.config['eventindex']['event']
+        print("Event index: %s" % self.eventIndex)
+
         # Elasticsearch AWS region
         self.elasticSearchAwsRegion = self.config['elasticSearch']['aws_region']
 

@@ -17,61 +17,68 @@ if(transactionCount >= 1):
         # transaction = harvester.web3.eth.getTransactionByBlock(b, singleTransactionInt)
         transaction = harvester.web3.eth.getTransactionByBlock(6328976, singleTransactionInt)
         transactionHash = transaction.hash
-        transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
-        transactionLogs = transactionReceipt.logs
-        if (len(transactionLogs) >= 1):
-            contractAddress = transactionReceipt.logs[0]["address"]
-            blockNumber = transactionReceipt["blockNumber"]
-            sentFrom = transactionReceipt["from"]
-            listOfAbis = harvester.fetchAbiShaList(contractAddress)
-            if listOfAbis["hits"]["total"] > 0:
-                distinctEventList = []
-                for item in listOfAbis["hits"]["hits"][0]["_source"]["abiShaList"]:
-                    jsonAbi = json.loads(harvester.fetchAbiUsingHash(str(item)))
-                    for abiComponents in jsonAbi:
-                        isEvent = False
-                        name = ""
-                        inputs = []
-                        for key, value in abiComponents.items():
-                            if key == "inputs":
-                                inputs = value
-                            if key == "name":
-                                name = value
-                            if key == "type":
-                                if value == "event":
-                                    isEvent = True
-                        if isEvent is True and name is not "":
-                            eventDict = {}
-                            # Create a selector hash
-                            selectorText = str(name) + "("
-                            inputCounter = 1
-                            inputDict = {}
-                            for input in range(0, len(inputs)):
-                                for inputKey, inputValue in inputs[input].items():
-                                    inputDict[str(inputKey)] = str(inputValue)
-                                    # Specifically build the selector string if the input key is type
-                                    if str(inputKey) == "type":
-                                        if input == len(inputs) - 1:
-                                            selectorText = selectorText + str(inputValue) + ")"
-                                        else:
-                                            selectorText = selectorText + str(inputValue) + ","
-                                    # Perform all other operations including if the input key is type
-                                    # 
-                                inputCounter = inputCounter + 1
-                            selectorHash = "0x" + str(harvester.web3.toHex(harvester.web3.sha3(text=selectorText)))[2:10]
-                            if str(selectorHash) not in distinctEventList:
-                                distinctEventList.append(str(selectorHash))
-                                eventDict["id"] = str(selectorHash)
-                                eventDict["name"] = str(name)
-                                eventDict["contractAddress"] = contractAddress
-                                eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
-                                eventDict["blockNumber"] = blockNumber
-                                eventDict["from"] = sentFrom
-                                eventDict["inputs"] = inputDict
+        # Check to see if this TxHash is indexed 
+        if harvester.hasDataBeenIndexed(harvester.eventIndex, str(harvester.web3.toHex(transactionHash))) != True:
+            transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
+            transactionLogs = transactionReceipt.logs
+            if (len(transactionLogs) >= 1):
+                contractAddress = transactionReceipt.logs[0]["address"]
+                blockNumber = transactionReceipt["blockNumber"]
+                sentFrom = transactionReceipt["from"]
+                listOfAbis = harvester.fetchAbiShaList(contractAddress)
+                if listOfAbis["hits"]["total"] > 0:
+                    distinctEventList = []
+                    for item in listOfAbis["hits"]["hits"][0]["_source"]["abiShaList"]:
+                        jsonAbi = json.loads(harvester.fetchAbiUsingHash(str(item)))
+                        for abiComponents in jsonAbi:
+                            isEvent = False
+                            name = ""
+                            inputs = []
+                            for key, value in abiComponents.items():
+                                if key == "inputs":
+                                    inputs = value
+                                if key == "name":
+                                    name = value
+                                if key == "type":
+                                    if value == "event":
+                                        isEvent = True
+                            if isEvent is True and name is not "":
+                                eventDict = {}
+                                # Create a selector hash
+                                selectorText = str(name) + "("
+                                inputCounter = 1
+                                inputDict = {}
+                                for input in range(0, len(inputs)):
+                                    for inputKey, inputValue in inputs[input].items():
+                                        inputDict[str(inputKey)] = str(inputValue)
+                                        # Specifically build the selector string if the input key is type
+                                        if str(inputKey) == "type":
+                                            if input == len(inputs) - 1:
+                                                selectorText = selectorText + str(inputValue) + ")"
+                                            else:
+                                                selectorText = selectorText + str(inputValue) + ","
+                                        # Perform all other operations including if the input key is type
+                                        # 
+                                    inputCounter = inputCounter + 1
+                                selectorHash = "0x" + str(harvester.web3.toHex(harvester.web3.sha3(text=selectorText)))[2:10]
+                                if str(selectorHash) not in distinctEventList:
+                                    eventDict["id"] = str(selectorHash)
+                                    eventDict["name"] = str(name)
+                                    eventDict["contractAddress"] = contractAddress
+                                    eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
+                                    eventDict["blockNumber"] = blockNumber
+                                    eventDict["from"] = sentFrom
+                                    eventDict["inputs"] = inputDict
+                                    distinctEventList.append(str(selectorHash))
+                                    contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress))
+                                    print(contractAddress)
+                                    print(json.dumps(jsonAbi))
+                else:
+                    print("This contract's ABIs are not known/indexed so we can not read the event names")
             else:
-                print("This contract's ABIs are not known/indexed so we can not read the event names")
+                print("Transaction: " + str(harvester.web3.toHex(transactionHash)) + " has no logs")
         else:
-            print("Transaction: " + str(harvester.web3.toHex(transactionHash)) + " has no logs")
+            print("Event already indexed")
 else:
     print("Transaction count is 0")
 
