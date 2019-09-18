@@ -13,22 +13,14 @@ for b in range(latestBlockNumber - 1, latestBlockNumber):
     transactionCount = harvester.web3.eth.getBlockTransactionCount(b)
     if(transactionCount >= 1):
         for singleTransactionInt in range(0, transactionCount):
-            #print("\n")
-            #print("Processing transaction " + str(singleTransactionInt)+ " of block " + str(b))
             transaction = harvester.web3.eth.getTransactionByBlock(b, singleTransactionInt)
             transactionHash = transaction.hash
-            #print(transaction.hash)
             transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
-            #print("***")
-            #print(transactionReceipt)
-            #print("***")
             transactionLogs = transactionReceipt.logs
             if (len(transactionLogs) >= 1):
-                ### Can we now get the contract address so that we can process each of the abis in the abi sha list
-                print("Transaction: " + str(harvester.web3.toHex(transactionHash)) + " log[s] shown below.")
-                print(transactionReceipt.logs[0]["address"])
-                print(transactionReceipt["blockNumber"])
-                print(transactionReceipt["from"])
+                contractAddress = transactionReceipt.logs[0]["address"]
+                blockNumber = transactionReceipt["blockNumber"]
+                sentFrom = transactionReceipt["from"]
                 # Get list of ABIs from the abiShaList at this point
                 ## Perhaps get a distinct list of events from all of the abis 
                 ## distinctEventList = []
@@ -59,4 +51,8 @@ for b in range(latestBlockNumber - 1, latestBlockNumber):
         print("\n")
     else:
         print("Transaction count is 0")
+
+# TODO
+# hasDataBeenIndexed(_eventLogaIndex, _esId)
+# fetchAbiUsingHash(_abiHash)
 

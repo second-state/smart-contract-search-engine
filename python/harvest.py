@@ -93,6 +93,11 @@ class Harvest:
             connection_class=RequestsHttpConnection
         )
 
+    def fetchAbiShaList(self, _contractAddress):
+        query = '''{"query":{"match":{"contractAddress": "'''+ _contractAddress +  '''"}}, "_source": "abiShaList"}'''
+        results = self.es.search(index=self.commonIndex, body=query)
+        return results
+
     # This will become a function used to create the index of unique comparisons IUC
     def createUniqueAbiComparisons(self, _contractAbiJSONData):
         keccakHashes = []
