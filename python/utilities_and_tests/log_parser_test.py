@@ -9,6 +9,31 @@
 import os
 import gzip
 
+def processSingleApacheAccessLogLine(_line):
+    split_line = _line.split()
+    callingIP = split_line[0]
+    one = split_line[0]
+    two = split_line[1]
+    three = split_line[2]
+    four = split_line[3]
+    five = split_line[4]
+    six = split_line[5]
+    seven = split_line[6]
+    eight = split_line[7]
+    returnStatus = split_line[8]
+    dataTransfer = split_line[9]
+    print(callingIP)
+    print(one)
+    print(two)
+    print(three)
+    print(four)
+    print(five)
+    print(six)
+    print(seven)
+    print(eight)
+    print(returnStatus)
+    print(dataTransfer)
+
 # accept an argument which is the apache access log directory
 def processApache2AccessLogs(_logDir):
     for subdir, dirs, files in os.walk(_logDir):
@@ -16,16 +41,16 @@ def processApache2AccessLogs(_logDir):
             if file.startswith("access"):
                 if file.endswith(".gz"):
                     print("Extracting: " + file)
-                    with gzip.open(os.path.join(_logDir, file), 'rb') as f1:
-                        for line in f1:
-                            print(line)
-                    f1.close()
+                    with gzip.open(os.path.join(_logDir, file), 'rt') as fGz:
+                        for line in fGz:
+                            processSingleApacheAccessLogLine(line)
+                    fGz.close()
                 else:
                     print("Processing: " + file)
-                    with open(os.path.join(_logDir, file), 'rb') as f2:
-                        for line in f2:
-                            print(line)
-                    f2.close()
+                    with open(os.path.join(_logDir, file), 'rt') as f:
+                        for line in f:
+                            processSingleApacheAccessLogLine(line)
+                    f.close()
 
 # create a unique key which we can use for indexing
 
