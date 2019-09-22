@@ -1,6 +1,10 @@
 #TODO
 # add imports that are not already in the harvest.py
 # updated the function arguments so that they include self, 
+# create es-ss.js function which will allow end users to query the amount of unique IP addresses for a given time period (and any other useful features such as hits per minute/hour etc.)
+# create an io.py API interface so that es-ss.js can access this code (which will ultimately end up as a mode in the harvest.py)
+# when adding this functionality to harvest.py be sure to add a timer so that it can be repeated over and over at a certain time interval
+
 
 import os
 import gzip
@@ -12,14 +16,16 @@ def processApache2AccessLogs(_logDir):
             if file.startswith("access"):
                 if file.endswith(".gz"):
                     print("Extracting: " + file)
-                    f = gzip.open(os.path.join(_logDir, file), 'rb')
-                    fileContent = f.read()
-                    f.close()
+                    with gzip.open(os.path.join(_logDir, file), 'rb') as f1:
+                        for line in f1:
+                            print(line)
+                    f1.close()
                 else:
                     print("Processing: " + file)
-                    f = open(os.path.join(_logDir, file), 'rb')
-                    fileContent = f.read()
-                    f.close()
+                    with open(os.path.join(_logDir, file), 'rb') as f2:
+                        for line in f2:
+                            print(line)
+                    f2.close()
 
 # create a unique key which we can use for indexing
 
