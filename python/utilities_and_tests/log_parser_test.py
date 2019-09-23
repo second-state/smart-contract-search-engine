@@ -8,31 +8,51 @@
 
 import os
 import gzip
+import math
+from datetime import datetime
 
 def processSingleApacheAccessLogLine(_line):
     split_line = _line.split()
+    # IP
     callingIP = split_line[0]
-    one = split_line[0]
-    two = split_line[1]
-    three = split_line[2]
-    four = split_line[3]
-    five = split_line[4]
-    six = split_line[5]
-    seven = split_line[6]
-    eight = split_line[7]
-    returnStatus = split_line[8]
-    dataTransfer = split_line[9]
-    print(callingIP)
-    print(one)
-    print(two)
-    print(three)
-    print(four)
-    print(five)
-    print(six)
-    print(seven)
-    print(eight)
-    print(returnStatus)
-    print(dataTransfer)
+    # Time
+    try:
+        time = str.join(" ",(split_line[3], split_line[4]))
+        time = time.replace("[", "")
+        time = time.replace("]", "")
+        d = datetime.strptime(time, "%d/%b/%Y:%H:%M:%S %z")
+        timestamp = math.floor(d.timestamp())
+    except:
+        timestamp = 0
+    # Request
+    try:
+        request = str(split_line[5])
+        request = request.replace("\"", "")
+    except:
+        request = ""
+    # Response status code
+    try:
+        responseStatus = str(split_line[8])
+    except:
+        responseStatus = ""
+    # Referer
+    try:
+        referer = str(split_line[10])
+        referer = referer.replace("\"", "")
+    except:
+        referer = ""
+    if timestamp > 0:
+        print("timestamp:" + str(timestamp))
+        print("request: " + str(request))
+        print("response: " + str(responseStatus))
+        print("referer: " + str(referer))
+        print(str(split_line))
+    # print(six)
+    # print(seven)
+    # print(eight)
+    # print(returnStatus)
+    # print(dataTransfer)
+    # print(split_line)
 
 # accept an argument which is the apache access log directory
 def processApache2AccessLogs(_logDir):

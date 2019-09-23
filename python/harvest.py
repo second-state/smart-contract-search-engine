@@ -4,6 +4,7 @@ import sys
 import time
 import json
 import math
+import gzip
 import boto3
 import queue
 import random
@@ -13,6 +14,7 @@ import threading
 import configparser
 from decimal import Decimal
 import elasticsearch.helpers
+from datetime import datetime
 from operator import itemgetter
 from web3 import Web3, HTTPProvider
 from aws_requests_auth.boto_utils import BotoAWSRequestsAuth 
@@ -76,6 +78,14 @@ class Harvest:
         # Event index
         self.eventIndex = self.config['eventindex']['event']
         print("Event index: %s" % self.eventIndex)
+
+        # Log analytics
+        self.logAnalyticsIndex = self.config['loganalyticsindex']['log']
+        print("Log analytics index: %s" % self.logAnalyticsIndex)
+
+        # Log directory
+        self.logDirectory = self.config['logdirectory']['location']
+        print("Log directory location: %s" % self.logDirectory)
 
         # Elasticsearch AWS region
         self.elasticSearchAwsRegion = self.config['elasticSearch']['aws_region']
@@ -221,6 +231,36 @@ class Harvest:
             print("Error, unable to test if event exists")
             returnVal = False
         return returnVal
+
+    def hasLogBeenIndexed(self, _theIndex, _esId):
+        returnVal = False
+        q = '{"query":{"bool":{"must":[{"match":{"uniqueHash":"'+ _esId +'"}}]}}, "size": 0}'
+        try:
+            esResponse2 = self.es.search(index=_theIndex, body=q)
+            print(esResponse2)
+            if int(esResponse2["hits"]["total"]) == 1:
+                returnVal = True
+                print("Event is already indexed.")
+            else:
+                print("Event does not exist yet.")
+                returnVal = False
+        except:
+            print("Error, unable to test if event exists")
+            returnVal = False
+        return returnVal
+
+    def performStringConversion(self, _data):
+        return str(_data)
+    
+    def performPossibleStringConversion(self, _data):
+        if len(str(_data)) > 10:
+            try:
+                int(_data)
+                return str(_data)
+            except:
+                return _data
+        else:
+            return _data
 
     def performStringConversion(self, _data):
         return str(_data)
@@ -1154,7 +1194,76 @@ class Harvest:
             self.es.indices.create(index=self.activityIndex)
         else:
             print(str(self.activityIndex) + ", index already exists")
+        print("Checking to see if " + str(self.logAnalyticsIndex) + " exists ...")
+        if self.es.indices.exists(index=self.logAnalyticsIndex) == False:
+            print("Creating " + str(self.logAnalyticsIndex))
+            self.es.indices.create(index=self.logAnalyticsIndex)
+        else:
+            print(str(self.logAnalyticsIndex) + ", index already exists")
         print("Initialisation complete!")
+
+    def processSingleApacheAccessLogLine(self, _line):
+        split_line = _line.split()
+        # IP
+        callingIP = split_line[0]
+        # Time
+        try:
+            time = str.join(" ",(split_line[3], split_line[4]))
+            time = time.replace("[", "")
+            time = time.replace("]", "")
+            d = datetime.strptime(time, "%d/%b/%Y:%H:%M:%S %z")
+            timestamp = math.floor(d.timestamp())
+        except:
+            timestamp = 0
+        # Request
+        try:
+            request = str(split_line[5])
+            request = request.replace("\"", "")
+        except:
+            request = ""
+        # Response status code
+        try:
+            responseStatus = str(split_line[8])
+        except:
+            responseStatus = ""
+        # Referer
+        try:
+            referer = str(split_line[10])
+            referer = referer.replace("\"", "")
+        except:
+            referer = ""
+        if timestamp > 0:
+            uniqueHash = str(self.web3.toHex(self.web3.sha3(text=str(split_line))))
+            if self.hasLogBeenIndexed(self.logAnalyticsIndex, uniqueHash) != True:
+                data = {}
+                data["timestamp"] = timestamp
+                data["request"] = request
+                data["responseStatus"] = responseStatus
+                data["referer"] = referer
+                data["uniqueHash"] = uniqueHash
+                indexingResult = self.loadDataIntoElastic(self.logAnalyticsIndex, uniqueHash, json.dumps(data))
+
+    def processApache2AccessLogs(self):
+        self.logHarvestTime = time.time()
+        while True:
+            for subdir, dirs, files in os.walk(self.logDirectory):
+                for file in files:
+                    if file.startswith("access"):
+                        if file.endswith(".gz"):
+                            print("Extracting: " + file)
+                            with gzip.open(os.path.join(self.logDirectory, file), 'rt') as fGz:
+                                for line in fGz:
+                                    self.processSingleApacheAccessLogLine(line)
+                            fGz.close()
+                        else:
+                            print("Processing: " + file)
+                            with open(os.path.join(self.logDirectory, file), 'rt') as f:
+                                for line in f:
+                                    self.processSingleApacheAccessLogLine(line)
+                            f.close()
+            self.logHarvestTime = self.logHarvestTime + math.floor(int(self.secondsPerBlock)*10)
+            if self.logHarvestTime > time.time():
+                time.sleep(self.logHarvestTime - time.time())
 
 
 if __name__ == "__main__":
@@ -1211,6 +1320,9 @@ if __name__ == "__main__":
     elif args.mode == "indexed":
         print("Updating master index to reflect items which are already indexed")
         harvester.markMasterAsIndexed()
+    elif args.mode == "analyse":
+        print("Harvesting Apache2 logs for analysis")
+        harvester.processApache2AccessLogs()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode init")
@@ -1222,6 +1334,7 @@ if __name__ == "__main__":
         print("harvest.py --mode bytecode")
         print("harvest.py --mode abi")
         print("harvest.py --mode indexed")
+        print("harvest.py --mode analyse")
 
 
 # Monitor the total number of threads on the operating system
