@@ -7,7 +7,7 @@ from harvest import Harvest
 harvester = Harvest()
 
 
-abiUrl1 = "http://api.etherscan.io/api?module=contract&action=getabi&address=0xfac7bea255a6990f749363002136af6556b31e04&format=raw"
+abiUrl1 = "https://raw.githubusercontent.com/tpmccallum/test_endpoint2/master/erc20_transfer_function_only_abi.txt"
 abiData1 = requests.get(abiUrl1).content
 abiData1JSON = json.loads(abiData1)
 theDeterministicHash1 = harvester.shaAnAbi(abiData1JSON)

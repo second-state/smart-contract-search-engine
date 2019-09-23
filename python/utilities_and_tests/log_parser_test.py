@@ -11,7 +11,7 @@ import gzip
 import math
 from datetime import datetime
 
-def processSingleApacheAccessLogLine(_line):
+def processSingleApacheAccessLogLine(self, _line):
     split_line = _line.split()
     # IP
     callingIP = split_line[0]
@@ -42,37 +42,19 @@ def processSingleApacheAccessLogLine(_line):
     except:
         referer = ""
     if timestamp > 0:
-        print("timestamp:" + str(timestamp))
-        print("request: " + str(request))
-        print("response: " + str(responseStatus))
-        print("referer: " + str(referer))
-        print(str(split_line))
-    # print(six)
-    # print(seven)
-    # print(eight)
-    # print(returnStatus)
-    # print(dataTransfer)
-    # print(split_line)
+        uniqueHash = str(self.web3.toHex(self.web3.sha3(text=str(split_line))))
+        if self.hasLogBeenIndexed(self.logAnalyticsIndex, uniqueHash) != True:
+            data = {}
+            data["timestamp"] = timestamp
+            data["request"] = request
+            data["responseStatus"] = responseStatus
+            data["referer"] = referer
+            data["uniqueHash"] = uniqueHash
+            indexingResult = self.loadDataIntoElastic(self.logAnalyticsIndex, uniqueHash, json.dumps(data))
 
 # accept an argument which is the apache access log directory
-def processApache2AccessLogs(_logDir):
-    for subdir, dirs, files in os.walk(_logDir):
-        for file in files:
-            if file.startswith("access"):
-                if file.endswith(".gz"):
-                    print("Extracting: " + file)
-                    with gzip.open(os.path.join(_logDir, file), 'rt') as fGz:
-                        for line in fGz:
-                            processSingleApacheAccessLogLine(line)
-                    fGz.close()
-                else:
-                    print("Processing: " + file)
-                    with open(os.path.join(_logDir, file), 'rt') as f:
-                        for line in f:
-                            processSingleApacheAccessLogLine(line)
-                    f.close()
 
-# create a unique key which we can use for indexing
+
 
 # check to see if the item is already indexed
 

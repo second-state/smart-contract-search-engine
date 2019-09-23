@@ -1205,7 +1205,10 @@ class Harvest:
     def processSingleApacheAccessLogLine(self, _line):
         split_line = _line.split()
         # IP
-        callingIP = split_line[0]
+        try:
+            callingIP = str(split_line[0])
+        except:
+            callingIP = ""
         # Time
         try:
             time = str.join(" ",(split_line[3], split_line[4]))
@@ -1232,15 +1235,17 @@ class Harvest:
             referer = referer.replace("\"", "")
         except:
             referer = ""
-        if timestamp > 0:
+        if timestamp > 0 and len(callingIP) > 0:
             uniqueHash = str(self.web3.toHex(self.web3.sha3(text=str(split_line))))
             if self.hasLogBeenIndexed(self.logAnalyticsIndex, uniqueHash) != True:
                 data = {}
                 data["timestamp"] = timestamp
+                data["callingIp"] = callingIP
                 data["request"] = request
                 data["responseStatus"] = responseStatus
                 data["referer"] = referer
                 data["uniqueHash"] = uniqueHash
+                data["rawLog"] = split_line
                 indexingResult = self.loadDataIntoElastic(self.logAnalyticsIndex, uniqueHash, json.dumps(data))
 
     def processApache2AccessLogs(self):
