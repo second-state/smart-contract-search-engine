@@ -279,6 +279,24 @@ def es_tx_search():
     #print(resultsDict)
     return jsonify(resultsDict["results"])
 
+@app.route("/api/es_access_search", methods=['GET', 'POST'])
+def es_access_search():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.logAnalyticsIndex, query=jsonRequestData)
+    outerList = []
+    for returnedItem in results:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                uniqueDict["_source"] = rValue
+                outerList.append(uniqueDict)
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    return jsonify(resultsDict["results"])
+
+
 @app.route("/api/getAll", methods=['GET', 'POST'])
 def getAll():
     matchAll = {}

@@ -1,10 +1,6 @@
-#TODO
-# add imports that are not already in the harvest.py
-# updated the function arguments so that they include self, 
-# create es-ss.js function which will allow end users to query the amount of unique IP addresses for a given time period (and any other useful features such as hits per minute/hour etc.)
-# create an io.py API interface so that es-ss.js can access this code (which will ultimately end up as a mode in the harvest.py)
-# when adding this functionality to harvest.py be sure to add a timer so that it can be repeated over and over at a certain time interval
-
+# UPDATE
+## THIS R&D WORK HAS BEEN CONVERTED TO A NEW MODE IN THE HARVEST.PY FILE
+## Please use harvest.py -m analyse
 
 import os
 import gzip
