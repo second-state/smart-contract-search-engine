@@ -1248,6 +1248,13 @@ class Harvest:
                 data["rawLog"] = split_line
                 indexingResult = self.loadDataIntoElastic(self.logAnalyticsIndex, uniqueHash, json.dumps(data))
 
+    def processCurrentApache2AccessLog(self):
+        while True:
+            with open(os.path.join(self.logDirectory, "access.log"), 'rt') as f:
+                for line in f:
+                    self.processSingleApacheAccessLogLine(line)
+            f.close()
+
     def processApache2AccessLogs(self):
         self.logHarvestTime = time.time()
         while True:
@@ -1328,6 +1335,9 @@ if __name__ == "__main__":
     elif args.mode == "analyse":
         print("Harvesting Apache2 logs for analysis")
         harvester.processApache2AccessLogs()
+    elif args.mode == "analyse_real_time":
+        print("Harvesting Apache2 access.log for analysis")
+        harvester.processCurrentApache2AccessLog()
     else:
         print("Invalid argument, please try any of the following")
         print("harvest.py --mode init")
@@ -1340,6 +1350,7 @@ if __name__ == "__main__":
         print("harvest.py --mode abi")
         print("harvest.py --mode indexed")
         print("harvest.py --mode analyse")
+        print("harvest.py --mode analyse_real_time")
 
 
 # Monitor the total number of threads on the operating system
