@@ -19,7 +19,7 @@ def logApi(_request):
     data["callingIp"] = callingIp
     endpoint = _request.endpoint
     data["endpoint"] = endpoint
-    harvester.processApiAccessLog()
+    harvester.processApiAccessLog(data)
 
 @app.route("/api/get_block_interval", methods=['GET', 'POST'])
 def get_block_interval():
