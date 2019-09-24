@@ -645,3 +645,20 @@ $(document).ready(function() {
         });
 });
 
+$(document).ready(function() {
+    esss.getAllCount()
+        .then(function(result) {
+            var g = new JustGage({
+                id: "gaugeContractsIndexed",
+                value: result,
+                min: 0,
+                max: Math.floor((result/3)*4),
+                title: "Contracts indexed"
+            });
+            console.log("Contracts indexed: " + result);
+        })
+        .catch(function() {
+            console.log("Error");
+        });
+});
+
