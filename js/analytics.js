@@ -601,4 +601,33 @@ $(document).ready(function() {
         });
 });
 
+$(document).ready(function() {
+    var now = Math.floor(Date.now() / 1000)
+    var week = Math.floor((Date.now() - (7 * 24 * 60 * 60 * 1000)) / 1000)
+    var q3 = {"_source": "callingIp"}
+    esss.queryAccessLogsUsingDsl(q3)
+        .then(function(result) {
+            var uniqueList3 = []
+            var a = JSON.parse(result);
+            for (i = 0; i < a.length; i++) {
+                if (uniqueList3.indexOf(a[i]["_source"]["uniqueHash"]) == -1) {
+                    uniqueList3.push(a[i]["_source"]["uniqueHash"])
+                }
+            }
+            var g = new JustGage({
+                id: "uniqueVisitors",
+                value: uniqueList3.length,
+                min: 0,
+                max: Math.floor((uniqueList3.length/3)*4),
+                title: "Unique Visitors (to date)"
+            });
+            console.log("Unique visitors: " + uniqueList3.length);
+        })
+        .catch(function() {
+            console.log("Error");
+        });
+});
+
+uniqueVisitors
+
 
