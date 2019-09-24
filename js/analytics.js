@@ -676,7 +676,7 @@ $(document).ready(function() {
                         value: result,
                         min: 0,
                         max: resultAll,
-                        title: "Contracts which adhere to ABIs"
+                        title: "Contracts adhering to ABIs"
                     });
                     console.log("Contracts adhering to ABIs: " + result);
                 })
