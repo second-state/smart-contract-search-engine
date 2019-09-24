@@ -32,7 +32,7 @@ $(document).ready(function() {
                 }
             }
             var g = new JustGage({
-                id: "uniqueVisitorsThisWeek",
+                id: "gauge",
                 value: uniqueList.length,
                 min: 0,
                 max: Math.floor((uniqueList.length/3)*4),
