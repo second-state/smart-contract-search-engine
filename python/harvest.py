@@ -87,6 +87,10 @@ class Harvest:
         self.logDirectory = self.config['logdirectory']['location']
         print("Log directory location: %s" % self.logDirectory)
 
+        # Log analytics
+        self.apiAnalyticsIndex = self.config['apianalyticsindex']['api']
+        print("API analytics index: %s" % self.apiAnalyticsIndex)
+
         # Elasticsearch AWS region
         self.elasticSearchAwsRegion = self.config['elasticSearch']['aws_region']
 
@@ -240,12 +244,29 @@ class Harvest:
             print(esResponse2)
             if int(esResponse2["hits"]["total"]) == 1:
                 returnVal = True
-                print("Event is already indexed.")
+                print("Log is already indexed.")
             else:
-                print("Event does not exist yet.")
+                print("Log does not exist yet.")
                 returnVal = False
         except:
-            print("Error, unable to test if event exists")
+            print("Error, unable to test if log exists")
+            returnVal = False
+        return returnVal
+
+    def hasApiBeenIndexed(self, _theIndex, _esId):
+        returnVal = False
+        q = '{"query":{"bool":{"must":[{"match":{"uniqueHash":"'+ _esId +'"}}]}}, "size": 0}'
+        try:
+            esResponse2 = self.es.search(index=_theIndex, body=q)
+            print(esResponse2)
+            if int(esResponse2["hits"]["total"]) == 1:
+                returnVal = True
+                print("API is already indexed.")
+            else:
+                print("API does not exist yet.")
+                returnVal = False
+        except:
+            print("Error, unable to test if API exists")
             returnVal = False
         return returnVal
 
@@ -1200,7 +1221,20 @@ class Harvest:
             self.es.indices.create(index=self.logAnalyticsIndex)
         else:
             print(str(self.logAnalyticsIndex) + ", index already exists")
+        print("Checking to see if " + str(self.apiAnalyticsIndex) + " exists ...")
+        if self.es.indices.exists(index=self.apiAnalyticsIndex) == False:
+            print("Creating " + str(self.apiAnalyticsIndex))
+            self.es.indices.create(index=self.apiAnalyticsIndex)
+        else:
+            print(str(self.apiAnalyticsIndex) + ", index already exists")
         print("Initialisation complete!")
+
+
+    def processApiAccessLog(self, _data):
+        uniqueHash = str(self.web3.toHex(self.web3.sha3(text=str(_data))))
+        if self.hasApiBeenIndexed(self.apiAnalyticsIndex, uniqueHash) != True:
+            _data["uniqueHash"] = uniqueHash
+            indexingResult = self.loadDataIntoElastic(self.apiAnalyticsIndex, uniqueHash, json.dumps(_data))
 
     def processSingleApacheAccessLogLine(self, _line):
         split_line = _line.split()

@@ -1,6 +1,7 @@
 import re
 import json
 import time
+import math
 import requests
 from harvest import Harvest
 import elasticsearch.helpers
@@ -10,9 +11,20 @@ harvester = Harvest()
 
 app = Flask(__name__)
 
+def logApi(_request):
+    data = {}
+    timestamp = math.floor(time.time())
+    data["timestamp"] = timestamp
+    callingIp = _request.headers.get('X-Forwarded-For', request.remote_addr)
+    data["callingIp"] = callingIp
+    endpoint = _request.endpoint
+    data["endpoint"] = endpoint
+    harvester.processApiAccessLog()
+
 @app.route("/api/get_block_interval", methods=['GET', 'POST'])
 def get_block_interval():
     blockInterval = harvester.getBlockInterval()
+    logApi(request)
     return jsonify(blockInterval)
 
 @app.route("/api/confirm_deployment", methods=['GET', 'POST'])
@@ -23,11 +35,11 @@ def confirm_deployment():
     returnValue = harvester.confirmDeployment(transactionHash)
     doc = {}
     doc["response"] = str(returnValue)
+    logApi(request)
     return jsonify(doc)
 
 @app.route("/api/update_state_of_contract_address", methods=['GET', 'POST'])
 def update_state_of_contract_address():
-    print(request)
     jsonRequestData = json.loads(request.data)
     if jsonRequestData["abi"] == "all":
         abi = "all"
@@ -41,6 +53,7 @@ def update_state_of_contract_address():
             doc["response"] = 'true'
         elif result == False:
             doc["response"] = 'false'
+        logApi(request)
         return jsonify(doc)
     except:
         doc = {}
@@ -60,6 +73,7 @@ def express_harvest_an_abi():
             doc["response"] = 'true'
         elif result == False:
             doc["response"] = 'false'
+        logApi(request)
         return jsonify(doc)
     except:
         doc = {}
@@ -70,6 +84,7 @@ def express_harvest_an_abi():
 @app.route("/api/most_recent_indexed_block_number", methods=['GET', 'POST'])
 def most_recent_indexed_block_number():
     mostRecentIndexedBlockNumber = harvester.mostRecentIndexedBlockNumber()
+    logApi(request)
     return jsonify(mostRecentIndexedBlockNumber)
 
 @app.route("/api/describe_using_tx", methods=['GET', 'POST'])
@@ -77,6 +92,7 @@ def describe_using_tx():
     jsonRequestData = json.loads(request.data)
     transactionHash = jsonRequestData["hash"]
     rawData = harvester.getDataUsingTransactionHash(transactionHash)
+    logApi(request)
     return jsonify(rawData)
 
 @app.route("/api/describe_using_address", methods=['GET', 'POST'])
@@ -84,6 +100,7 @@ def describe_using_address():
     jsonRequestData = json.loads(request.data)
     address = jsonRequestData["address"]
     rawData = harvester.getDataUsingAddressHash(address)
+    logApi(request)
     return jsonify(rawData)
 
 @app.route("/api/submit_abi", methods=['GET', 'POST'])
@@ -113,6 +130,7 @@ def submit_abi():
         print("Index was a success")
         doc = {}
         doc["response"] = 'Successfully indexed contract.'
+        logApi(request)
         return jsonify(doc)
 
 @app.route("/api/submit_many_abis", methods=['GET', 'POST'])
@@ -154,6 +172,7 @@ def submit_many_abis():
             harvester.abiCompatabilityUpdate(jsonAbiObj, source["hits"]["hits"][0]["_source"])
     doc = {}
     doc["response"] = 'Completed ABI submissions'
+    logApi(request)
     return jsonify(doc)
 
 @app.route("/api/sha_an_abi", methods=['GET', 'POST'])
@@ -165,6 +184,7 @@ def sha_an_abi():
     result = {}
     result["abiSha3"] = abiHash
     print(result)
+    logApi(request)
     return jsonify(result)
 
 @app.route("/api/sort_an_abi", methods=['GET', 'POST'])
@@ -176,6 +196,7 @@ def sort_an_abi():
     result = {}
     result["abiSorted"] = abiHash
     print(result)
+    logApi(request)
     return jsonify(result)
 
 @app.route("/api/es_get_abi_count", methods=['GET', 'POST'])
@@ -183,6 +204,7 @@ def es_get_abi_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getAbiCount()
+    logApi(request)
     return jsonify(results)
 
 @app.route("/api/es_get_all_count", methods=['GET', 'POST'])
@@ -190,6 +212,7 @@ def es_get_all_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getAllCount()
+    logApi(request)
     return jsonify(results)
 
 @app.route("/api/es_get_contract_count", methods=['GET', 'POST'])
@@ -197,6 +220,7 @@ def es_get_contract_count():
     print(request)
     #jsonRequestData = json.loads(request.data)
     results = harvester.getContractCount()
+    logApi(request)
     return jsonify(results)
 
 @app.route("/api/es_quick_100_search", methods=['GET', 'POST'])
@@ -229,6 +253,7 @@ def es_quick_100_search():
     resultsDict = {}
     resultsDict["results"] = outerList
     #print(resultsDict)
+    logApi(request)
     return jsonify(resultsDict["results"])
 
 @app.route("/api/es_search", methods=['GET', 'POST'])
@@ -260,6 +285,7 @@ def es_search():
     resultsDict = {}
     resultsDict["results"] = outerList
     #print(resultsDict)
+    logApi(request)
     return jsonify(resultsDict["results"])
 
 @app.route("/api/es_tx_search", methods=['GET', 'POST'])
@@ -277,6 +303,7 @@ def es_tx_search():
     resultsDict = {}
     resultsDict["results"] = outerList
     #print(resultsDict)
+    logApi(request)
     return jsonify(resultsDict["results"])
 
 @app.route("/api/es_access_search", methods=['GET', 'POST'])
@@ -294,6 +321,7 @@ def es_access_search():
     resultsDict = {}
     resultsDict["results"] = outerList
     #print(resultsDict)
+    logApi(request)
     return jsonify(resultsDict["results"])
 
 
@@ -310,6 +338,7 @@ def getAll():
     for item in results:
         obj[str(num)] = item
         num = num+1
+    logApi(request)
     return jsonify(obj)
 
 @app.route("/api/es_update_quality", methods=['GET', 'POST'])
@@ -323,6 +352,7 @@ def es_update_quality():
         outerData["quality"] = qualityScore
         doc["doc"] = outerData
         theResponse = harvester.es.update(index=harvester.commonIndex, id=itemId, body=json.dumps(doc))
+        logApi(request)
         return jsonify(theResponse)
 
 if __name__ == "__main__":
