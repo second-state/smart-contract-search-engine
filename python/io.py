@@ -203,7 +203,7 @@ def sort_an_abi():
 def es_get_abi_count():
     print("Checking API usage limits")
     # Allowed 10 hits per 60 seconds for that IP
-    if harvester.withinApiRequestsLimit(10, 60, _request.headers.get('X-Forwarded-For', request.remote_addr)) == True:
+    if harvester.withinApiRequestsLimit(10, 60, request.headers.get('X-Forwarded-For', request.remote_addr)) == True:
         results = harvester.getAbiCount()
         logApi(request)
         return jsonify(results)
