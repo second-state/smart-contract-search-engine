@@ -201,11 +201,14 @@ def sort_an_abi():
 
 @app.route("/api/es_get_abi_count", methods=['GET', 'POST'])
 def es_get_abi_count():
-    print(request)
-    #jsonRequestData = json.loads(request.data)
-    results = harvester.getAbiCount()
-    logApi(request)
-    return jsonify(results)
+    print("Checking API usage limits")
+    # Allowed 10 hits per 60 seconds for that IP
+    if harvester.withinApiRequestsLimit(10, 60, _request.headers.get('X-Forwarded-For', request.remote_addr)) == True:
+        results = harvester.getAbiCount()
+        logApi(request)
+        return jsonify(results)
+    else:
+        print("Please wait ... exceeded API limits")
 
 @app.route("/api/es_get_all_count", methods=['GET', 'POST'])
 def es_get_all_count():

@@ -1229,6 +1229,15 @@ class Harvest:
             print(str(self.apiAnalyticsIndex) + ", index already exists")
         print("Initialisation complete!")
 
+    def withinApiRequestsLimit(self, _hits, _seconds, _Ip):
+        now = math.floor(time.time())
+        before = now - _seconds
+        q='''{"query":{"bool":{"must":[{"match":{"callingIp":"''' + str(_Ip) + '''"}},{"range":{"timestamp":{"gte":''' + before + ''',"lt":''' + now + '''}}}]}}, "size": 0}'''
+        esResponse = self.es.search(index=self.apiAnalyticsIndex, body=q)
+        if int(esResponse["hits"]["total"]) >= int(_hits):
+            return False
+        else:
+            return True
 
     def processApiAccessLog(self, _data):
         uniqueHash = str(self.web3.toHex(self.web3.sha3(text=str(_data))))
