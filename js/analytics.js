@@ -573,3 +573,32 @@ $(document).ready(function() {
             console.log("Error");
         });
 });
+
+$(document).ready(function() {
+    var now = Math.floor(Date.now() / 1000)
+    var week = Math.floor((Date.now() - (7 * 24 * 60 * 60 * 1000)) / 1000)
+    var q2 = {"_source": "uniqueHash"}
+    esss.queryAccessLogsUsingDsl(q2)
+        .then(function(result) {
+            var uniqueList2 = []
+            var a = JSON.parse(result);
+            for (i = 0; i < a.length; i++) {
+                if (uniqueList2.indexOf(a[i]["_source"]["uniqueHash"]) == -1) {
+                    uniqueList2.push(a[i]["_source"]["uniqueHash"])
+                }
+            }
+            var g = new JustGage({
+                id: "totalHits",
+                value: uniqueList2.length,
+                min: 0,
+                max: Math.floor((uniqueList2.length/3)*4),
+                title: "Total Hits (to date)"
+            });
+            console.log("Total hits: " + uniqueList2.length);
+        })
+        .catch(function() {
+            console.log("Error");
+        });
+});
+
+
