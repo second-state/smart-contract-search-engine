@@ -628,4 +628,20 @@ $(document).ready(function() {
         });
 });
 
+$(document).ready(function() {
+    esss.getAbiCount()
+        .then(function(result) {
+            var g = new JustGage({
+                id: "gaugeAbisUploaded",
+                value: result,
+                min: 0,
+                max: Math.floor((result/3)*4),
+                title: "Unique ABIs uploaded"
+            });
+            console.log("Unique ABIs uploaded: " + result);
+        })
+        .catch(function() {
+            console.log("Error");
+        });
+});
 
