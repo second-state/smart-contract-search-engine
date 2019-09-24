@@ -1,5 +1,4 @@
 var publicIp = "https://testnet.cmt.search.secondstate.io"; 
-var esss = new ESSS(publicIp);
 
 $(document).ready(function() {
     var now = Math.floor(Date.now() / 1000)
@@ -572,3 +571,5 @@ class ESSS {
         });
     }
 }
+
+var esss = new ESSS(publicIp);
