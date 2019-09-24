@@ -1,4 +1,4 @@
-var publicIp = "https://testnet.cmt.search.secondstate.io"; 
+var publicIp = "https://testnet.cmt.search.secondstate.io";
 
 class ESSS {
     // Search Engine Base URL (Please include protocol. Please do not include trailing slash)
@@ -9,15 +9,15 @@ class ESSS {
         this.indexStatus = {};
     }
 
-    setIndexStatusToTrue(_transactionHash){
+    setIndexStatusToTrue(_transactionHash) {
         this.indexStatus[_transactionHash] = true;
     }
 
-    setIndexStatusToFalse(_transactionHash){
+    setIndexStatusToFalse(_transactionHash) {
         this.indexStatus[_transactionHash] = false;
     }
 
-    getIndexStatus(_transactionHash){
+    getIndexStatus(_transactionHash) {
         return this.indexStatus[_transactionHash];
     }
 
@@ -60,8 +60,8 @@ class ESSS {
             xhr.send(JSON.stringify(_query));
         });
     }
-    
-        queryUsingDsl(_query) {
+
+    queryUsingDsl(_query) {
         var url = this.searchEngineBaseUrl + "/api/es_search";
         return new Promise(function(resolve, reject) {
 
@@ -564,7 +564,7 @@ $(document).ready(function() {
                 id: "uniqueVisitorsThisWeek",
                 value: uniqueList.length,
                 min: 0,
-                max: Math.floor((uniqueList.length/3)*4),
+                max: Math.floor((uniqueList.length / 3) * 4),
                 title: "Unique Visitors (this week)"
             });
             console.log("Unique IP Addresses: " + uniqueList.length);
@@ -577,7 +577,9 @@ $(document).ready(function() {
 $(document).ready(function() {
     var now = Math.floor(Date.now() / 1000)
     var week = Math.floor((Date.now() - (7 * 24 * 60 * 60 * 1000)) / 1000)
-    var q2 = {"_source": "uniqueHash"}
+    var q2 = {
+        "_source": "uniqueHash"
+    }
     esss.queryAccessLogsUsingDsl(q2)
         .then(function(result) {
             var uniqueList2 = []
@@ -591,7 +593,7 @@ $(document).ready(function() {
                 id: "totalHits",
                 value: uniqueList2.length,
                 min: 0,
-                max: Math.floor((uniqueList2.length/3)*4),
+                max: Math.floor((uniqueList2.length / 3) * 4),
                 title: "Total Hits (to date)"
             });
             console.log("Total hits: " + uniqueList2.length);
@@ -604,7 +606,9 @@ $(document).ready(function() {
 $(document).ready(function() {
     var now = Math.floor(Date.now() / 1000)
     var week = Math.floor((Date.now() - (7 * 24 * 60 * 60 * 1000)) / 1000)
-    var q3 = {"_source": "callingIp"}
+    var q3 = {
+        "_source": "callingIp"
+    }
     esss.queryAccessLogsUsingDsl(q3)
         .then(function(result) {
             var uniqueList3 = []
@@ -618,7 +622,7 @@ $(document).ready(function() {
                 id: "uniqueVisitors",
                 value: uniqueList3.length,
                 min: 0,
-                max: Math.floor((uniqueList3.length/3)*4),
+                max: Math.floor((uniqueList3.length / 3) * 4),
                 title: "Unique Visitors (to date)"
             });
             console.log("Unique visitors: " + uniqueList3.length);
@@ -635,7 +639,7 @@ $(document).ready(function() {
                 id: "gaugeAbisUploaded",
                 value: result,
                 min: 0,
-                max: Math.floor((result/3)*4),
+                max: Math.floor((result / 3) * 4),
                 title: "Unique ABIs uploaded"
             });
             console.log("Unique ABIs uploaded: " + result);
@@ -652,7 +656,7 @@ $(document).ready(function() {
                 id: "gaugeContractsIndexed",
                 value: result,
                 min: 0,
-                max: Math.floor((result/3)*4),
+                max: Math.floor((result / 3) * 4),
                 title: "Contracts indexed"
             });
             console.log("Contracts indexed: " + result);
@@ -662,3 +666,25 @@ $(document).ready(function() {
         });
 });
 
+$(document).ready(function() {
+    esss.getAllCount()
+        .then(function(resultAll) {
+            esss.getContractCount()
+                .then(function(result) {
+                    var g = new JustGage({
+                        id: "gaugeContractsThatAdhereToAbis",
+                        value: result,
+                        min: 0,
+                        max: resultAll,
+                        title: "Contracts which adhere to ABIs"
+                    });
+                    console.log("Contracts which adhere to ABIs: " + result);
+                })
+                .catch(function() {
+                    console.log("Error");
+                });
+        })
+        .catch(function() {
+            console.log("Error");
+        });
+});
