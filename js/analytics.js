@@ -610,8 +610,8 @@ $(document).ready(function() {
             var uniqueList3 = []
             var a = JSON.parse(result);
             for (i = 0; i < a.length; i++) {
-                if (uniqueList3.indexOf(a[i]["_source"]["uniqueHash"]) == -1) {
-                    uniqueList3.push(a[i]["_source"]["uniqueHash"])
+                if (uniqueList3.indexOf(a[i]["_source"]["callingIp"]) == -1) {
+                    uniqueList3.push(a[i]["_source"]["callingIp"])
                 }
             }
             var g = new JustGage({
@@ -627,7 +627,5 @@ $(document).ready(function() {
             console.log("Error");
         });
 });
-
-uniqueVisitors
 
 
