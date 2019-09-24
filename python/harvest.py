@@ -1231,8 +1231,8 @@ class Harvest:
 
     def withinApiRequestsLimit(self, _hits, _seconds, _Ip):
         now = math.floor(time.time())
-        before = now - _seconds
-        q='''{"query":{"bool":{"must":[{"match":{"callingIp":"''' + str(_Ip) + '''"}},{"range":{"timestamp":{"gte":''' + before + ''',"lt":''' + now + '''}}}]}}, "size": 0}'''
+        before = math.floor(now - _seconds)
+        q='''{"query":{"bool":{"must":[{"match":{"callingIp":"''' + str(_Ip) + '''"}},{"range":{"timestamp":{"gte":''' + str(before) + ''',"lt":''' + str(now) + '''}}}]}}, "size": 0}'''
         esResponse = self.es.search(index=self.apiAnalyticsIndex, body=q)
         if int(esResponse["hits"]["total"]) >= int(_hits):
             return False
