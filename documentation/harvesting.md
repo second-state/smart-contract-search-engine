@@ -26,6 +26,11 @@ Pip3
 sudo apt-get -y install python3-pip
 ```
 
+Eth-Abi
+```
+python3.6 -m pip install eth-abi --user
+```
+
 Web3
 
 ```
