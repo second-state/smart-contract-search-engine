@@ -86,9 +86,12 @@ while True:
                                         print(eventSignature)
                                         print("Input type list")
                                         print(inputTypeList)
-                                        print("Event Log Values")
-                                        values = eth_abi.decode_abi(inputTypeList, data)
-                                        print("Values")
+                                        if data != "0x":
+                                            print("Event Log Values")
+                                            values = eth_abi.decode_abi(inputTypeList, str.encode(data))
+                                            print("Values")
+                                        else:
+                                            print("Indexed Log Values")
                                         #contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress)) 
                                         #logs = contractInstance.events.EventOne().processReceipt(transactionReceipt)
                                         # event_filter = harvester.web3.eth.filter({'topics': [event_signature_transfer]})
