@@ -8,6 +8,7 @@ import gzip
 import boto3
 import queue
 import random
+import eth_abi
 import argparse
 import requests
 import threading
