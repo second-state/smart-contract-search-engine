@@ -51,10 +51,13 @@ while True:
                                     selectorText = str(name) + "("
                                     inputDict = {}
                                     inputTypeList = []
+                                    inputNameList = []
                                     for input in range(0, len(inputs)):
                                         for inputKey, inputValue in inputs[input].items():
                                             inputDict[str(inputKey)] = str(inputValue)
                                             # Specifically build the selector string if the input key is type
+                                            if str(inputKey) == "name":
+                                                inputNameList.append(str(inputValue))
                                             if str(inputKey) == "type":
                                                 inputTypeList.append(str(inputValue))
                                                 if input == len(inputs) - 1:
@@ -73,25 +76,27 @@ while True:
                                         eventDict["blockNumber"] = blockNumber
                                         eventDict["from"] = sentFrom
                                         eventDict["inputs"] = inputDict
-                                        print("Transaction receipt:")
+                                        # print("Transaction receipt:")
                                         print(transactionReceipt)
-                                        print("Topics:")
+                                        # print("Topics:")
                                         topics = transactionReceipt.logs[0].topics
-                                        print(topics)
-                                        print("Data:")
+                                        # print(topics)
+                                        # print("Data:")
                                         data = transactionReceipt.logs[0].data
                                         print(data)
-                                        print("Event signature")
+                                        # print("Event signature")
                                         eventSignature = harvester.web3.toHex(harvester.web3.sha3(text=selectorText))
-                                        print(eventSignature)
-                                        print("Input type list")
-                                        print(inputTypeList)
+                                        # print(eventSignature)
+                                        # print("Input type list")
+                                        # print(inputTypeList)
                                         if data != "0x":
                                             print("Event Log Values")
-                                            values = eth_abi.decode_abi(inputTypeList, str.encode(data))
-                                            print("Values")
-                                        else:
-                                            print("Indexed Log Values")
+                                            values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                            print(values)
+                                        #     eventLogDataDict = dict(zip(inputNameList, values))
+                                        #     print(eventLogDataDict)
+                                        # else:
+                                        #     print("Indexed Log Values")
                                         #contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress)) 
                                         #logs = contractInstance.events.EventOne().processReceipt(transactionReceipt)
                                         # event_filter = harvester.web3.eth.filter({'topics': [event_signature_transfer]})
