@@ -49,10 +49,11 @@ while True:
                                     eventDict = {}
                                     # Create a selector hash
                                     selectorText = str(name) + "("
-                                    inputDict = {}
+                                    inputList = []
                                     inputTypeList = []
                                     inputNameList = []
                                     for input in range(0, len(inputs)):
+                                        inputDict = {}
                                         for inputKey, inputValue in inputs[input].items():
                                             inputDict[str(inputKey)] = str(inputValue)
                                             # Specifically build the selector string if the input key is type
@@ -64,61 +65,31 @@ while True:
                                                     selectorText = selectorText + str(inputValue) + ")"
                                                 else:
                                                     selectorText = selectorText + str(inputValue) + ","
+                                        inputList.append(inputDict)
+                                    # Creating a unique identifier for this event for ES 
                                     selectorHash = "0x" + str(harvester.web3.toHex(harvester.web3.sha3(text=selectorText)))[2:10]
                                     txEventString = str(selectorHash) + str(harvester.web3.toHex(transaction.hash))
                                     txEventKey = str(harvester.web3.toHex(harvester.web3.sha3(text=txEventString)))
                                     if harvester.hasEventBeenIndexed(harvester.eventIndex, txEventKey) != True:
-                                        eventDict["txEventKey"] = txEventKey
-                                        eventDict["id"] = str(selectorHash)
-                                        eventDict["name"] = str(name)
-                                        eventDict["contractAddress"] = contractAddress
-                                        eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
-                                        eventDict["blockNumber"] = blockNumber
-                                        eventDict["from"] = sentFrom
-                                        eventDict["inputs"] = inputDict
-                                        # print("Transaction receipt:")
-                                        print(transactionReceipt)
-                                        # print("Topics:")
-                                        topics = transactionReceipt.logs[0].topics
-                                        # print(topics)
-                                        # print("Data:")
-                                        data = transactionReceipt.logs[0].data
-                                        print(data)
-                                        # print("Event signature")
+                                        # Calculate the hash to that we can see if the transaction's topic has a match
                                         eventSignature = harvester.web3.toHex(harvester.web3.sha3(text=selectorText))
-                                        # print(eventSignature)
-                                        # print("Input type list")
-                                        # print(inputTypeList)
-                                        if data != "0x":
-                                            print("Event Log Values")
-                                            values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
-                                            print(values)
-                                        #     eventLogDataDict = dict(zip(inputNameList, values))
-                                        #     print(eventLogDataDict)
-                                        # else:
-                                        #     print("Indexed Log Values")
-                                        #contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress)) 
-                                        #logs = contractInstance.events.EventOne().processReceipt(transactionReceipt)
-                                        # event_filter = harvester.web3.eth.filter({'topics': [event_signature_transfer]})
-                                        # transfer_events = harvester.web3.eth.getFilterChanges(event_filter.filter_id)
-                                        # print(transfer_events)
-                                        # a = functools.partial(get_event_data, jsonAbi)
-                                        # print(a)
-                                        # loggy = harvester.web3.eth.getLogs({'fromBlock': blockNumber, 'toBlock': blockNumber, 'address': contractAddress})
-                                        # print(loggy)
-                                        #contractInstance = harvester.web3.eth.contract(abi=jsonAbi, address=harvester.web3.toChecksumAddress(contractAddress))
-                                        #myfilter_new=contractInstance.events.EventOne.createFilter(fromBlock=blockNumber, toBlock=blockNumber)
-                                        #print(myfilter_new)
-                                        #entries = myfilter_new.get_all_entries()
-                                        #print(entries)
-                                        #print(selectorHash)
-                                        #event_filter = harvester.web3.eth.filter({"address": contractAddress, "topics": [event_signature_hash]})
-                                        #print(event_filter)
-                                        #eventLogDataObject = contractInstance.eventFilter(str(name), {"filter": {"_from": sentFrom}})
-                                        # print(jsonAbi)
-                                        # print(contractAddress)
-                                        # print(blockNumber)
-                                        #print(sentFrom)
+                                        # Obtain the transaction's topics so we can compare
+                                        topics = harvester.web3.toHex(transactionReceipt.logs[0].topics[0])
+                                        if topics == eventSignature:
+                                            eventDict["txEventKey"] = txEventKey
+                                            eventDict["id"] = str(selectorHash)
+                                            eventDict["name"] = str(name)
+                                            eventDict["contractAddress"] = contractAddress
+                                            eventDict["TxHash"] = str(harvester.web3.toHex(transaction.hash))
+                                            eventDict["blockNumber"] = blockNumber
+                                            eventDict["from"] = sentFrom
+                                            eventDict["inputs"] = inputList
+                                            data = transactionReceipt.logs[0].data
+                                            if data != "0x":
+                                                values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                                eventLogData = dict(zip(inputNameList, values))
+                                                eventDict["eventLogData"] = eventLogData
+                                        print(eventDict)
                     else:
                         print("This contract's ABIs are not known/indexed so we can not read the event names")
                 else:
