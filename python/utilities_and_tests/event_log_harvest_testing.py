@@ -24,6 +24,11 @@ while True:
                 transactionHash = transaction.hash
                 # Check to see if this TxHash is indexed 
                 transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
+                # REMOVE THIS SECTION START
+                print("********************************")
+                print(transactionReceipt.logs[0].topics)
+                print(transactionReceipt)
+                # REMOVE THIS SECTION END
                 transactionLogs = transactionReceipt.logs
                 if (len(transactionLogs) >= 1):
                     contractAddress = transactionReceipt.logs[0]["address"]
@@ -52,20 +57,38 @@ while True:
                                     inputList = []
                                     inputTypeList = []
                                     inputNameList = []
+                                    indexedInputTypeList = []
+                                    idexedInputNameList = []
                                     for input in range(0, len(inputs)):
                                         inputDict = {}
+                                        # Set the status of a particular input's index attribute
+                                        inputIndexed = False
                                         for inputKey, inputValue in inputs[input].items():
+                                            # Create a list of input key values for the ES index
                                             inputDict[str(inputKey)] = str(inputValue)
-                                            # Specifically build the selector string if the input key is type
+                                            if str(inputKey) == "indexed":
+                                                if str(inputValue) == "false":
+                                                    inputIndexed = False
+                                                else:
+                                                    if str(inputValue) == "true":
+                                                        inputIndexed = True
+                                        inputList.append(inputDict)
+                                        # With the given status, go ahead and create the respective lists of values (indexed vs not indexed)
+                                        for inputKey, inputValue in inputs[input].items():
                                             if str(inputKey) == "name":
-                                                inputNameList.append(str(inputValue))
+                                                if inputIndexed == False:
+                                                    inputNameList.append(str(inputValue))
+                                                elif inputIndexed == True:
+                                                    idexedInputNameList.append(str(inputValue))
                                             if str(inputKey) == "type":
-                                                inputTypeList.append(str(inputValue))
+                                                if inputIndexed == False:
+                                                    inputTypeList.append(str(inputValue))
+                                                elif inputIndexed == True:
+                                                    indexedInputTypeList.append(str(inputValue))
                                                 if input == len(inputs) - 1:
                                                     selectorText = selectorText + str(inputValue) + ")"
                                                 else:
                                                     selectorText = selectorText + str(inputValue) + ","
-                                        inputList.append(inputDict)
                                     # Creating a unique identifier for this event for ES 
                                     selectorHash = "0x" + str(harvester.web3.toHex(harvester.web3.sha3(text=selectorText)))[2:10]
                                     txEventString = str(selectorHash) + str(harvester.web3.toHex(transaction.hash))
@@ -85,6 +108,7 @@ while True:
                                             eventDict["from"] = sentFrom
                                             eventDict["inputs"] = inputList
                                             data = transactionReceipt.logs[0].data
+                                            # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
                                             if data != "0x":
                                                 values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
                                                 eventLogData = dict(zip(inputNameList, values))
