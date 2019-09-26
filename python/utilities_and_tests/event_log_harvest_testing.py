@@ -2,6 +2,7 @@ import re
 import json
 import time
 import requests
+from itertools import chain
 from harvest import Harvest
 
 # import functools
@@ -24,11 +25,6 @@ while True:
                 transactionHash = transaction.hash
                 # Check to see if this TxHash is indexed 
                 transactionReceipt = harvester.web3.eth.getTransactionReceipt(transaction.hash)
-                # REMOVE THIS SECTION START
-                print("********************************")
-                print(transactionReceipt)
-                #print(transactionReceipt.logs[0].topics)
-                # REMOVE THIS SECTION END
                 transactionLogs = transactionReceipt.logs
                 if (len(transactionLogs) >= 1):
                     for transactionLog in transactionLogs:
@@ -60,7 +56,7 @@ while True:
                                             inputTypeList = []
                                             inputNameList = []
                                             indexedInputTypeList = []
-                                            idexedInputNameList = []
+                                            indexedInputNameList = []
                                             for input in range(0, len(inputs)):
                                                 inputDict = {}
                                                 # Set the status of a particular input's index attribute
@@ -69,10 +65,10 @@ while True:
                                                     # Create a list of input key values for the ES index
                                                     inputDict[str(inputKey)] = str(inputValue)
                                                     if str(inputKey) == "indexed":
-                                                        if str(inputValue) == "false":
+                                                        if inputValue == False:
                                                             inputIndexed = False
                                                         else:
-                                                            if str(inputValue) == "true":
+                                                            if inputValue == True:
                                                                 inputIndexed = True
                                                 inputList.append(inputDict)
                                                 # With the given status, go ahead and create the respective lists of values (indexed vs not indexed)
@@ -81,7 +77,7 @@ while True:
                                                         if inputIndexed == False:
                                                             inputNameList.append(str(inputValue))
                                                         elif inputIndexed == True:
-                                                            idexedInputNameList.append(str(inputValue))
+                                                            indexedInputNameList.append(str(inputValue))
                                                     if str(inputKey) == "type":
                                                         if inputIndexed == False:
                                                             inputTypeList.append(str(inputValue))
@@ -99,7 +95,7 @@ while True:
                                                 # Calculate the hash to that we can see if the transaction's topic has a match
                                                 eventSignature = harvester.web3.toHex(harvester.web3.sha3(text=selectorText))
                                                 # Obtain the transaction's topics so we can compare
-                                                topics = harvester.web3.toHex(transactionLog.topics[0])
+                                                topics = harvester.web3.toHex(transactionLog['topics'][0])
                                                 # Check to see that the topic in this transaction matches the particular ABI event that we are currently iterating over
                                                 if topics == eventSignature:
                                                     print(str(name))
@@ -112,12 +108,21 @@ while True:
                                                     eventDict["from"] = sentFrom
                                                     eventDict["inputs"] = inputList
                                                     data = transactionLog.data
-                                                #     # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
-                                                #     if data != "0x":
-                                                #         values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
-                                                #         eventLogData = dict(zip(inputNameList, values))
-                                                #         eventDict["eventLogData"] = eventLogData
-                                                # print(eventDict)
+                                                    # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
+                                                    if data != "0x":
+                                                        print("This event has a combination of indexed and non indexed inputs")
+                                                        values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                                        indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                        eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
+                                                        eventDict["eventLogData"] = eventLogData
+                                                    else:
+                                                        print(transactionLog['topics'][1:])
+                                                        print(indexedInputNameList)
+                                                        print(indexedInputTypeList)
+                                                        indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                        eventLogData = dict(zip(indexedInputNameList, indexedValues))
+                                                        eventDict["eventLogData"] = eventLogData
+                                                print(eventDict)
                             else:
                                 print("This contract's ABIs are not known/indexed so we can not read the event names")
                         else:
