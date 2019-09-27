@@ -1080,6 +1080,7 @@ class Harvest:
                     stopAtBlock = 0
                 print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
             for b in reversed(range(stopAtBlock, latestBlockNumber)):
+                blockIteration = self.web3.eth.getBlock(b)
                 transactionCount = self.web3.eth.getBlockTransactionCount(b)
                 if(transactionCount >= 1):
                     for singleTransactionInt in range(0, transactionCount):
@@ -1160,7 +1161,7 @@ class Harvest:
                                                         # Check to see that the topic in this transaction matches the particular ABI event that we are currently iterating over
                                                         if topics == eventSignature:
                                                             print(str(name))
-                                                            eventDict['timestamp'] = b['timestamp']
+                                                            eventDict["timestamp"] = blockIteration["timestamp"]
                                                             eventDict["txEventKey"] = txEventKey
                                                             eventDict["id"] = str(selectorHash)
                                                             eventDict["name"] = str(name)
