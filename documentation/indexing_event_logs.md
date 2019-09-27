@@ -107,3 +107,18 @@ As you can see the event log data correctly contains `{'sseo9': 9, 'sseo8': 10}`
 {'txEventKey': '0xc761a1c96aca12eec60751eebc4e7c47feda61b71dd9676484c32942e91d4b0e', 'id': '0x8acd1506', 'name': 'EventFive', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0x9c272f36f80f5678e67f5816a7b85d8283de5457932f6b6ee9ff1da56134dcb3', 'blockNumber': 6682356, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo10', 'type': 'uint256'}], 'eventLogData': {'sseo10': 10}}
 ```
 As you can see the event log data correctly contains `{'sseo10': 10}`
+
+# Code logic
+The logic behind the event log harvesting code is as follows.
+
+## Loop through each block
+The [code iterates over each block](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L18) (from latest to earilest)
+
+## Loop through each transaction 
+If the transaction count in the block in question is greater than 0 then [the code iterates through each transaction](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L22)
+
+## Loop through log events
+A transaction can have more than one event log (as we have demonstrated above). [The code iterates through all of the event logs](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L30), processing each one individually.
+
+## Loop through all ABIs
+The smart contract search engine facilitates the indexing of contract which have many nested ABIs (a side effect of inheritence). [The code fetches the ABIs which pertain to a given contract address and then processes the event log in question in accordance with that specific ABI](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L34)
