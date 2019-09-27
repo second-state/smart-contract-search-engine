@@ -1182,10 +1182,10 @@ class Harvest:
                                                                 print(indexedInputTypeList)
                                                                 indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
                                                                 eventLogData = dict(zip(indexedInputNameList, indexedValues))
-                                                        if len(eventLogData) >= 1:
-                                                            eventDict["eventLogData"] = eventLogData
-                                                            print(eventDict)
-                                                            indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(eventDict))
+                                                            if len(eventLogData) >= 1:
+                                                                eventDict["eventLogData"] = eventLogData
+                                                                print(eventDict)
+                                                                indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(eventDict))
                                                     else:
                                                         print("We have already indexed this event log")
                                     else:
