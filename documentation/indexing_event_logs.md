@@ -76,3 +76,21 @@ As you can see the event log data correctly contains `{'sseo1': 10, 'sseo2': 9}`
 {'txEventKey': '0x49789c8e85529c0bac1d1885a9802d462a40655527c39357e0aa1ed0b263bf10', 'id': '0x9021d3b7', 'name': 'EventTwo', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0x7219d89c29cde95ba14c3d20cdd8343b4c143d9e3b5891dce96bc3b5d7bb0877', 'blockNumber': 6681571, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo3', 'type': 'uint256'}, {'indexed': 'False', 'name': 'sseo4', 'type': 'uint256'}], 'eventLogData': {'sseo3': 10, 'sseo4': 9}}
 ```
 As you can see the event log data correctly contains `{'sseo3': 10, 'sseo4': 9}`
+
+## Set3
+
+### EventOne
+```
+{'txEventKey': '0x8f9fdf6e63bf9898b59c52a3bd98c1b5ef6e69d1dd425096e366de6f33ca60a1', 'id': '0xdc8fec5c', 'name': 'EventOne', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0xaaa90f48b06fa6952e564ddc01b5ccc7200b43d6bdf5e6a6a9e9316166f1645b', 'blockNumber': 6682122, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo1', 'type': 'uint256'}, {'indexed': 'True', 'name': 'sseo2', 'type': 'uint256'}], 'eventLogData': {'sseo1': 10, 'sseo2': 9}}
+```
+As you can see the event log data correctly contains  {'sseo1': 10, 'sseo2': 9}
+### EventTwo
+```
+{'txEventKey': '0xcecc7ad9aa1372ac6e40fb4a34df0d648565ea5fbdfd5059807a5ae3c0c5f250', 'id': '0x9021d3b7', 'name': 'EventTwo', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0xaaa90f48b06fa6952e564ddc01b5ccc7200b43d6bdf5e6a6a9e9316166f1645b', 'blockNumber': 6682122, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo3', 'type': 'uint256'}, {'indexed': 'False', 'name': 'sseo4', 'type': 'uint256'}], 'eventLogData': {'sseo3': 10, 'sseo4': 9}}
+```
+As you can see the event log data correctly contains `{'sseo3': 10, 'sseo4': 9}`
+### EventThree
+```
+{'txEventKey': '0x21716a1728279df4f023f85401a7c922ba5166ccbd992fea8b830b4e65a5b5e3', 'id': '0x5415ac1e', 'name': 'EventThree', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0xaaa90f48b06fa6952e564ddc01b5ccc7200b43d6bdf5e6a6a9e9316166f1645b', 'blockNumber': 6682122, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo5', 'type': 'uint256'}, {'indexed': 'True', 'name': 'sseo6', 'type': 'uint256'}, {'indexed': 'False', 'name': 'sseo7', 'type': 'uint256'}], 'eventLogData': {'sseo7': 10, 'sseo5': 10, 'sseo6': 9}}
+```
+As you can see the event log data correctly contains `{'sseo7': 10, 'sseo5': 10, 'sseo6': 9}`
