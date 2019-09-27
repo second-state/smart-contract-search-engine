@@ -1184,7 +1184,7 @@ class Harvest:
                                                                 eventLogData = dict(zip(indexedInputNameList, indexedValues))
                                                                 eventDict["eventLogData"] = eventLogData
                                                         print(eventDict)
-                                                        indexResult = self.loadDataIntoElastic(self.eventIndex, str(self.web3.toHex(txEventKey)), json.dumps(eventDict))
+                                                        indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(eventDict))
                                                     else:
                                                         print("We have already indexed this event log")
                                     else:
