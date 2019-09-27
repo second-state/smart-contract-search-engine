@@ -291,6 +291,24 @@ def es_search():
     logApi(request)
     return jsonify(resultsDict["results"])
 
+@app.route("/api/es_event_search", methods=['GET', 'POST'])
+def es_event_search():
+    print(request)
+    jsonRequestData = json.loads(request.data)
+    results = elasticsearch.helpers.scan(client=harvester.es, index=harvester.eventIndex, query=jsonRequestData)
+    outerList = []
+    for returnedItem in results:
+        uniqueDict = {}
+        for rKey, rValue in returnedItem.items():
+            if str(rKey) == "_source":
+                uniqueDict["_source"] = rValue
+                outerList.append(uniqueDict)
+    resultsDict = {}
+    resultsDict["results"] = outerList
+    #print(resultsDict)
+    logApi(request)
+    return jsonify(resultsDict["results"])
+
 @app.route("/api/es_tx_search", methods=['GET', 'POST'])
 def es_tx_search():
     print(request)
