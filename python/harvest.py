@@ -14,6 +14,7 @@ import requests
 import threading
 import configparser
 from decimal import Decimal
+from itertools import chain
 import elasticsearch.helpers
 from datetime import datetime
 from operator import itemgetter
@@ -1063,6 +1064,147 @@ class Harvest:
             if self.tstateOfRecentBlocksOnly > time.time():
                 time.sleep(self.tstateOfRecentBlocksOnly - time.time())
 
+    def harvestAllEvents(self, _esIndex, _argList=[], _topup=False):
+        self.upcomingCallTimeEventHarvest = time.time()
+        while True:
+            latestBlockNumber = self.web3.eth.getBlock('latest').number
+            print("Latest block is %s" % latestBlockNumber)
+            stopAtBlock = 0
+            if _topup == True and len(_argList) == 0:
+                # This takes time so therefore 10 second block time goes back 10 blocks, 1 second block time goes back 100 blocks etc.
+                stopAtBlock = latestBlockNumber - math.floor(100 / int(self.secondsPerBlock))
+            if _topup == False and len(_argList) == 2:
+                latestBlockNumber = _argList[0]
+                stopAtBlock = latestBlockNumber - _argList[1]
+                if stopAtBlock < 0:
+                    stopAtBlock = 0
+                print("Reverse processing from block %s to block %s" %(latestBlockNumber, stopAtBlock))
+            for b in reversed(range(stopAtBlock, latestBlockNumber)):
+                transactionCount = self.web3.eth.getBlockTransactionCount(b)
+                if(transactionCount >= 1):
+                    for singleTransactionInt in range(0, transactionCount):
+                        transaction = self.web3.eth.getTransactionByBlock(b, singleTransactionInt)
+                        transactionHash = transaction.hash
+                        transactionReceipt = self.web3.eth.getTransactionReceipt(transaction.hash)
+                        transactionLogs = transactionReceipt.logs
+                        if (len(transactionLogs) >= 1):
+                            for transactionLog in transactionLogs:
+                                contractAddress = transactionLog["address"]
+                                blockNumber = transactionReceipt["blockNumber"]
+                                sentFrom = transactionReceipt["from"]
+                                if self.hasDataBeenIndexed(self.commonIndex, contractAddress) == True:
+                                    listOfAbis = self.fetchAbiShaList(contractAddress)
+                                    if listOfAbis["hits"]["total"] > 0:
+                                        for item in listOfAbis["hits"]["hits"][0]["_source"]["abiShaList"]:
+                                            jsonAbi = json.loads(self.fetchAbiUsingHash(str(item)))
+                                            for abiComponents in jsonAbi:
+                                                isEvent = False
+                                                name = ""
+                                                inputs = []
+                                                for key, value in abiComponents.items():
+                                                    if key == "inputs":
+                                                        inputs = value
+                                                    if key == "name":
+                                                        name = value
+                                                    if key == "type":
+                                                        if value == "event":
+                                                            isEvent = True
+                                                if isEvent is True and name is not "":
+                                                    eventDict = {}
+                                                    # Create a selector hash
+                                                    selectorText = str(name) + "("
+                                                    inputList = []
+                                                    inputTypeList = []
+                                                    inputNameList = []
+                                                    indexedInputTypeList = []
+                                                    indexedInputNameList = []
+                                                    for input in range(0, len(inputs)):
+                                                        inputDict = {}
+                                                        # Set the status of a particular input's index attribute
+                                                        inputIndexed = False
+                                                        for inputKey, inputValue in inputs[input].items():
+                                                            # Create a list of input key values for the ES index
+                                                            inputDict[str(inputKey)] = str(inputValue)
+                                                            if str(inputKey) == "indexed":
+                                                                if inputValue == False:
+                                                                    inputIndexed = False
+                                                                else:
+                                                                    if inputValue == True:
+                                                                        inputIndexed = True
+                                                        inputList.append(inputDict)
+                                                        # With the given status, go ahead and create the respective lists of values (indexed vs not indexed)
+                                                        for inputKey, inputValue in inputs[input].items():
+                                                            if str(inputKey) == "name":
+                                                                if inputIndexed == False:
+                                                                    inputNameList.append(str(inputValue))
+                                                                elif inputIndexed == True:
+                                                                    indexedInputNameList.append(str(inputValue))
+                                                            if str(inputKey) == "type":
+                                                                if inputIndexed == False:
+                                                                    inputTypeList.append(str(inputValue))
+                                                                elif inputIndexed == True:
+                                                                    indexedInputTypeList.append(str(inputValue))
+                                                                if input == len(inputs) - 1:
+                                                                    selectorText = selectorText + str(inputValue) + ")"
+                                                                else:
+                                                                    selectorText = selectorText + str(inputValue) + ","
+                                                    # Creating a unique identifier for this event for ES 
+                                                    selectorHash = "0x" + str(self.web3.toHex(self.web3.sha3(text=selectorText)))[2:10]
+                                                    txEventString = str(selectorHash) + str(self.web3.toHex(transaction.hash))
+                                                    txEventKey = str(self.web3.toHex(self.web3.sha3(text=txEventString)))
+                                                    if self.hasEventBeenIndexed(self.eventIndex, txEventKey) != True:
+                                                        # Calculate the hash to that we can see if the transaction's topic has a match
+                                                        eventSignature = self.web3.toHex(self.web3.sha3(text=selectorText))
+                                                        # Obtain the transaction's topics so we can compare
+                                                        topics = self.web3.toHex(transactionLog['topics'][0])
+                                                        # Check to see that the topic in this transaction matches the particular ABI event that we are currently iterating over
+                                                        if topics == eventSignature:
+                                                            print(str(name))
+                                                            eventDict["txEventKey"] = txEventKey
+                                                            eventDict["id"] = str(selectorHash)
+                                                            eventDict["name"] = str(name)
+                                                            eventDict["contractAddress"] = contractAddress
+                                                            eventDict["TxHash"] = str(self.web3.toHex(transaction.hash))
+                                                            eventDict["blockNumber"] = blockNumber
+                                                            eventDict["from"] = sentFrom
+                                                            eventDict["inputs"] = inputList
+                                                            data = transactionLog.data
+                                                            # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
+                                                            if data != "0x":
+                                                                print("This event has a combination of indexed and non indexed inputs")
+                                                                values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                                                indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                                eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
+                                                                eventDict["eventLogData"] = eventLogData
+                                                            else:
+                                                                print(transactionLog['topics'][1:])
+                                                                print(indexedInputNameList)
+                                                                print(indexedInputTypeList)
+                                                                indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                                eventLogData = dict(zip(indexedInputNameList, indexedValues))
+                                                                eventDict["eventLogData"] = eventLogData
+                                                        print(eventDict)
+                                                        indexResult = self.loadDataIntoElastic(self.eventIndex, str(self.web3.toHex(txEventKey)), json.dumps(eventDict))
+                                                    else:
+                                                        print("We have already indexed this event log")
+                                    else:
+                                        print("This contract's ABIs are not known/indexed so we can not read the event names")
+                                else:
+                                    print("We have not idexed this contract and therefore do not have the ABIs")
+                        else:
+                            print("Transaction: " + str(self.web3.toHex(transactionHash)) + " has no logs")
+                else:
+                    print("Transaction count is 0")
+            if _topup == True and len(_argList) == 0:
+                self.upcomingCallTimeEventHarvest = self.upcomingCallTimeEventHarvest + int(self.secondsPerBlock)
+                if self.upcomingCallTimeEventHarvest > time.time():
+                    time.sleep(self.upcomingCallTimeEventHarvest - time.time())
+            else:
+                if _topup == False and len(_argList) == 2:
+                    break
+
+
+
     def harvestAllContracts(self, esIndex,  _argList=[], _topup=False):
         self.upcomingCallTimeHarvest = time.time()
         while True:
@@ -1358,6 +1500,35 @@ if __name__ == "__main__":
         print("Performing topup")
         argsList = []
         harvester.harvestAllContracts(harvester.masterIndex, argsList, True)
+    elif args.mode == "full_event":
+        while True:
+            print("Performing full Event harvest")
+            latestBlockNumber = harvester.web3.eth.getBlock('latest').number
+            threadsFromConf = harvester.maxThreads
+            # Learned that there is a limitation in the number of bulk transactions which ES can process, have to throttle this here but threads can be used elsewhere i.e. state are which does not use bulk
+            if int(threadsFromConf) > 50:
+                threadsToUse = 50
+            else:
+                threadsToUse = int(threadsFromConf)
+            blocksPerThread = int(latestBlockNumber / threadsToUse)
+            harvester.fastThreads = []
+            for startingBlock in range(1, latestBlockNumber, blocksPerThread):
+                argList = []
+                argList.append(startingBlock)
+                argList.append(blocksPerThread)
+                tFullDriver = threading.Thread(target=harvester.harvestAllEvents, args=[harvester.eventIndex, argList, False])
+                tFullDriver.daemon = True
+                tFullDriver.start()
+                harvester.fastThreads.append(tFullDriver)
+            for tt in harvester.fastThreads:
+                tt.join()
+            print("Full event log harvest has fully completed, sleeping for 5 seconds and then restarting again ...")
+            time.sleep(5)
+            print("Restarting now ...")
+    elif args.mode == "topup_event":
+        print("Performing event log topup")
+        argsList = []
+        harvester.harvestAllEvents(harvester.eventIndex, argsList, True)
     elif args.mode == "tx":
         print("Performing harvest of masterindex transactions")
         harvester.harvestTransactionsDriver()
@@ -1387,6 +1558,8 @@ if __name__ == "__main__":
         print("harvest.py --mode init")
         print("harvest.py --mode full")
         print("harvest.py --mode topup")
+        print("harvest.py --mode full_event")
+        print("harvest.py --mode topup_event")
         print("harvest.py --mode state")
         print("harvest.py --mode faster_state")
         print("harvest.py --mode tx")
