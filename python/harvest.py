@@ -1160,6 +1160,7 @@ class Harvest:
                                                         # Check to see that the topic in this transaction matches the particular ABI event that we are currently iterating over
                                                         if topics == eventSignature:
                                                             print(str(name))
+                                                            eventDict['timestamp'] = b['timestamp']
                                                             eventDict["txEventKey"] = txEventKey
                                                             eventDict["id"] = str(selectorHash)
                                                             eventDict["name"] = str(name)
