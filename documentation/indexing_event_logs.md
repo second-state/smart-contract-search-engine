@@ -3,7 +3,7 @@
 This is a detailed explaination of how the smart contract search engine indexes smart contract event logs. This is for information/education purposes. This code is executed automatically as part of the search engine's normal operation. 
 
 # An example smart contract
-As you can see the smart contract below called `SimpleStorage2` inherits from `SimpleStorage`. We do this because we need to ensure that the smart contract search engine is able to harvest event logs even in situations where there are multiple nested ABIs.
+As you can see the smart contract below called `SimpleStorage2` inherits from `SimpleStorage`. We do this because we need to ensure that the smart contract search engine is able to harvest event logs even in situations where there are multiple nested ABIs. You will also notice that there a combination of indexed and non indexed inputs for each event. You will also notice that some functions emit just one event and other functions emit two or more events. These scenarios cover all bases from a testing perspective.
 
 ```
 pragma solidity >=0.4.0 <0.6.0;
@@ -58,6 +58,7 @@ When we deploy the `SimpleStorage2` contract and call each of the public functio
 
 ## Set
 Call the function by passing in the number `10` as the argument
+### EventOne
 ```
 {'txEventKey': '0x8732f795b1d16a09c9ca64e433870a9d669c36f037323f671c1c07c7f6f9171a', 'id': '0xdc8fec5c', 'name': 'EventOne', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0xaed53fa0303464ac5a399da63a8b165e04aa4f103871ed6af7d81d413824f366', 'blockNumber': 6681080, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo1', 'type': 'uint256'}, {'indexed': 'True', 'name': 'sseo2', 'type': 'uint256'}], 'eventLogData': {'sseo1': 10, 'sseo2': 9}}
 ```
@@ -65,7 +66,13 @@ As you can see the event log data correctly contains `{'sseo1': 10, 'sseo2': 9}`
 
 ## Set2
 Call the function by passing in the number `10` as the argument
+### EventOne
 ```
-{'txEventKey': '0x49789c8e85529c0bac1d1885a9802d462a40655527c39357e0aa1ed0b263bf10', 'id': '0x9021d3b7', 'name': 'EventTwo', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0x7219d89c29cde95ba14c3d20cdd8343b4c143d9e3b5891dce96bc3b5d7bb0877', 'blockNumber': 6681571, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo3', 'type': 'uint256'}, {'indexed': 'False', 'name': 'sseo4', 'type': 'uint256'}], 'eventLogData': {'sseo4': 9, 'sseo3': 10}}
+{'txEventKey': '0xed67e29135371f808d4940489f63e7da1629df6cc40eeb758f35aad1c919b60c', 'id': '0xdc8fec5c', 'name': 'EventOne', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0x7219d89c29cde95ba14c3d20cdd8343b4c143d9e3b5891dce96bc3b5d7bb0877', 'blockNumber': 6681571, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo1', 'type': 'uint256'}, {'indexed': 'True', 'name': 'sseo2', 'type': 'uint256'}], 'eventLogData': {'sseo1': 10, 'sseo2': 9}}
 ```
-As you can see the event log data correctly contains `{'sseo4': 9, 'sseo3': 10}`
+As you can see the event log data correctly contains `{'sseo1': 10, 'sseo2': 9}`
+### EventTwo
+```
+{'txEventKey': '0x49789c8e85529c0bac1d1885a9802d462a40655527c39357e0aa1ed0b263bf10', 'id': '0x9021d3b7', 'name': 'EventTwo', 'contractAddress': '0x982785C0983522079eD58FDfd92d56DdA43613ed', 'TxHash': '0x7219d89c29cde95ba14c3d20cdd8343b4c143d9e3b5891dce96bc3b5d7bb0877', 'blockNumber': 6681571, 'from': '0xd7617c5e4f0aaeb288e622764cf0d34fa5acefe8', 'inputs': [{'indexed': 'True', 'name': 'sseo3', 'type': 'uint256'}, {'indexed': 'False', 'name': 'sseo4', 'type': 'uint256'}], 'eventLogData': {'sseo3': 10, 'sseo4': 9}}
+```
+As you can see the event log data correctly contains `{'sseo3': 10, 'sseo4': 9}`
