@@ -122,3 +122,16 @@ A transaction can have more than one event log (as we have demonstrated above). 
 
 ## Loop through all ABIs
 The smart contract search engine facilitates the indexing of contract which have many nested ABIs (a side effect of inheritence). [The code fetches the ABIs which pertain to a given contract address and then processes the event log in question in accordance with that specific ABI](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L34)
+
+## Identify the contract's events and inputs
+[The code uses the contract's ABI to identify the events as well as the event's inputs](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L60). The code builds lists for event input type and event input name as well as separate lists for type and name in the event that the inputs are defined as `indexed`. This is important because the data is accessed differently depending on whether the input is indexed or not.
+
+Events which are indexed keep all of their data in the topic section of the transaction receipt. Event inputs which are not indexed keep their data in the transaction receipt's data area.
+
+## Obtaining the actual data
+Once we have all of the important information i.e blockNumber, transactioHash as well as the metadata about the event (name, type, indexed etc.) we can go ahead and get the actual data. We do not use web3 for this. Instead we determine the characteristics for each of the events and their inputs and then decode the data manually. You will notice that [the code can differentiate between events where all of the inputs are indexed vs where there is a combination of indexed and non indexed](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L112). These data extraction methods are performed as close to the metal as possible. Whilst this requires extra more complex coding, I find that it is more reliable than using high level libraries and filters etc. There have been cases where I have noticed events missing and have also experienced timeouts when creating filters which are too inclusive (which try and get all logs at once etc.)
+
+## Loading data into the ES index
+The final product from this process is an `eventDict` dictionary. [The code builds this dict automatically](https://github.com/second-state/smart-contract-search-engine/blob/master/python/utilities_and_tests/event_log_harvest_testing.py#L125). This is valid JSON and therefore can be uploaded straight into Elasticsearch.
+
+The next step for this code, now that it is all tested, is to integrate this into the single `harvest.py` file.
