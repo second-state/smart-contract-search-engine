@@ -1170,7 +1170,9 @@ class Harvest:
                                                             outerData["blockNumber"] = blockNumber
                                                             outerData["from"] = sentFrom
                                                             outerData["inputs"] = inputList
+                                                            print(transactionLog)
                                                             data = transactionLog.data
+                                                            eventLogData = {}
                                                             # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
                                                             if data != "0x":
                                                                 print("This event has a combination of indexed and non indexed inputs")
