@@ -1179,7 +1179,7 @@ class Harvest:
                                                                 print(data)
                                                                 print(inputTypeList)
                                                                 print("0")
-                                                                values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                                                values = eth_abi.decode_abi(inputTypeList[len(indexedInputTypeList)-1:], bytes.fromhex(re.split("0x", data)[1]))
                                                                 indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
                                                                 eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
                                                                 fdoo = {}
