@@ -1111,7 +1111,7 @@ class Harvest:
                                                         if value == "event":
                                                             isEvent = True
                                                 if isEvent is True and name is not "":
-                                                    eventDict = {}
+                                                    outerData = {}
                                                     # Create a selector hash
                                                     selectorText = str(name) + "("
                                                     inputList = []
@@ -1161,15 +1161,15 @@ class Harvest:
                                                         # Check to see that the topic in this transaction matches the particular ABI event that we are currently iterating over
                                                         if topics == eventSignature:
                                                             print(str(name))
-                                                            eventDict["timestamp"] = blockIteration["timestamp"]
-                                                            eventDict["txEventKey"] = txEventKey
-                                                            eventDict["id"] = str(selectorHash)
-                                                            eventDict["name"] = str(name)
-                                                            eventDict["contractAddress"] = contractAddress
-                                                            eventDict["TxHash"] = str(self.web3.toHex(transaction.hash))
-                                                            eventDict["blockNumber"] = blockNumber
-                                                            eventDict["from"] = sentFrom
-                                                            eventDict["inputs"] = inputList
+                                                            outerData["timestamp"] = blockIteration["timestamp"]
+                                                            outerData["txEventKey"] = txEventKey
+                                                            outerData["id"] = str(selectorHash)
+                                                            outerData["name"] = str(name)
+                                                            outerData["contractAddress"] = contractAddress
+                                                            outerData["TxHash"] = str(self.web3.toHex(transaction.hash))
+                                                            outerData["blockNumber"] = blockNumber
+                                                            outerData["from"] = sentFrom
+                                                            outerData["inputs"] = inputList
                                                             data = transactionLog.data
                                                             # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
                                                             if data != "0x":
@@ -1177,17 +1177,21 @@ class Harvest:
                                                                 values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
                                                                 indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
                                                                 eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
-                                                                eventDict["eventLogData"] = eventLogData
+                                                                fdoo = {}
+                                                                fdl = []
+                                                                fdl.append(eventLogData)
+                                                                fdoo["0"] = fdl
+                                                                outerData["eventLogData"] = fdoo
                                                             else:
-                                                                print(transactionLog['topics'][1:])
-                                                                print(indexedInputNameList)
-                                                                print(indexedInputTypeList)
                                                                 indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
                                                                 eventLogData = dict(zip(indexedInputNameList, indexedValues))
+                                                                fdoo = {}
+                                                                fdl = []
+                                                                fdl.append(eventLogData)
+                                                                fdoo["0"] = fdl
+                                                                outerData["eventLogData"] = fdoo
                                                             if len(eventLogData) >= 1:
-                                                                eventDict["eventLogData"] = eventLogData
-                                                                print(eventDict)
-                                                                indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(eventDict))
+                                                                indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(outerData))
                                                     else:
                                                         print("We have already indexed this event log")
                                     else:
