@@ -1174,6 +1174,9 @@ class Harvest:
                                                             # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
                                                             if data != "0x":
                                                                 print("This event has a combination of indexed and non indexed inputs")
+                                                                print(data)
+                                                                print(inputTypeList)
+                                                                print("0")
                                                                 values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
                                                                 indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
                                                                 eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
