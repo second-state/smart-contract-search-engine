@@ -1174,34 +1174,37 @@ class Harvest:
                                                             data = transactionLog.data
                                                             eventLogData = {}
                                                             # If all of the event inputs are declared in the smart contract as indexed the data will be 0x
-                                                            if data != "0x":
-                                                                print("This event has a combination of indexed and non indexed inputs")
-                                                                print("inputList"  + str(inputList))
-                                                                print("inputTypeList" + str(inputTypeList))
-                                                                print("inputNameList" + str(inputNameList))
-                                                                print("indexedInputTypeList" + str(indexedInputTypeList))
-                                                                print("indexedInputNameList" + str(indexedInputNameList))
-                                                                print(data)
-                                                                print(inputTypeList)
-                                                                print("0")
-                                                                values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
-                                                                indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
-                                                                eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
-                                                                fdoo = {}
-                                                                fdl = []
-                                                                fdl.append(eventLogData)
-                                                                fdoo["0"] = fdl
-                                                                outerData["eventLogData"] = fdoo
-                                                            else:
-                                                                indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
-                                                                eventLogData = dict(zip(indexedInputNameList, indexedValues))
-                                                                fdoo = {}
-                                                                fdl = []
-                                                                fdl.append(eventLogData)
-                                                                fdoo["0"] = fdl
-                                                                outerData["eventLogData"] = fdoo
-                                                            if len(eventLogData) >= 1:
-                                                                indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(outerData))
+                                                            try:
+                                                                if data != "0x":
+                                                                    print("This event has a combination of indexed and non indexed inputs")
+                                                                    print("inputList"  + str(inputList))
+                                                                    print("inputTypeList" + str(inputTypeList))
+                                                                    print("inputNameList" + str(inputNameList))
+                                                                    print("indexedInputTypeList" + str(indexedInputTypeList))
+                                                                    print("indexedInputNameList" + str(indexedInputNameList))
+                                                                    print(data)
+                                                                    print(inputTypeList)
+                                                                    print("0")
+                                                                    values = eth_abi.decode_abi(inputTypeList, bytes.fromhex(re.split("0x", data)[1]))
+                                                                    indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                                    eventLogData = dict(chain(zip(inputNameList, values), zip(indexedInputNameList, indexedValues)))
+                                                                    fdoo = {}
+                                                                    fdl = []
+                                                                    fdl.append(eventLogData)
+                                                                    fdoo["0"] = fdl
+                                                                    outerData["eventLogData"] = fdoo
+                                                                else:
+                                                                    indexedValues = [eth_abi.decode_single(t, v) for t, v in zip(indexedInputTypeList, transactionLog['topics'][1:])]
+                                                                    eventLogData = dict(zip(indexedInputNameList, indexedValues))
+                                                                    fdoo = {}
+                                                                    fdl = []
+                                                                    fdl.append(eventLogData)
+                                                                    fdoo["0"] = fdl
+                                                                    outerData["eventLogData"] = fdoo
+                                                                if len(eventLogData) >= 1:
+                                                                    indexResult = self.loadDataIntoElastic(self.eventIndex, txEventKey, json.dumps(outerData))
+                                                            except:
+                                                                print("Data creation and indexing section's exception - this can trigger if ABIs share the same event function signature so please ignore unless data is not being indexed as intended")
                                                     else:
                                                         print("We have already indexed this event log")
                                     else:
