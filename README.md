@@ -4,7 +4,7 @@
 
 This search engine is designed to run in two modalities:
 - local, single end-user mode (without the need for a server). See [local-mode documentation](./documentation/local_mode.md)
-- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation](documentation/global_mode.md)
+- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation](https://docs.secondstate.io/smart-contracts-search-engine/start-a-search-engine)
 
 ## Frontend Demonstration
 
