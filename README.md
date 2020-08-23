@@ -8,11 +8,7 @@ This search engine is designed to run in two modalities:
 
 ## Frontend Demonstration
 
-We have put together a: 
-- live TestNet [demonstration of the search engine running on the CyberMiles TestNet](https://testnet.cmt.search.secondstate.io)
-- live MainNet [demonstration of the search engine running on the CyberMiles MainNet](https://cmt.search.secondstate.io)
-
-Specifically, we have indexed this particular [Product Giveaway Smart Contract](https://github.com/CyberMiles/smart_contracts/blob/master/FairPlay/FairPlay.lity) from both the aforementioned networks (TestNet and MainNet).
+The smart contract search engine powers applications such as the [FairPlay DApp](https://www.fairplaydapp.com/)
 
 ---
 
