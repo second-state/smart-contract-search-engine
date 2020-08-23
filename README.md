@@ -1,10 +1,7 @@
 # Smart Contract Search Engine
 
-## Local vs Global
-
-This search engine is designed to run in two modalities:
-- local, single end-user mode (without the need for a server). See [local-mode documentation](./documentation/local_mode.md)
-- global, multiple end-user mode (where the search engine is made available to the world via a server). See [global-mode documentation](https://docs.secondstate.io/smart-contracts-search-engine/start-a-search-engine)
+# 100% Ethereum compatible
+If you would like to set up a smart contract search engine one or more of your contracts on Ethereum, Ethereum Classic or CyberMiles get in touch.
 
 ## Frontend Demonstration
 
