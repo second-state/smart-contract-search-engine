@@ -1,12 +1,16 @@
 # Smart Contract Search Engine
 
 # 100% Ethereum compatible
-If you would like to set up a smart contract search engine one or more of your contracts on Ethereum, Ethereum Classic or CyberMiles get in touch.
+If you would like to set up a smart contract search engine one or more of your contracts on Ethereum, Ethereum Classic or any other Ethereum compatible network, please get in touch so we can get you up and running.
 
 ---
 
 ## Easy to use API
 You can now access all of the data within the smart contract search engine via [a handy API called es-ss.js](https://www.npmjs.com/package/es-ss.js). This allows your DApp to query all information simply by writing a little Javascript or Node.js code.
+
+--- 
+
+## Example of a DApp which uses the smart contract search engine and the API
 
 ### General search
 
